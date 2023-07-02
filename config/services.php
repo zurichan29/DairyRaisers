@@ -14,6 +14,24 @@ return [
     |
     */
 
+    'notifications' => [
+        'firebase' => [
+            'driver' => 'firebase',
+        ],
+    ],
+    
+
+    // 'vonage' => [
+    //     'api_key' => env('VONAGE_API_KEY'),
+    //     'api_secret' => env('VONAGE_API_SECRET'),
+    //     'sms_from' => env('VONAGE_SMS_FROM'),
+    // ],
+    
+    // 'infobip' => [
+    //     'api_key' => env('INFOBIP_API_KEY'),
+    //     'api_secret' => env('INFOBIP_API_SECRET'),
+    // ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
