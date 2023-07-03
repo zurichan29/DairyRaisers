@@ -1,8 +1,9 @@
 <header class=" inset-x-0 top-0 z-auto shadow-md bg-[#fff8dc] z-[1]">
     <div class="items-center flex justify-between p-1 mt-0 max-w-[1330px] relative">
 
-        <a href="{{ URL::secure(route('index')) }}"><img src="{{ asset('images/Baka.png') }}" alt=""
-                class="logo w-[75px] ml-3 hover:animate-pulse" /></a>
+        <a href="{{ URL::secure(route('index')) }}">
+            <img src="{{ asset('images/Baka.png') }}" alt="" class="logo w-[75px] ml-3 hover:animate-pulse"/>
+        </a>
 
         <a href="{{ URL::secure(route('index')) }}"
             class="logos text-[#c98c3e] text-[2.6rem] absolute ml-[90px] font-bold hover:animate-pulse">GTDRMPC</a>
@@ -39,9 +40,9 @@
                         {{ $cartCount }}</span>
                 </a>
                 <div
-                    class="dropdown-menu hidden absolute text-white font-semibold cursor-auto  rounded-xl bg-[#5f9ea0] shadow-md mt-5 rounded z-[1]">
+                    class="dropdown-menu hidden absolute text-white border-dashed border-4 rounded-xl border-[#d3a870] font-semibold cursor-auto bg-[#5f9ea0] shadow-md mt-4 z-[1]">
                     <div
-                        class="text-left rounded-2xl border-dashed border-4 border-[#d3a870] w-[16.6rem] overflow-y-auto max-h-[36rem] flex-grow shadow-[0_.5rem_1rem_rgba(0,0,0,0.3)]">
+                        class="text-left w-[16.6rem] overflow-y-auto max-h-[36rem] flex-grow">
                         <div class="icons cart px-4">
                     
                             @if ($carts)

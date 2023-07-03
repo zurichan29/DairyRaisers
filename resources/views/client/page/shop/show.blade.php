@@ -50,7 +50,7 @@
                 </div>
             </div>
 
-            <div class="pt-2">
+            <div class="pt-[15rem]">
                 <div>
                     <label class="bg-[#5f9ea0] py-2 pl-3 pr-[30px] rounded-t-2xl font-semibold">Sort by Price <i class="fa-solid fa-sort ml-[90px]"></i></label>
                 </div>

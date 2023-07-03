@@ -1,7 +1,7 @@
 <x-layout>
     @include('client.components.header')
 
-    <div class="term-services left-0 w-full h-full">
+    <div class="term-services left-0 w-full h-[185vh]">
 
         <section class="row flex items-center">
 

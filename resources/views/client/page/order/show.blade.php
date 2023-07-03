@@ -1,7 +1,7 @@
 <x-layout>
     @include('client.components.header')
 
-    <section class="order mt-32">
+    <section class="order">
 
         <div class="custom-product">
 
@@ -55,7 +55,12 @@
                     </div>
                 @endforeach
             @else
-                <h1>NO ORDERS</h1>
+                <div class="empty block ml-[32%] mt-28 text-[#5f9ea0] justify-center text-center items-center">
+                    <img src="{{ asset('images/empty.png') }}" class="w-28 ml-[20%]" alt="">
+                    <div class="w-2/4 text-xl font-semibold text-center pt-5 pl-10">
+                        <h1>NO ORDERS</h1>
+                    </div>
+                </div>
             @endif
 
             {{-- @foreach ($order as $item)

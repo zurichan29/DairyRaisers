@@ -86,23 +86,24 @@
         }
     </script> --}}
 
-    <div class="container mt-5" style="max-width: 550px">
+    <div class="container ml-[23rem] my-16 bg-[#deb88757] text-center items-center justify-center p-8 rounded-[1rem] shadow-[0_.5rem_1rem_rgba(0,0,0,0.6)]" style="max-width: 550px">
         <div class="alert alert-danger" id="error" style="display: none;"></div>
-        <h3>Add Phone Number</h3>
+        <h3 class="mb-5 text-[#5f9ea0] font-semibold text-2xl">Add Phone Number</h3>
         <div class="alert alert-success" id="successAuth" style="display: none;"></div>
         <form>
-            <label>Phone Number:</label>
-            <input type="text" id="number" class="form-control" placeholder="+91 ********">
-            <div id="recaptcha-container"></div>
-            <button type="button" class="btn btn-primary mt-3" onclick="sendOTP();">Send OTP</button>
+            <label class="text-[#5f9ea0] text-lg font-semibold">Phone Number:</label>
+            <input type="text" id="number" class="form-control py-1 px-2 rounded text-[#5f9ea0] font-semibold" placeholder="+91 ********">
+            <div id="recaptcha-container" class=" ml-20 mt-4"></div>
+            <button type="button" class="btn btn-primary mt-3 bg-[#199696] w-fit py-2 px-5 text-white font-bold rounded hover:shadow-[1px_1px_15px_rgb(0,0,0,.3)] transition delay-80 hover:-translate-y-1 hover:scale-90 duration-300" 
+                onclick="sendOTP();">Send OTP</button>
         </form>
 
-        <div class="mb-5 mt-5">
-            <h3>Add verification code</h3>
+        <div class="mb-5 mt-16">
+            <h3 class="mb-2 text-[#5f9ea0] font-semibold text-2xl">Add verification code</h3>
             <div class="alert alert-success" id="successOtpAuth" style="display: none;"></div>
             <form>
-                <input type="text" id="verification" class="form-control" placeholder="Verification code">
-                <button type="button" class="btn btn-danger mt-3" onclick="verify()">Verify code</button>
+                <input type="text" id="verification" class="form-control py-1 px-2 rounded text-[#5f9ea0] font-semibold" placeholder="Verification code">
+                <button type="button" class="btn btn-danger mt-3 bg-[#199696] w-fit py-2 px-4 text-white font-bold text-xs rounded hover:shadow-[1px_1px_15px_rgb(0,0,0,.3)] transition delay-80 hover:-translate-y-1 hover:scale-90 duration-300" onclick="verify()">Verify code</button>
             </form>
         </div>
     </div>

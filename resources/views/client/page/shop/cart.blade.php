@@ -4,7 +4,7 @@
     <section class="icons carts">
 
         <div class="justify-center text-center items-center uppercase pb-10">
-            <h1 class="title mt-10 mb-8 text-[#199696] text-5xl font-bold">Cart</h1>
+            <h1 class="title mt-10 mb-5 text-[#199696] text-5xl font-bold">Cart</h1>
             <div><a href="{{ route('shop') }}"
                     class="text-[#5f9ea0] hover:text-[#deb887] font-semibold text-base min-w-fit hover:underline">
                     <i class="fa-solid fa-angle-left"></i> Continue Shopping</a></div>
@@ -63,9 +63,9 @@
                     </div>
                 </form>
             @else
-                <div class="empty block ml-[32%] mt-20 text-[#5f9ea0] justify-center text-center items-center">
-                    <img src="{{ asset('images/empty.png') }}" class="w-28 ml-[18%]" alt="">
-                    <div class="w-2/4 text-xl font-semibold text-center p-4">
+                <div class="empty block ml-[32%] mt-28 text-[#5f9ea0] justify-center text-center items-center">
+                    <img src="{{ asset('images/empty.png') }}" class="w-28 ml-[20%]" alt="">
+                    <div class="w-2/4 text-xl font-semibold text-center pt-5 pl-10">
                         <h1>No Cart Item</h1>
                     </div>
                 </div>
