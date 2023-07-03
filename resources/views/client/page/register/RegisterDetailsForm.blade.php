@@ -1,7 +1,7 @@
 <x-layout>
     @include('client.components.header')
     <!-- register-details.blade.php -->
-    <form action="{{ URL::secure(route('register.details.validate')) }}" method="POST">
+    <form action="{{ URL::secure(route('register.details.validate', ['mobile_number' => $mobile_number])) }}" method="POST">
         @csrf
         <label for="first_name">First Name:</label>
         <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}" required>

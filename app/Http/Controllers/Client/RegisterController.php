@@ -13,22 +13,6 @@ use Carbon\Carbon;
 
 use App\Models\User;
 
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\Notification;
-use Kreait\Firebase\Messaging\WebPushConfig;
-use Kreait\Firebase\Messaging\WebPushNotification;
-
-// use App\Notifications\SendSMSNotification;
-// use Illuminate\Support\Facades\Notification;
-
-// use Illuminate\Notifications\Messages\VonageMessage;
-// use App\Notifications\SendOTPNotification;
-
-// use Vonage\Client\Credentials\Basic;
-// use Vonage\Client as VonageClient;
-// use Vonage\Message;
-
 class RegisterController extends Controller
 {
     //
@@ -37,82 +21,99 @@ class RegisterController extends Controller
         return view('client.page.register.show');
     }
 
-    public function sendOTP(Request $request)
-    {
-
-        // return view('client.page.otp');
-
-        $factory = (new Factory)
-            ->withServiceAccount('C:\xampp\htdocs\Laravel\GTDRMPC2\config\firebase_credentials.json');
-
-        $messaging = $factory->createMessaging();
-
-
-        $webPushConfig = WebPushConfig::fromArray([
-            'notification' => [
-                'title' => 'Title',
-                'body' => 'Body',
-            ],
-        ]);
-
-        $message = CloudMessage::new()
-            ->withWebPushConfig($webPushConfig)
-            ->withTarget('phone_number', '+639760353285');
-
-        // $message = CloudMessage::new()
-        // ->withNotification(Notification::create('This is my Title', 'This is my Body so pogi.'))
-        // ->withPhoneNumber('+639760353285');
-
-        // $message = CloudMessage::withTarget('phone_number', '+639760353285')
-        //     ->withNotification(Notification::create('This is my Title', 'This is my Body so pogi.'));
-
-        $messaging->send($message);
-    }
-
     public function checkMobileNum(Request $request)
     {
         if (!auth()->check()) {
-            $request->validate([
-                'mobile_number' => ['required', 'numeric', 'regex:/^9[0-9]{9}$/'],
-            ], [
-                'mobile_number.regex' => 'The :attribute must be a valid phone number with 10 characters and starting with 9.',
-            ]);
 
-            $user = User::where('mobile_number', $request->input('mobile_number'))->whereNotNull('mobile_verified_at')->first();
+            $user = User::where('mobile_number', $request->input('number'))->first();
 
-            if ($user == null) {
-                // Mobile number is registered or not yet verified
-                // User will be redirect to another page to verify the registered mobile number
-                $otp = rand(1000, 9999);
-                $mobile_number = $request->input('mobile_number');
-                if (session()->exists('register.details')) {
-                    return redirect()->route('register.reset');
+            if ($user) {
+                if ($user->password == NULL) {
+                    return response()->json([
+                        'status' => 'no data'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'verified'
+                    ]);
                 }
-
-                if (!session()->exists('register.mobile_number')) {
-
-                    $message = "This is your OTP code: $otp. NEVER share the code to anyone.";
-
-                    if (session('register.mobile_number') != $mobile_number) {
-                        session()->remove('register.mobile_number');
-                    }
-                    session()->put('register.mobile_number', $request->input('mobile_number'));
-                    session()->put('register.mobile_verify_otp', $otp);
-                    session()->put('register.otp_expires_at', Carbon::now()->addMinutes(10));
-                    session()->put('register.verify_otp_cooldown', null);
-                    session()->put('register.resend_otp_cooldown', null);
-                    session()->put('register.mobile_verified_at', null);
-                    session()->put('register.otp_count', 0);
-                    session()->put('register.otp_resend_attempt', 0);
-                }
-                return redirect()->route('register.verify-otp');
+            } else {
+                return response()->json([
+                    'status' => 'unverified'
+                ]);
             }
 
-            throw ValidationException::withMessages([
-                'mobile_number' => 'The mobile number is already registered and verified',
+
+
+
+
+
+
+
+            // $request->validate([
+            //     'mobile_number' => ['required', 'numeric', 'regex:/^9[0-9]{9}$/'],
+            // ], [
+            //     'mobile_number.regex' => 'The :attribute must be a valid phone number with 10 characters and starting with 9.',
+            // ]);
+
+            // $user = User::where('mobile_number', $request->input('mobile_number'))->whereNotNull('mobile_verified_at')->first();
+
+            // if ($user == null) {
+            //     // Mobile number is registered or not yet verified
+            //     // User will be redirect to another page to verify the registered mobile number
+            //     $otp = rand(1000, 9999);
+            //     $mobile_number = $request->input('mobile_number');
+            //     if (session()->exists('register.details')) {
+            //         return redirect()->route('register.reset');
+            //     }
+
+            //     if (!session()->exists('register.mobile_number')) {
+
+            //         $message = "This is your OTP code: $otp. NEVER share the code to anyone.";
+
+            //         if (session('register.mobile_number') != $mobile_number) {
+            //             session()->remove('register.mobile_number');
+            //         }
+            //         session()->put('register.mobile_number', $request->input('mobile_number'));
+            //         session()->put('register.mobile_verify_otp', $otp);
+            //         session()->put('register.otp_expires_at', Carbon::now()->addMinutes(10));
+            //         session()->put('register.verify_otp_cooldown', null);
+            //         session()->put('register.resend_otp_cooldown', null);
+            //         session()->put('register.mobile_verified_at', null);
+            //         session()->put('register.otp_count', 0);
+            //         session()->put('register.otp_resend_attempt', 0);
+            //     }
+            //     return redirect()->route('register.verify-otp');
+            // }
+
+            // throw ValidationException::withMessages([
+            //     'mobile_number' => 'The mobile number is already registered and verified',
+            // ]);
+        } else {
+            return response()->json([
+                'status' => 'failed'
             ]);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        // throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function InputMobileNum(Request $request)
+    {
+        $user = User::where('mobile_number', $request->input('number'))->first();
+        if (!$user && !auth()->check()) {
+            $new_user = New User;
+            $new_user->mobile_number = $request->input('number');
+            $new_user->mobile_verified_at = Carbon::now();
+            $new_user->save();
+
+            return response()->json([
+                'status' => 'success'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed'
+            ]);
+        }
     }
 
     public function showVerifyOTPForm()
@@ -214,19 +215,19 @@ class RegisterController extends Controller
         throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
     }
 
-    public function showDetailsForm()
+    public function showDetailsForm($mobile_number)
     {
-        $user = User::where('mobile_number', session('register.mobile_number'))->first();
-        if (!$user && !auth()->check() && session()->exists('register.details') && session('register.mobile_verified_at') != null) {
-            return view('client.page.register.RegisterDetailsForm');
+        $user = User::where('mobile_number', $mobile_number)->where('password', NULL)->first();
+        if ($user && !auth()->check()) {
+            return view('client.page.register.RegisterDetailsForm', ['mobile_number' => $mobile_number]);
         }
         throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function checkDetails(Request $request)
     {
-        $user = User::where('mobile_number', session('register.mobile_number'))->first();
-        if (!$user && !auth()->check() && session()->exists('register.details') && session('register.mobile_verified_at') != null) {
+        $user = User::where('mobile_number', $request->input('mobile_number'))->where('password', NULL)->first();
+        if ($user && !auth()->check()) {
             $request->validate([
                 'first_name' => ['required', 'string', 'min:5'],
                 'last_name' => ['required', 'string', 'min:5'],
@@ -235,16 +236,11 @@ class RegisterController extends Controller
                 'password.regex' => 'The password must be at least 6 characters long and contain at least one uppercase letter and one number.',
             ]);
 
-            $user = new User;
-            $user->mobile_number = session('register.mobile_number');
             $user->mobile_verified_at = Carbon::now();
             $user->first_name = $request->input('first_name');
             $user->last_name = $request->input('last_name');
             $user->password = Hash::make($request->input('password'));
-            $user->mobile_verify_otp = session('register.mobile_verify_otp');
             $user->save();
-
-            session()->forget('register');
 
             // Log in the user automatically
             Auth::login($user);

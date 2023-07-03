@@ -11,7 +11,6 @@ use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Client\CheckoutController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -51,7 +50,7 @@ Route::post('/shop/product/add/{productId}', [ShopController::class, 'addToCart'
 /** AUTHENTICATION */
 Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login/authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-/**asd */
+
 Route::get('/buyer/forgot_password', [ResetPassController::class, 'show'])->name('forgot_password');
 Route::post('/buyer/forgot_password/validate', [ResetPassController::class, 'checkMobileNum'])->name('forgot_password.validate');
 
@@ -66,14 +65,16 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /**REGISTER */
 Route::get('/register', [RegisterController::class, 'show'])->name('register');
-Route::post('register/validate', [RegisterController::class, 'checkMobileNum'])->name('register.validate');
-Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
+Route::post('/check-mobile-number', [RegisterController::class, 'checkMobileNum'])->name('register.validate');
+Route::post('/input-mobile-number', [RegisterController::class, 'InputMobileNum']);
+Route::get('/register-details/number/{mobile_number}', [RegisterController::class, 'showDetailsForm']);
+// Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
 
-Route::get('register/verify-otp', [RegisterController::class, 'showVerifyOTPForm'])->name('register.verify-otp');
-Route::post('register/verify-otp/validate', [RegisterController::class, 'checkOTP'])->name('register.verify-otp.validate');
-Route::post('register/verify-otp/resend', [RegisterController::class, 'resendOTP'])->name('register.verify-otp.resend');
+// Route::get('register/verify-otp', [RegisterController::class, 'showVerifyOTPForm'])->name('register.verify-otp');
+// Route::post('register/verify-otp/validate', [RegisterController::class, 'checkOTP'])->name('register.verify-otp.validate');
+// Route::post('register/verify-otp/resend', [RegisterController::class, 'resendOTP'])->name('register.verify-otp.resend');
 
-Route::get('register/details', [RegisterController::class, 'showDetailsForm'])->name('register.details');
+// Route::get('register/details', [RegisterController::class, 'showDetailsForm'])->name('register.details');
 Route::post('register/details/validate', [RegisterController::class, 'checkDetails'])->name('register.details.validate');
 
 /** ORDER HISTORY */

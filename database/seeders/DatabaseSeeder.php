@@ -34,12 +34,12 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Jacalne',
             'email' => 'krischang29@gmail.com',
             'password' =>  Hash::make('2329Cjay'),
-            'mobile_number' => '9262189072',
+            'mobile_number' => '+639262189072',
             'mobile_verified_at' => Carbon::now()
         ]);
 
         User::Create([
-            'mobile_number' => '9262189071',
+            'mobile_number' => '+639872654850',
             'mobile_verify_otp' => 1234,
             'otp_expires_at' => Carbon::now()->addMinutes(10),
 
