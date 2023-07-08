@@ -1,11 +1,29 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+// import { defineConfig } from 'vite';
+// import laravel from 'laravel-vite-plugin';
+const { defineConfig } = require('vite');
+const laravel = require('laravel-vite-plugin');
 
-export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
-        }),
-    ],
+module.exports = defineConfig(({ mode }) => {
+    return {
+        plugins: [
+            laravel({
+                input: {
+                    app: 'resources/js/app.js',
+                    styles: 'resources/css/app.css',
+                },
+                output: {
+                    publicPath: '/build/',
+                    manifestPath: 'public/build/manifest.json',
+                },
+                resolveAliases: {
+                    '~': __dirname,
+                },
+                hmr: {
+                    protocol: 'ws',
+                    host: 'localhost',
+                    port: 3000,
+                },
+            }),
+        ],
+    };
 });

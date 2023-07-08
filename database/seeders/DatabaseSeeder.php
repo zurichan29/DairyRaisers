@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\User_Address;
+use App\Models\Admin;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
@@ -29,20 +30,27 @@ class DatabaseSeeder extends Seeder
         // 5. Pastillas
         // 6. Cheese
 
+        Admin::create([
+            'name' => 'Christian',
+            'email' => 'christian@dairyraisers.com',
+            'password' => Hash::make('Test123'),
+        ]);
+
         User::Create([
             'first_name' => 'christian',
             'last_name' => 'Jacalne',
             'email' => 'krischang29@gmail.com',
             'password' =>  Hash::make('2329Cjay'),
-            'mobile_number' => '+639262189072',
+            'mobile_number' => '9262189072',
             'mobile_verified_at' => Carbon::now()
         ]);
 
         User::Create([
-            'mobile_number' => '+639872654850',
-            'mobile_verify_otp' => 1234,
-            'otp_expires_at' => Carbon::now()->addMinutes(10),
-
+            'first_name' => 'admin1',
+            'last_name' => 'test',
+            'email' => 'christian@dairyraisers.com',
+            'role' => 'admin',
+            'password' => hash::make('Test123'),
         ]);
 
         User_Address::Create([

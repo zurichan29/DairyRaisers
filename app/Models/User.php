@@ -50,6 +50,10 @@ class User extends Model implements AuthenticatableContract
         'email_verified_at' => 'datetime',
     ];
 
+    public function isAdmin() {
+        return $this->role === 'admin';
+    }
+
     public function cart()
     {
         return $this->hasMany(Cart::class);

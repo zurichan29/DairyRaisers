@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -13,11 +14,11 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use App\Rules\AuthRule;
 use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-    
     public function show()
     {
         return view('client.page.auth.login');
@@ -27,43 +28,54 @@ class AuthController extends Controller
     {
         if (!auth()->check()) {
             $credentials = $request->validate([
-                'mobile_number' => ['required', 'numeric', 'regex:/^9[0-9]{9}$/'],
+                'user_field' => ['required'],
                 'password' => ['required', 'string'],
-            ], [
-                'mobile_number.regex' => 'The :attribute must be a valid phone number with 10 characters and starting with 9.',
             ]);
-            
-            // dd($request->input('password'));
-            // dd(Auth::attempt($credentials));
-            // if (Auth::attempt($credentials)) {
-                
-                // }
-                if ($this->hasTooManyLoginAttempts($request)) {
-                    return;
-                }
-                $user = User::where('mobile_number', $request->input('mobile_number'))->first();
 
-            if ($user) {
-                if ($user->mobile_verified_at == null) {
-                    return redirect()->route('verify.mobile.page', ['mobile_number' => $request->input('mobile_number')]);
-                } elseif ($user->password == null || $user->first_name == null || $user->last_name == null) {
-                    return redirect()->route('register.details.page', ['mobile_number' => $request->input('mobile_number')]);
-                }
+            if ($this->hasTooManyLoginAttempts($request)) {
+                return;
             }
 
-            // $remember = $request->input('remember', false);
+            // Check if 'user_field' is either email or mobile_number
+            $userField = $credentials['user_field'];
+            if (filter_var($userField, FILTER_VALIDATE_EMAIL)) {
+                // Use email for authentication
+                $credentials['email'] = $userField;
+                $admin = Admin::where('email', $credentials['email'])->first();
+                $user = User::where('email', $credentials['email'])->first();
+                unset($credentials['user_field']);
+            } else if (preg_match('/^9[0-9]{9}$/', $userField)) {
+                // Use mobile_number for authentication
+                $credentials['mobile_number'] = $userField;
+                $user = User::where('mobile_number', $credentials['mobile_number'])->first();
+                unset($credentials['user_field']);
+            } else {
+                return redirect()->back()->withErrors(['user_field' => 'Invalid input format.'])->withInput();
+            }
 
-            if (Auth::attempt($credentials)) {
+            if ($user && $user->role == 'user') {
+                if ($user->password == null || $user->first_name == null || $user->last_name == null) {
+                    return redirect()->route('register.details.page', ['mobile_number' => $user->mobile_number]);
+                }
+            }
+            
+            // Attempt authentication with modified credentials and remember option
+            if (Auth::attempt($credentials, $request->filled('remember'))) {
                 $this->clearLoginAttempts($request);
-                return redirect()->intended('/')->with('message', 'Login Successfully!');
+                if (auth()->user()->isAdmin()) {
+                    return redirect()->intended('/admin/dashboard')->with('message', 'Welcome Back Admin!');
+                } else {
+                    return redirect()->intended('/')->with('message', 'Login Successfully!');
+                }
             }
 
             $this->incrementLoginAttempts($request);
 
             throw ValidationException::withMessages([
-                'mobile_number' => 'The provided credentials do not match our records.',
+                'user_field' => 'The provided credentials do not match our records.',
             ])->status(422);
         }
+        
         throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
     }
 

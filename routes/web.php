@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Client\ClientController;
@@ -11,6 +13,8 @@ use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Client\CheckoutController;
+
+// use App\Http\Controllers\ProductController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -67,14 +71,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'show'])->name('register');
 Route::post('/check-mobile-number', [RegisterController::class, 'checkMobileNum'])->name('register.validate');
 Route::post('/input-mobile-number', [RegisterController::class, 'InputMobileNum']);
-Route::get('/register-details/number/{mobile_number}', [RegisterController::class, 'showDetailsForm']);
-// Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
-
-// Route::get('register/verify-otp', [RegisterController::class, 'showVerifyOTPForm'])->name('register.verify-otp');
-// Route::post('register/verify-otp/validate', [RegisterController::class, 'checkOTP'])->name('register.verify-otp.validate');
-// Route::post('register/verify-otp/resend', [RegisterController::class, 'resendOTP'])->name('register.verify-otp.resend');
-
-// Route::get('register/details', [RegisterController::class, 'showDetailsForm'])->name('register.details');
+Route::get('/register-details/number/{mobile_number}', [RegisterController::class, 'showDetailsForm'])->name('register.details.page');
 Route::post('register/details/validate', [RegisterController::class, 'checkDetails'])->name('register.details.validate');
 
 /** ORDER HISTORY */
@@ -110,9 +107,10 @@ Route::get('/verify-email/{token}', [ClientController::class, 'verifyEmail'])->n
 
 
 // ADMIN
-Route::get('/admin_dashboard', [AdminController::class, 'dashboard']);
-Route::get('/admin/pie-chart', 'ChartController@pieChart')->name('admin.pie.chart');
-Route::get('/admin/bar-chart', 'ChartController@barChart')->name('admin.bar.chart');
-Route::get('/admin/customers', [AdminController::class, 'customers']);
-Route::get('/admin/inventory', [AdminController::class, 'inventory']);
-Route::get('/admin/add_products', [AdminController::class, 'addProducts']);
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
+Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
+Route::get('/admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
+Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
+Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
