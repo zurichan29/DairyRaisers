@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('guest_users', function (Blueprint $table) {
             $table->id();
-            $table->string('guest_identifier');
+            $table->string('guest_identifier')->nullable();
             $table->string('product_name')->nullable();
             $table->timestamps();
         });

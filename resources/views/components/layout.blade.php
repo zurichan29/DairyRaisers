@@ -12,17 +12,6 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     <script src="//unpkg.com/alpinejs" defer></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        laravel: "#ef3b2d",
-                    }
-                },
-            },
-        };
-    </script>
     <title>Dairy Raisers</title>
     
 </head>
