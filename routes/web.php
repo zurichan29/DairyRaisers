@@ -27,6 +27,7 @@ use App\Http\Controllers\Client\CheckoutController;
 /* HOME */
 
 Route::get('/', [PageController::class, 'index'])->name('index');
+Route::get('/test', [PageController::class, 'test']);
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 

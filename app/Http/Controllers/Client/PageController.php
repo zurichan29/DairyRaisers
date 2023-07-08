@@ -17,6 +17,11 @@ class PageController extends Controller
 {
     //
 
+    public function test()
+    {
+        return view('test');
+    }
+
     public function index(Request $request)
     {
         $deviceIdentifier = $request->input('device_identifier');
@@ -35,7 +40,8 @@ class PageController extends Controller
     {
         $deviceIdentifier = $request->input('device_identifier');
 
-        return view('client.page.others.about', ['identifier' => $deviceIdentifier]);
+        return view('test');
+        // return view('client.page.others.about', ['identifier' => $deviceIdentifier]);
     }
 
     public function contact()
