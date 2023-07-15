@@ -95,6 +95,6 @@ class OrderController extends Controller
             }
         }
 
-        return view('client.page.order.show', ['user_order' => $user_order]);
+        return view('client.order.show', ['user_order' => $user_order]);
     }
 }

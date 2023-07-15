@@ -33,11 +33,11 @@ class ShopController extends Controller
             $products = $products->get();
             
             if ($request->ajax()) {
-                return view('client.page.shop.filteredProducts', compact('products'));
+                return view('client.shop.filteredProducts', compact('products'));
             }
-            return view('client.page.shop.show', compact('products'));
+            return view('client.shop.show', compact('products'));
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function addToCartForm($id)
@@ -50,9 +50,9 @@ class ShopController extends Controller
             $products = $products->except($product->id);
             $randomProducts = $products->random(5)->unique();
 
-            return view('client.page.shop.singleProductForm', ['product' => $product, 'randomProducts' => $randomProducts]);
+            return view('client.shop.singleProductForm', ['product' => $product, 'randomProducts' => $randomProducts]);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function addToCart(Request $request, $productId)

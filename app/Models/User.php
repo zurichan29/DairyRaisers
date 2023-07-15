@@ -3,13 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Foundation\Auth\User as Authenticatable;
 
 // class User extends Authenticatable
 class User extends Model implements AuthenticatableContract
@@ -49,10 +51,6 @@ class User extends Model implements AuthenticatableContract
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function isAdmin() {
-        return $this->role === 'admin';
-    }
 
     public function cart()
     {

@@ -19,7 +19,7 @@ class ResetPassController extends Controller
     public function show()
     {
         if (!auth()->check()) {
-            return view('client.page.resetPass.show');
+            return view('client.resetPass.show');
         }
 
         return redirect()->intended('/');
@@ -62,16 +62,16 @@ class ResetPassController extends Controller
                 'mobile_number' => 'The provided credentials do not match our records.',
             ])->status(422);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function showOTPForm()
     {
         $user = User::where('mobile_number', session('reset_password.number'))->whereNotNull('mobile_verified_at')->first();
         if ($user && !auth()->check()) {
-            return view('client.page.resetPass.OTPForm');
+            return view('client.resetPass.OTPForm');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function checkOTP(Request $request)
@@ -129,7 +129,7 @@ class ResetPassController extends Controller
                 'otp' => 'Too many attempt in verifying OTP. Please wait in ' . $remainingTime,
             ]);
         } else {
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
     }
 
@@ -162,7 +162,7 @@ class ResetPassController extends Controller
 
             return redirect()->back()->with('resend_otp', 'You have reach maximum sent of OTP. Please wait in ' . $remainingTime);
         } else {
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
     }
 
@@ -170,9 +170,9 @@ class ResetPassController extends Controller
     {
         $user = User::where('mobile_number', session('reset_password.number'))->whereNotNull('mobile_verified_at')->first();
         if ($user && !auth()->check() && session()->exists('reset_password.change')) {
-            return view('client.page.resetPass.NewPassForm');
+            return view('client.resetPass.NewPassForm');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
 
     }
 
@@ -198,7 +198,7 @@ class ResetPassController extends Controller
 
             return redirect()->route('login')->with('message', 'Password reset successfully!');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
 
     }
 }

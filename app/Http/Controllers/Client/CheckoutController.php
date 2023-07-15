@@ -56,7 +56,7 @@ class CheckoutController extends Controller
             $cart = $guest->guest_cart->where('order_number', NULL);
             $grandTotal = $cart->sum('total');
         }
-        return view('client.page.checkout.show', ['defaultAddress' => $defaultAddress, 'addresses' => $address, 'items' => $cart, 'grandTotal' => $grandTotal]);
+        return view('client.checkout.show', ['defaultAddress' => $defaultAddress, 'addresses' => $address, 'items' => $cart, 'grandTotal' => $grandTotal]);
     }
 
     public function showEditAddressForm(Request $request)
@@ -64,11 +64,11 @@ class CheckoutController extends Controller
         if (auth()->check()) {
             $address = User_Address::where('default', true)->where('user_id', auth()->user()->id)->first();
             if ($address) {
-                return view('client.page.checkout.editAddressForm', ['address' => $address]);
+                return view('client.checkout.editAddressForm', ['address' => $address]);
             }
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function checkEditAddress(Request $request)
@@ -99,9 +99,9 @@ class CheckoutController extends Controller
 
                 return redirect()->route('checkout')->with('message', 'Address updated successfully');
             }
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function makeDefaultAddress(Request $request)
@@ -155,11 +155,11 @@ class CheckoutController extends Controller
             $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
 
             if (!$user->cart) {
-                throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
 
             if (!$user->address->where('default', 1)->first()) {
-                throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
 
             $cart = $user->cart->first();

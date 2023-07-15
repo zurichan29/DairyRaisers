@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductDashboardController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\RegisterController;
 use App\Http\Controllers\Client\OrderController;
-use App\Http\Controllers\Client\ResetPassController;
 use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
@@ -25,9 +25,11 @@ use App\Http\Controllers\Client\CheckoutController;
 */
 
 /* HOME */
+Route::get('/testing', function () {
+    return view('test');
+});
 
 Route::get('/', [PageController::class, 'index'])->name('index');
-Route::get('/test', [PageController::class, 'test']);
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 
@@ -55,18 +57,16 @@ Route::post('/shop/product/add/{productId}', [ShopController::class, 'addToCart'
 /** AUTHENTICATION */
 Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login/authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-
-Route::get('/buyer/forgot_password', [ResetPassController::class, 'show'])->name('forgot_password');
-Route::post('/buyer/forgot_password/validate', [ResetPassController::class, 'checkMobileNum'])->name('forgot_password.validate');
-
-Route::get('/buyer/reset', [ResetPassController::class, 'showOTPForm'])->name('forgot_password.otp');
-Route::post('buyer/reset/validate', [ResetPassController::class, 'checkOTP'])->name('forgot_password.otp.validate');
-Route::post('/buyer/reset/resend', [ResetPassController::class, 'resendOTP'])->name('forgot_password.otp.resend');
-
-Route::get('/buyer/reset/new_password', [ResetPassController::class, 'showResetPassForm'])->name('forgot_password.reset');
-Route::post('/buyer/reset/new_password/validate', [ResetPassController::class, 'checkNewPass'])->name('forgot_password.reset.validate');
+Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name('login.administrator');
+Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
+Route::get('/reset-password', [AuthController::class, 'resetPasswordForm'])->name('reset_password');
+Route::post('/check-reset-password-form', [AuthController::class, 'checkRPForm'])->name('reset_password.check');
+Route::post('/verify-reset-password-form', [AuthController::class, 'verifyRPForm'])->name('reset_password.verify');
+Route::get('/reset-password/{number}', [AuthController::class, 'newPasswordForm'])->name('reset_password.newpassword');
+Route::post('/reset-password/{number}/verify', [AuthController::class, 'verifyNewPass'])->name('reset_password.verify_newpassword');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/logout/admin', [AuthController::class, 'logout_admin'])->name('logout.admin');
 
 /**REGISTER */
 Route::get('/register', [RegisterController::class, 'show'])->name('register');
@@ -94,24 +94,33 @@ Route::post('/profile/change_password/validate', [ClientController::class, 'vali
 
 Route::get('/profile/address', [ClientController::class, 'address'])->name('profile.address');
 Route::post('/profile/create_address', [ClientController::class, 'createAddress'])->name('create.address');
-Route::get('/profile/address/edit', [ClientController::class, 'editAddress'])->name('edit.address');
-Route::post('/profile/address/edit/validate', [ClientController::class, 'updateAddress'])->name('edit.address.validate');
+Route::delete('/profile/address/delete/{id}', [ClientController::class, 'deleteAddress'])->name('delete.address');
+Route::get('/profile/address/edit/{id}', [ClientController::class, 'editAddress'])->name('edit.address');
+Route::put('/profile/address/update/{id}', [ClientController::class, 'updateAddress'])->name('update.address');
 Route::post('/profile/address/make_default', [ClientController::class, 'defaultAddress'])->name('default.address');
 
+Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
+Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
+Route::get('/profile/email/verify', [ClientController::class, 'EmailVerifyShow'])->name('email.show');
+Route::post('/profile/change-email/verify', [ClientController::class, 'ChangeEmail'])->name('email.change');
 Route::post('/profile/create/email', [ClientController::class, 'createEmail'])->name('email.create');
 Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'])->name('email.resend');
-Route::get('/verify-email/{token}', [ClientController::class, 'verifyEmail'])->name('email.verify');
-
-
-
-
-
+Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 // ADMIN
+
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
 Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
-Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
+Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
+Route::get('/admin/variants', [ProductController::class, 'variants'])->name('admin.products.variants');
+Route::post('/admin/variants/store', [ProductController::class, 'variants_store'])->name('admin.products.variants.store');
 Route::get('/admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
 Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
 Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+Route::get('/admin/products/stock/{product}', [ProductController::class, 'stock'])->name('admin.products.stock');
+Route::post('/admin/products/stock/{product}/store', [ProductController::class, 'stock_store'])->name('admin.products.stock.store');
+Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
+Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
+Route::resource('products', ProductsController::class);

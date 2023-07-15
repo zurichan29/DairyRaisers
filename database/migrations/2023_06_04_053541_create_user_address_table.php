@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('user_address', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
+            $table->string('region');
             $table->string('province');
-            $table->string('city');
+            $table->string('municipality');
             $table->string('barangay');
             $table->string('street');
-            $table->string('label')->default(false);
+            $table->string('label')->default('home');
             $table->integer('zip_code');
             $table->boolean('default')->default(false);
             $table->string('remarks')->nullable();

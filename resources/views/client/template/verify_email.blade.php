@@ -3,7 +3,7 @@
 
 Please click the button below to verify your email address.
 
-@component('mail::button', ['url' => route('email.verify', $user->email_verify_token)])
+@component('mail::button', ['url' => route('email.verify', ['token' => $user->email_verify_token, 'email' => $user->email])])
 Verify Email
 @endcomponent
 

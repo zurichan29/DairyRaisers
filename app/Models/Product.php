@@ -16,4 +16,15 @@ class Product extends Model
     {
         return $this->hasMany(Cart::class);
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class)->orderBy('date_created', 'asc');
+    }
+
+    public function productStocks()
+    {
+        return $this->hasMany(ProductStock::class);
+    }
+    
 }

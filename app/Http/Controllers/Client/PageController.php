@@ -17,46 +17,35 @@ class PageController extends Controller
 {
     //
 
-    public function test()
-    {
-        return view('test');
-    }
-
     public function index(Request $request)
-    {
-        $deviceIdentifier = $request->input('device_identifier');
-        //dd($deviceIdentifier);
-        
-        return view('client.page.index', ['identifier' => $deviceIdentifier]);
+    {      
+        return view('client.index');
     }
 
     public function order()
     {
         $data = Product::all();
-        return view('client.page.order', ['order' => $data]);
+        return view('client.order', ['order' => $data]);
     }
 
-    public function about(Request $request)
+    public function about()
     {
-        $deviceIdentifier = $request->input('device_identifier');
-
-        return view('test');
-        // return view('client.page.others.about', ['identifier' => $deviceIdentifier]);
+        return view('client.others.about');
     }
 
     public function contact()
     {
-        return view('client.page.others.contact');
+        return view('client.others.contact');
     }
 
     public function faqs()
     {
-        return view('client.page.others.faqs');
+        return view('client.others.faqs');
     }
 
     public function terms()
     {
-        return view('client.page.others.terms');
+        return view('client.others.terms');
     }
 
     
@@ -68,13 +57,13 @@ class PageController extends Controller
 
         $data = Product::all();
 
-        return view('client.page.checkout', ['checkout' => $data]);
+        return view('client.checkout', ['checkout' => $data]);
     }
 
     public function payment()
     {
 
-        return view('client.page.payment');
+        return view('client.payment');
     }
 
     public function detail()

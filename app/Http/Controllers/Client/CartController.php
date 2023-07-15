@@ -62,7 +62,7 @@ class CartController extends Controller
             }
         }
 
-        return view('client.page.shop.cart', ['cart' => $userCart, 'grand_total' => $grand_total]);
+        return view('client.shop.cart', ['cart' => $userCart, 'grand_total' => $grand_total]);
     }
 
     public function updateQuantity(Request $request, $id)

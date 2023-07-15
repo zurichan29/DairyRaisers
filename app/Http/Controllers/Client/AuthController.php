@@ -9,11 +9,11 @@ use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
 use App\Rules\AuthRule;
 use Carbon\Carbon;
 
@@ -21,7 +21,132 @@ class AuthController extends Controller
 {
     public function show()
     {
-        return view('client.page.auth.login');
+        return view('client.auth.login');
+    }
+
+    public function show_admin()
+    {
+        if (auth()->guard('admin')->check()) {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+        return view('client.auth.admin');
+    }
+
+    public function admin_auth(Request $request)
+    {
+        if (auth()->guard('admin')->check()) {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            // Admin logged in successfully
+            return redirect()->intended('/admin/dashboard'); // Redirect to the admin dashboard or any desired page
+        } else {
+            // Failed to log in admin
+            return back()->withErrors(['email' => 'Invalid credentials']); // Redirect back to the login page with an error message
+        }
+    }
+
+    public function resetPasswordForm()
+    {
+        if (!auth()->check()) {
+            return view('client.auth.reset_password');
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function checkRPForm(Request $request)
+    {
+        if (!auth()->check()) {
+            $number = $request->input('number');
+            $country_code = '+63'; // Country code to be removed
+            $number = str_replace($country_code, '', $number);
+            $user = User::where('mobile_number', $number)->first();
+
+            if ($user) {
+                if ($user->mobile_verified_at != NULL) {
+                    return response()->json([
+                        'status' => 'verified'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'userError',
+                        'user' => $user
+
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'status' => 'userError'
+                ]);
+            }
+        }
+    }
+
+    public function verifyRPForm(Request $request)
+    {
+        if (!auth()->check()) {
+
+            $user = User::where('mobile_number', $request->input('number'))->first();
+
+            if ($user) {
+                session(['password_reset.mobile_number' => $request->input('number')]);
+
+                return response()->json([
+                    'status' => 'success'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'failed'
+                ]);
+            }
+        }
+    }
+
+    public function newPasswordForm(Request $request, $number)
+    {
+        if (!auth()->check()) {
+            $user = User::where('mobile_number', $number)->first();
+
+            if ($user && session()->exists('password_reset.mobile_number')) {
+                return view('client.auth.new_password', ['number' => $number]);
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function verifyNewPass(Request $request, $number)
+    {
+        if (!auth()->check()) {
+            $user = User::where('mobile_number', $number)->first();
+
+            if ($user && session()->exists('password_reset.mobile_number')) {
+                $request->validate([
+                    'password' => ['required', 'string', 'min:6', 'confirmed', 'regex:/^(?=.*[A-Z])(?=.*\d).+$/'],
+                ], [
+                    'password.regex' => 'The password must be at least 6 characters long and contain at least one uppercase letter and one number.',
+                ]);
+
+                $user->password = Hash::make($request->input('password'));
+                $user->save();
+
+                session()->forget('password_reset.mobile_number');
+
+                return redirect()->intended('/login')->with('success', 'Password has been successfully reset. Please enter your credentials to login.');
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function authenticate(Request $request)
@@ -41,7 +166,6 @@ class AuthController extends Controller
             if (filter_var($userField, FILTER_VALIDATE_EMAIL)) {
                 // Use email for authentication
                 $credentials['email'] = $userField;
-                $admin = Admin::where('email', $credentials['email'])->first();
                 $user = User::where('email', $credentials['email'])->first();
                 unset($credentials['user_field']);
             } else if (preg_match('/^9[0-9]{9}$/', $userField)) {
@@ -53,20 +177,14 @@ class AuthController extends Controller
                 return redirect()->back()->withErrors(['user_field' => 'Invalid input format.'])->withInput();
             }
 
-            if ($user && $user->role == 'user') {
-                if ($user->password == null || $user->first_name == null || $user->last_name == null) {
-                    return redirect()->route('register.details.page', ['mobile_number' => $user->mobile_number]);
-                }
+            if ($user->password == null || $user->first_name == null || $user->last_name == null) {
+                return redirect()->route('register.details.page', ['mobile_number' => $user->mobile_number]);
             }
-            
+
             // Attempt authentication with modified credentials and remember option
             if (Auth::attempt($credentials, $request->filled('remember'))) {
                 $this->clearLoginAttempts($request);
-                if (auth()->user()->isAdmin()) {
-                    return redirect()->intended('/admin/dashboard')->with('message', 'Welcome Back Admin!');
-                } else {
-                    return redirect()->intended('/')->with('message', 'Login Successfully!');
-                }
+                return redirect()->intended('/')->with('message', 'Login Successfully!');
             }
 
             $this->incrementLoginAttempts($request);
@@ -75,8 +193,8 @@ class AuthController extends Controller
                 'user_field' => 'The provided credentials do not match our records.',
             ])->status(422);
         }
-        
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function logout(Request $request)
@@ -86,7 +204,17 @@ class AuthController extends Controller
 
             return redirect('/')->with('message', 'You have been logged out!');
         } else {
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+    }
+
+    public function logout_admin()
+    {
+        if (auth()->guard('admin')->check()) {
+            auth()->guard('admin')->logout();
+            return redirect('/')->with('message', 'You have been logged out!');
+        } else {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
     }
 

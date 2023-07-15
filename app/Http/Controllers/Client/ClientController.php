@@ -28,9 +28,9 @@ class ClientController extends Controller
     {
         if (auth()->check()) {
             $user = User::where('id', auth()->user()->id)->first();
-            return view('client.page.profile.menu', ['user' => $user]);
+            return view('client.profile.menu', ['user' => $user]);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function address()
@@ -38,9 +38,9 @@ class ClientController extends Controller
         if (auth()->check()) {
             $address = User_Address::where('user_id', auth()->user()->id)->get();
 
-            return view('client.page.profile.address', ['addresses' => $address]);
+            return view('client.profile.address', ['addresses' => $address]);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function createAddress(Request $request)
@@ -49,25 +49,45 @@ class ClientController extends Controller
             $address = User_Address::where('user_id', auth()->user()->id)->get();
 
             if ($address->count() != 2) {
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
 
-                $request->validate([
+                $addresses = $request->validate([
+                    'region' => ['string', 'required', 'max:255'],
                     'province' => ['string', 'required', 'max:255'],
                     'barangay' => ['string', 'required', 'max:255'],
-                    'city' => ['string', 'required', 'max:255'],
+                    'municipality' => ['string', 'required', 'max:255'],
                     'street' => ['string', 'required', 'max:255'],
-                    'label' => ['required', 'max:255', 'in:home,label'],
+                    'label' => ['required', 'max:255', 'in:home,office'],
                     'zip_code' => ['integer', 'required', 'digits:4']
                 ]);
 
+
+                if (
+                    isset($addressData[$addresses['region']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
+                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+                ) {
+                    $regionName = $addressData[$request->input('region')]['region_name'];
+                    // User input is valid
+                } else {
+                    // User input is invalid
+                    throw ValidationException::withMessages([
+                        'error' => 'Something went wrong on the address value, please try again.',
+                    ]);
+                }
+
                 $user_address = new User_Address;
                 $user_address->user_id = auth()->user()->id;
+                $user_address->region = $regionName;
                 $user_address->province = $request->input('province');
-                $user_address->city = $request->input('city');
+                $user_address->municipality = $request->input('municipality');
                 $user_address->barangay = $request->input('barangay');
                 $user_address->street = $request->input('street');
                 $user_address->label = $request->input('label');
                 $user_address->zip_code = $request->input('zip_code');
-                $user_address->default = 0;
+                ($address->count() == 0) ? $user_address->default = 1 : $user_address->default = 0;
 
                 $user_address->save();
 
@@ -78,53 +98,111 @@ class ClientController extends Controller
                 'error' => 'Maximum user address',
             ]);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
-    public function editAddress(Request $request)
+    public function deleteAddress($id)
     {
-        $id = $request->query('id');
         if (auth()->check()) {
             $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->first();
+
             if ($address) {
-                return view('client.page.profile.EditAddressForm', ['address' => $address]);
+                $isDefault = $address->default;
+                $address->delete();
+
+                if ($isDefault) {
+                    $newDefaultAddress = User_Address::where('user_id', auth()->user()->id)
+                        ->where('id', '<>', $id)
+                        ->first();
+
+                    if ($newDefaultAddress) {
+                        $newDefaultAddress->default = 1;
+                        $newDefaultAddress->save();
+                    }
+                }
+                return redirect()->back()->with('success', 'User address has been deleted.');
+            } else {
+                // Address not found or does not belong to the authenticated user
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
-    public function updateAddress(Request $request)
+    public function editAddress($id)
     {
-        $id = $request->query('id');
         if (auth()->check()) {
-            $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->firstOrFail();
+            $address = User_Address::findOrFail($id)->where('user_id', auth()->user()->id)->first();
             if ($address) {
-                $request->validate([
-                    'street' => ['string', 'required', 'max:255'],
-                    'barangay' => ['string', 'required', 'max:255'],
-                    'city' => ['string', 'required', 'max:255'],
-                    'province' => ['string', 'required', 'max:255'],
-                    'zip_code' => ['numeric', 'digits:4', 'required'],
-                    'remarks' => ['string', 'required', 'max:255'],
-                    'label' => ['string', 'required'],
-                ]);
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
 
-                $address->update([
-                    'street' => $request->input('street'),
-                    'barangay' => $request->input('barangay'),
-                    'city' => $request->input('city'),
-                    'province' => $request->input('province'),
-                    'zip_code' => $request->input('zip_code'),
-                    'remarks' => $request->input('remarks'),
-                    'label' => $request->input('label'),
-                ]);
+                $allowedRegionCodes = ['01', '02', '03', '4A', '05', 'CAR', 'NCR'];
 
-                return redirect()->route('profile.address')->with('message', 'Address updated successfully');
+                $regions = array_filter($addressData, function ($regionCode) use ($allowedRegionCodes) {
+                    return in_array($regionCode, $allowedRegionCodes);
+                }, ARRAY_FILTER_USE_KEY);
+
+                return view('client.profile.EditAddressForm', compact('address', 'regions', 'addressData'));
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function updateAddress(Request $request, $id)
+    {
+        if (auth()->check()) {
+
+            $address = User_Address::findOrFail($id)->where('user_id', auth()->user()->id)->first();
+
+            if ($address) {
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
+
+                $addresses = $request->validate([
+                    'region' => ['string', 'required', 'max:255'],
+                    'province' => ['string', 'required', 'max:255'],
+                    'barangay' => ['string', 'required', 'max:255'],
+                    'municipality' => ['string', 'required', 'max:255'],
+                    'street' => ['string', 'required', 'max:255'],
+                    'label' => ['required', 'max:255', 'in:home,office'],
+                    'zip_code' => ['integer', 'required', 'digits:4']
+                ]);
+
+                if (
+                    isset($addressData[$addresses['region']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
+                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+                ) {
+                    $regionName = $addressData[$addresses['region']]['region_name'];
+                    // User input is valid
+                } else {
+                    // User input is invalid
+                    throw ValidationException::withMessages([
+                        'error' => 'Something went wrong with the address value, please try again.',
+                    ]);
+                }
+
+                $address->region = $regionName;
+                $address->province = $addresses['province'];
+                $address->municipality = $addresses['municipality'];
+                $address->barangay = $addresses['barangay'];
+                $address->street = $addresses['street'];
+                $address->label = $addresses['label'];
+                $address->zip_code = $addresses['zip_code'];
+
+                $address->save();
+
+                return redirect()->route('profile.address')->with('message', 'User Address Successfully updated');
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function defaultAddress(Request $request)
@@ -150,7 +228,7 @@ class ClientController extends Controller
             return redirect()->route('profile.address')->with('error', 'Invalid address or already set as default');
         }
 
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function editName(Request $request)
@@ -177,15 +255,15 @@ class ClientController extends Controller
                 return redirect()->back()->with('success', 'Data updated successfully');
             }
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function showChangePassForm()
     {
         if (auth()->check()) {
-            return view('client.page.profile.ChangePassForm');
+            return view('client.profile.ChangePassForm');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function validatePass(Request $request)
@@ -207,12 +285,41 @@ class ClientController extends Controller
 
             return redirect()->route('profile')->with('message', 'Password has been change successfully.');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function EmailForm()
+    {
+        if (auth()->check()) {
+            $user = User::where('id', auth()->user()->id)->first();
+            if ($user->email != NULL && $user->email_verified_at == NULL) {
+                return view('client.profile.verifyEmail', ['user' => $user]);
+            } else if ($user->email == NULL) {
+                return view('client.profile.EmailForm');
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function EmailVerifyShow()
+    {
+        if (auth()->check()) {
+            $user = User::where('id', auth()->user()->id)->first();
+            if ($user->email != NULL && $user->email_verified_at == NULL) {
+                return view('client.profile.verifyEmail', ['user' => $user]);
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function createEmail(Request $request)
     {
         if (auth()->check()) {
+            $user = User::where('id', auth()->user()->id)->first();
 
             $token = Str::random(40);
 
@@ -233,8 +340,6 @@ class ClientController extends Controller
                 $token = Str::random(40);
             }
 
-            $user = User::where('id', auth()->user()->id)->first();
-
             $request->validate([
                 'email' => 'required|email',
             ]);
@@ -245,9 +350,9 @@ class ClientController extends Controller
 
             Mail::to($user->email)->send(new VerifyEmail($user));
 
-            return redirect()->back();
+            return redirect()->route('email.show');
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function resendMail()
@@ -280,15 +385,15 @@ class ClientController extends Controller
 
             return redirect()->back()->withErrors('resend', 'You have reach maximum sent of OTP. Please wait in ' . $remainingTime);
         }
-        throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
-    public function verifyEmail($token)
+    public function verifyEmail($token, $email)
     {
-        $user = User::where('email_verify_token', $token)->first();
+        $user = User::where('email', $email)->where('email_verify_token', $token)->first();
 
         if (!$user) {
-            throw new HttpResponseException(response()->view('client.404_page', [], Response::HTTP_NOT_FOUND));
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
 
         $user->email_code_count = 0;
@@ -298,5 +403,62 @@ class ClientController extends Controller
         $user->save();
 
         return redirect('/')->with('success', 'Email verified successfully.');
+    }
+
+    public function ChangeEmailForm()
+    {
+        if (auth()->check()) {
+            $user = User::where('id', auth()->user()->id)->first();
+            if ($user->email != NULL && $user->email_verified_at == NULL) {
+                return view('client.profile.changeEmail');
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+    }
+
+    public function ChangeEmail(Request $request)
+    {
+        if (auth()->check()) {
+            $user = User::where('id', auth()->user()->id)->first();
+            if ($user->email) {
+                $token = Str::random(40);
+
+                // Validate the uniqueness of the token
+                $validator = Validator::make($request->all(), [
+                    'verification_token' => [
+                        'nullable',
+                        'string',
+                        'max:255',
+                        Rule::unique('users')->where(function ($query) use ($token) {
+                            return $query->where('verification_token', $token);
+                        }),
+                    ],
+                ]);
+
+                // If the token is not unique, generate a new one
+                if ($validator->fails()) {
+                    $token = Str::random(40);
+                }
+
+                $user = User::where('id', auth()->user()->id)->first();
+
+                $request->validate([
+                    'email' => 'required|email',
+                ]);
+
+                $user->email = $request->input('email');
+                $user->email_verify_token = $token;
+                $user->save();
+
+                Mail::to($user->email)->send(new VerifyEmail($user));
+
+                return redirect()->route('email.show');
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            }
+        }
+        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 }
