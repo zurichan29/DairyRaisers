@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <div class=" flex justify-center items-center py-28">
 
@@ -43,5 +42,4 @@
         </section>
     </div>
 
-    @include('client.components.footer')
 @endsection

@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <div class="justify-center text-center items-center uppercase pb-10">
         <h1 class="title text-center mt-10 mb-14 text-[#199696] text-5xl font-bold">Taste the Gentri's Best</h1>
@@ -135,5 +134,4 @@
         });
     </script>
 
-    @include('client.components.footer')
 @endsection

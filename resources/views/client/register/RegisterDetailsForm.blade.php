@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+
     <!-- register-details.blade.php -->
     <h1>{{ session('register.mobile_number') }}</h1>
     <form action="{{ URL::secure(route('register.details.validate', ['mobile_number' => $mobile_number])) }}" method="POST">
@@ -29,5 +29,4 @@
         <button type="submit">Register</button>
     </form>
 
-    @include('client.components.footer')
 @endsection

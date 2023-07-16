@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <div class="term-services left-0 w-full h-[185vh]">
 
@@ -57,5 +56,4 @@
         </section>
     </div>
 
-    @include('client.components.footer')
 @endsection

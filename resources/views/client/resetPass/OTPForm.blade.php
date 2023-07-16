@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+
     <form method="POST" action="{{ URL::secure(route('forgot_password.otp.validate')) }}">
         @csrf
         <h1>very sms to {{ session('reset_password.number') }}</h1>
@@ -21,5 +21,5 @@
         @endif
         <button type="submit">Resend Code</button>
     </form>
-    @include('client.components.footer')
+
 @endsection

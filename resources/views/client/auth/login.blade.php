@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <section class="form-container pb-24 pt-16 flex items-center justify-center">
         <div class="flex items-center justify-center gap-10 font-semibold w-[38rem] h-[25rem] bg-[#5f9ea098] text-center p-8 rounded-[1rem] shadow-[0_.5rem_1rem_rgba(0,0,0,0.6)]">
@@ -51,7 +50,4 @@
         </div>
     </section>
 
-    
-
-    @include('client.components.footer')
 @endsection

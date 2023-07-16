@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Variants;
 use App\Models\ProductStock;
+use App\Models\PaymentMethod;
 use App\Models\Order;
 use App\Models\User_Address;
 use App\Models\Admin;
@@ -43,18 +44,17 @@ class DatabaseSeeder extends Seeder
             'mobile_verified_at' => Carbon::now()
         ]);
 
-        // User::Create([
-        //     'first_name' => 'admin1',
-        //     'last_name' => 'test',
-        //     'email' => 'christian@dairyraisers.com',
-        //     'role' => 'admin',
-        //     'password' => hash::make('Test123'),
-        // ]);
-
         Admin::Create([
             'first_name' => 'administrator',
             'email' => 'christian@dairyraisers.com',
             'password' => hash::make('test123'),
+        ]);
+
+        PaymentMethod::Create([
+            'type' => 'Gcash',
+            'account_name' => 'Christian Jay Jacalne',
+            'account_number' => '09262189072',
+            'status' => 'Activated'
         ]);
 
         // User_Address::Create([

@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
     <div class="container ml-[23rem] my-16 bg-[#deb88757] text-center items-center justify-center p-8 rounded-[1rem] shadow-[0_.5rem_1rem_rgba(0,0,0,0.6)]"
         style="max-width: 550px">
         <div class="alert alert-danger" id="error" style="display: none;"></div>
@@ -215,5 +214,4 @@
         }
     </script>
 
-    @include('client.components.footer')
 @endsection

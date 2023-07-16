@@ -39,9 +39,13 @@
                 </div>
 
                 <div class="mb-4">
+
                     <label for="variant" class="block text-gray-700 font-semibold mb-2">Variant</label>
-                    <input type="text" name="variant" id="variant" value="{{ old('variant') }}"
-                        class="form-input rounded-md border-gray-300 @error('variant') border-red-500 @enderror" required>
+                    <select name="variant" id="variant">
+                        @foreach ($variants as $variant)
+                            <option value="{{ $variant->name }}">{{ $variant->name }}</option>
+                        @endforeach
+                    </select>
                     @error('variant')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -50,7 +54,8 @@
                 <div class="mb-4">
                     <label for="price" class="block text-gray-700 font-semibold mb-2">Price</label>
                     <input type="number" name="price" id="price" value="{{ old('price') }}"
-                        class="form-input rounded-md border-gray-300 @error('price') border-red-500 @enderror" step="0.01" required>
+                        class="form-input rounded-md border-gray-300 @error('price') border-red-500 @enderror"
+                        step="0.01" required>
                     @error('price')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror

@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+
     <div class="items-left flex text-2xl justify-between pl-8 pt-28">
         <div class="font-semibold delay-75 text-[#5f9ea0] items-center text-center">
             <a href="/cart" class="title text-center my-10 text-[#199696] hover:underline">Cart <i
@@ -152,5 +152,4 @@
             xhr.send(data);
         });
     </script>
-    @include('client.components.footer')
 @endsection

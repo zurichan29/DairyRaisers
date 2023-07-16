@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ProductDashboardController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\ProductStockController;
+use App\Http\Controllers\Admin\VariantController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Client\ClientController;
@@ -41,7 +43,7 @@ Route::get('/faqs', [PageController::class, 'faqs'])->name('faqs');
 
 Route::get('/payment', [PageController::class, 'payment']);
 
-Route::get('/detail', [PageController::class, 'detail']);
+Route::get('/detail', [PageController::class, 'detail'])->name('orders');
 
 /** CART MANAGEMENT */
 Route::get('/cart', [CartController::class, 'cart'])->name('cart');
@@ -114,13 +116,18 @@ Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('adm
 Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
 Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
-Route::get('/admin/variants', [ProductController::class, 'variants'])->name('admin.products.variants');
-Route::post('/admin/variants/store', [ProductController::class, 'variants_store'])->name('admin.products.variants.store');
+Route::get('/admin/variants', [VariantController::class, 'index'])->name('admin.products.variants');
+Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.products.variants.store');
 Route::get('/admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
 Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
 Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
-Route::get('/admin/products/stock/{product}', [ProductController::class, 'stock'])->name('admin.products.stock');
-Route::post('/admin/products/stock/{product}/store', [ProductController::class, 'stock_store'])->name('admin.products.stock.store');
+Route::get('/admin/products/stock/{product}', [ProductStockController::class, 'index'])->name('admin.products.stock');
+Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
 Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
 Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
 Route::resource('products', ProductsController::class);
+
+Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
+
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

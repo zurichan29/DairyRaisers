@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+
     <!-- verify-mobile.blade.php -->
     <form action="{{ URL::secure(route('register.verify-otp.validate')) }}" method="POST">
         @csrf
@@ -23,6 +23,4 @@
         <button type="submit">Resend Code</button>
     </form>
 
-    
-        @include('client.components.footer')
 @endsection
