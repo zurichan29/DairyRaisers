@@ -5,16 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <style>
+        .dropdown {
+            position: relative;
+        }
+    
+        .dropdown-toggle::after {
+            display: none;
+        }
+    
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            transform: translateX(-100%);
+            min-width: 10rem;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script> --}}
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/app.js') }}" defer></script>
     <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
@@ -367,8 +383,9 @@
 
 
     <!-- Bootstrap core JavaScript-->
+    
     <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script> --}}
 
     <!-- Core plugin JavaScript-->
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
@@ -380,13 +397,6 @@
     <script src="{{ asset('js/sb-admin-2/Chart.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('#dataTable').DataTable([
-                
-            ]);
-        });
-    </script>
 </body>
 
 </html>

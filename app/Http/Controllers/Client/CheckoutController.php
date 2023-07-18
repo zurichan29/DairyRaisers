@@ -10,7 +10,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
+use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Cart;
@@ -19,6 +21,7 @@ use App\Models\User_Address;
 use App\Models\GuestUser;
 use App\Models\GuestCart;
 use App\Models\GuestOrder;
+use App\Models\PaymentMethod;
 
 class CheckoutController extends Controller
 {
@@ -56,8 +59,51 @@ class CheckoutController extends Controller
             $cart = $guest->guest_cart->where('order_number', NULL);
             $grandTotal = $cart->sum('total');
         }
-        return view('client.checkout.show', ['defaultAddress' => $defaultAddress, 'addresses' => $address, 'items' => $cart, 'grandTotal' => $grandTotal]);
+
+        $paymentMethod = PaymentMethod::all();
+
+        return view('client.checkout.show', [
+            'defaultAddress' => $defaultAddress,
+            'addresses' => $address,
+            'items' => $cart,
+            'grandTotal' => $grandTotal,
+            'payment_methods' => $paymentMethod
+        ]);
     }
+
+    public function uploadAndExtractText(Request $request)
+    {
+        try {
+            // Get the uploaded file
+            $file = $request->file('formFile');
+            $validatedData = $request->validate([
+                'formFile' => 'required|file|mimes:jpeg,png,jpg',
+            ]);
+            // Validate the file upload
+            if (!$file) {
+                return response()->json(['error' => 'Invalid file upload.'], 400);
+            }
+
+            // Move the file to a temporary location
+            $path = $file->store('temp');
+
+            // Perform OCR on the image using Tesseract OCR
+            $text = (new TesseractOCR($path))->run();
+
+            // Extract the desired information from the extracted text using regular expressions
+            $pattern = '/Ref No\. (\d+)/';
+            preg_match($pattern, $text, $matches);
+            $refNo = $matches[1] ?? null;
+
+            // Return the extracted reference number
+            return response()->json(['refNo' => $refNo]);
+        } catch (\Exception $e) {
+            // Log the exception for debugging purposes
+            // Return a meaningful error message to the client
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function showEditAddressForm(Request $request)
     {
@@ -108,10 +154,10 @@ class CheckoutController extends Controller
     {
         $user = Auth::user();
         $defaultAddressId = $request->input('default_address_id');
-        
+
         // Update the default flag for user addresses
         User_Address::where('user_id', $user->id)->update(['default' => false]);
-        
+
         // Set the selected address as the default
         $address = User_Address::where('user_id', $user->id)->findOrFail($defaultAddressId);
         $address->default = true;
@@ -119,11 +165,12 @@ class CheckoutController extends Controller
 
         return response()->json([
             'address' => $address,
-            ]);
+        ]);
     }
 
     public function placeOrder(Request $request)
     {
+        dd($request);
         function generateOrderId()
         {
             $currentDate = Carbon::now();

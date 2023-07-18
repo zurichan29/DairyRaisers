@@ -86,7 +86,7 @@ Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddres
 Route::post('/checkout/edit_address/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit_address.validate');
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
-
+Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
 /** USER PROFILE OR SETTINGS */
 Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
 Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
@@ -125,9 +125,13 @@ Route::get('/admin/products/stock/{product}', [ProductStockController::class, 'i
 Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
 Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
 Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
-Route::resource('products', ProductsController::class);
 
 Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
-
+// Route::get('/admin/payment_method/create', [PaymentMethodController::class, 'create'])->name('admin.payment_method.create');
+Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
+Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
+Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
+Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::resource('products', ProductsController::class);
