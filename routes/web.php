@@ -2,13 +2,16 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ProductDashboardController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\ProductStockController;
+use App\Http\Controllers\Admin\VariantController;
+use App\Http\Controllers\Admin\OrderController as OrderManagement;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\RegisterController;
-use App\Http\Controllers\Client\OrderController;
+// use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
@@ -41,7 +44,7 @@ Route::get('/faqs', [PageController::class, 'faqs'])->name('faqs');
 
 Route::get('/payment', [PageController::class, 'payment']);
 
-Route::get('/detail', [PageController::class, 'detail']);
+Route::get('/detail', [PageController::class, 'detail'])->name('orders');
 
 /** CART MANAGEMENT */
 Route::get('/cart', [CartController::class, 'cart'])->name('cart');
@@ -80,11 +83,11 @@ Route::get('/order', [OrderController::class, 'show'])->name('order_history');
 
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit_address');
 Route::post('/checkout/edit_address/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit_address.validate');
+Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit_address');
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
-
+Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
 /** USER PROFILE OR SETTINGS */
 Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
 Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
@@ -114,13 +117,24 @@ Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('adm
 Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
 Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
-Route::get('/admin/variants', [ProductController::class, 'variants'])->name('admin.products.variants');
-Route::post('/admin/variants/store', [ProductController::class, 'variants_store'])->name('admin.products.variants.store');
+Route::get('/admin/variants', [VariantController::class, 'index'])->name('admin.products.variants');
+Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.products.variants.store');
 Route::get('/admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
 Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
 Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
-Route::get('/admin/products/stock/{product}', [ProductController::class, 'stock'])->name('admin.products.stock');
-Route::post('/admin/products/stock/{product}/store', [ProductController::class, 'stock_store'])->name('admin.products.stock.store');
+Route::get('/admin/products/stock/{product}', [ProductStockController::class, 'index'])->name('admin.products.stock');
+Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
 Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
 Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
+
+Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
+Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
+Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
+Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
+Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
+
+Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
+Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('products', ProductsController::class);

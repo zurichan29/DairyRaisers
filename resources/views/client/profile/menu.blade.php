@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <p>{{ $user->mobile_number }}</p>
     <form action="{{ route('edit.name') }}" method="POST">
@@ -19,6 +18,4 @@
     <a href="{{ route('profile.address') }}">go to address</a>
     <a href="{{ url()->previous() }}">go back</a>
 
-
-    @include('client.components.footer')
 @endsection

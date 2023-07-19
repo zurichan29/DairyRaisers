@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <div class=" flex justify-center items-center py-28">
 
@@ -12,7 +11,7 @@
                         class="fa-solid fa-circle-xmark flex text-xl ml-[270px] text-red-500 cursor-pointer"></i></a>
 
                 @csrf
-                <img src="{{ asset('images/Baka.png') }}" class="w-[10rem] ml-16" alt="">
+                <img src="{{ asset('images/Baka.png') }}" class="w-25 ml-16" alt="">
                 <h1 class="text-[#d2691e] text-2xl font-semibold pb-5">{{ $product->name }}</h1>
                 <input type="number" name="quantity" value="1"
                     class="justify-center text-center font-semibold text-[#199696] px-4 py-2 rounded-xl">
@@ -43,5 +42,4 @@
         </section>
     </div>
 
-    @include('client.components.footer')
 @endsection

@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+
     <form action="{{ route('update.address', ['id' => $address['id']]) }}" method="POST" id="addressForm">
         @csrf
         @method('PUT')
@@ -66,5 +66,4 @@
         <button type="submit">Update Address</button>
     </form>
 
-    @include('client.components.footer')
 @endsection

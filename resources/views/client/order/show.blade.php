@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <section class="order">
 
@@ -102,7 +101,4 @@
 
     </section>
 
-
-     
-    @include('client.components.footer')
 @endsection

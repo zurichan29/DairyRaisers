@@ -148,7 +148,6 @@ class ClientController extends Controller
                 throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
         }
-
         throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 

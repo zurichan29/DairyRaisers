@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <form method="POST" action="{{ URL::secure(route('profile.change_password.validate')) }}">
         @csrf
@@ -25,5 +24,4 @@
         <button type="submit">Submit</button>
     </form>
 
-    @include('client.components.footer')
 @endsection

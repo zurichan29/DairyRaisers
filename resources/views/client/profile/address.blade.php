@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     @if ($addresses)
         @foreach ($addresses as $address)
@@ -65,6 +64,5 @@
         </select>
         <button type="submit">create address</button>
     </form>
-    
-    @include('client.components.footer')
+
 @endsection

@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
+use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Cart;
@@ -19,6 +22,8 @@ use App\Models\User_Address;
 use App\Models\GuestUser;
 use App\Models\GuestCart;
 use App\Models\GuestOrder;
+use App\Models\PaymentMethod;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
@@ -28,7 +33,9 @@ class CheckoutController extends Controller
             $userId = auth()->user()->id;
             $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
             $address = $user->address;
+
             $defaultAddress = $user->address->where('default', true)->first();
+
             $cartItems = $user->cart->where('order_number', null);
             $cart = [];
             $grandTotal = $cartItems->sum('total');
@@ -56,17 +63,71 @@ class CheckoutController extends Controller
             $cart = $guest->guest_cart->where('order_number', NULL);
             $grandTotal = $cart->sum('total');
         }
-        return view('client.checkout.show', ['defaultAddress' => $defaultAddress, 'addresses' => $address, 'items' => $cart, 'grandTotal' => $grandTotal]);
+
+        $paymentMethod = PaymentMethod::all();
+
+        return view('client.checkout.show', [
+            'defaultAddress' => $defaultAddress,
+            'addresses' => $address,
+            'items' => $cart,
+            'grandTotal' => $grandTotal,
+            'payment_methods' => $paymentMethod,
+            'user' => $user
+        ]);
     }
+
+    public function uploadAndExtractText(Request $request)
+    {
+        try {
+            // Get the uploaded file
+            $file = $request->file('formFile');
+            $validatedData = $request->validate([
+                'formFile' => 'required|file|mimes:jpeg,png,jpg',
+            ]);
+            // Validate the file upload
+            if (!$file) {
+                return response()->json(['error' => 'Invalid file upload.'], 400);
+            }
+
+            // Move the file to a temporary location
+            $path = $file->store('temp');
+
+            // Perform OCR on the image using Tesseract OCR
+            $text = (new TesseractOCR($path))->run();
+
+            // Extract the desired information from the extracted text using regular expressions
+            $pattern = '/Ref No\. (\d+)/';
+            preg_match($pattern, $text, $matches);
+            $refNo = $matches[1] ?? null;
+
+            // Return the extracted reference number
+            return response()->json(['refNo' => $refNo]);
+        } catch (\Exception $e) {
+            // Log the exception for debugging purposes
+            // Return a meaningful error message to the client
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function showEditAddressForm(Request $request)
     {
         if (auth()->check()) {
             $address = User_Address::where('default', true)->where('user_id', auth()->user()->id)->first();
             if ($address) {
-                return view('client.checkout.editAddressForm', ['address' => $address]);
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
+
+                $allowedRegionCodes = ['01', '02', '03', '4A', '05', 'CAR', 'NCR'];
+
+                $regions = array_filter($addressData, function ($regionCode) use ($allowedRegionCodes) {
+                    return in_array($regionCode, $allowedRegionCodes);
+                }, ARRAY_FILTER_USE_KEY);
+
+                return view('client.checkout.editAddressForm', compact('address', 'regions', 'addressData'));
+            } else {
+                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
         throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
@@ -77,25 +138,43 @@ class CheckoutController extends Controller
         if (auth()->check()) {
             $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->firstOrFail();
             if ($address) {
-                $request->validate([
-                    'street' => ['string', 'required', 'max:255'],
-                    'barangay' => ['string', 'required', 'max:255'],
-                    'city' => ['string', 'required', 'max:255'],
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
+
+                $addresses = $request->validate([
+                    'region' => ['string', 'required', 'max:255'],
                     'province' => ['string', 'required', 'max:255'],
-                    'zip_code' => ['numeric', 'digits:4', 'required'],
-                    'remarks' => ['string', 'required', 'max:255'],
-                    'label' => ['string', 'required'],
+                    'barangay' => ['string', 'required', 'max:255'],
+                    'municipality' => ['string', 'required', 'max:255'],
+                    'street' => ['string', 'required', 'max:255'],
+                    'label' => ['required', 'max:255', 'in:home,office'],
+                    'zip_code' => ['integer', 'required', 'digits:4']
                 ]);
 
-                $address->update([
-                    'street' => $request->input('street'),
-                    'barangay' => $request->input('barangay'),
-                    'city' => $request->input('city'),
-                    'province' => $request->input('province'),
-                    'zip_code' => $request->input('zip_code'),
-                    'remarks' => $request->input('remarks'),
-                    'label' => $request->input('label'),
-                ]);
+                if (
+                    isset($addressData[$addresses['region']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
+                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+                ) {
+                    $regionName = $addressData[$addresses['region']]['region_name'];
+                    // User input is valid
+                } else {
+                    // User input is invalid
+                    throw ValidationException::withMessages([
+                        'error' => 'Something went wrong with the address value, please try again.',
+                    ]);
+                }
+
+                $address->region = $regionName;
+                $address->province = $addresses['province'];
+                $address->municipality = $addresses['municipality'];
+                $address->barangay = $addresses['barangay'];
+                $address->street = $addresses['street'];
+                $address->label = $addresses['label'];
+                $address->zip_code = $addresses['zip_code'];
+
+                $address->save();
 
                 return redirect()->route('checkout')->with('message', 'Address updated successfully');
             }
@@ -108,10 +187,10 @@ class CheckoutController extends Controller
     {
         $user = Auth::user();
         $defaultAddressId = $request->input('default_address_id');
-        
+
         // Update the default flag for user addresses
         User_Address::where('user_id', $user->id)->update(['default' => false]);
-        
+
         // Set the selected address as the default
         $address = User_Address::where('user_id', $user->id)->findOrFail($defaultAddressId);
         $address->default = true;
@@ -119,7 +198,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'address' => $address,
-            ]);
+        ]);
     }
 
     public function placeOrder(Request $request)
@@ -148,8 +227,31 @@ class CheckoutController extends Controller
         $orderID = generateOrderId();
         $request->validate([
             'remarks' => ['string', 'max:255'],
+            'payment_method' => ['required'],
+            'reference_number' => ['required', 'max:255']
         ]);
 
+        $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
+        $referenceNumber = $request->input('reference_number');
+
+        if (!$paymentMethod) {
+            throw ValidationException::withMessages([
+                'payment_method' => 'Something went wrong on the payment method, please try again.',
+            ]);
+        }
+        $validator = Validator::make($request->all(), [
+            'formFile' => 'required|image|mimes:png,jpg,jpeg',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $file = $request->file('formFile');
+        $extension = $file->getClientOriginalExtension();
+        $fileName = Str::random(40) . '.' . $extension;
+        $file->storeAs('public/images/payment_reciept', $fileName);
+        $filePath = 'images/payment_reciept' . $fileName;
         if (auth()->check()) {
             $userId = auth()->user()->id;
             $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
@@ -158,9 +260,9 @@ class CheckoutController extends Controller
                 throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
 
-            if (!$user->address->where('default', 1)->first()) {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
+            // if (!$user->address->where('default', 1)->first()) {
+            //     throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            // }
 
             $cart = $user->cart->first();
             $address = $user->address->where('default', true)->first();
@@ -168,26 +270,46 @@ class CheckoutController extends Controller
             if ($address) {
                 $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->city . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
             } else {
-                $request->validate([
+                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+                $addressData = json_decode($jsonData, true);
+
+                $addresses = $request->validate([
+                    'region' => ['string', 'required', 'max:255'],
                     'province' => ['string', 'required', 'max:255'],
                     'barangay' => ['string', 'required', 'max:255'],
-                    'city' => ['string', 'required', 'max:255'],
+                    'municipality' => ['string', 'required', 'max:255'],
                     'street' => ['string', 'required', 'max:255'],
-                    'label' => ['required', 'max:255', 'in:home,label'],
+                    'label' => ['required', 'max:255', 'in:home,office'],
                     'zip_code' => ['integer', 'required', 'digits:4']
                 ]);
 
+                if (
+                    isset($addressData[$addresses['region']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
+                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+                ) {
+                    $regionName = $addressData[$request->input('region')]['region_name'];
+                    // User input is valid
+                } else {
+                    // User input is invalid
+                    throw ValidationException::withMessages([
+                        'error' => 'Something went wrong on the address value, please try again.',
+                    ]);
+                }
+
                 $user_address = new User_Address;
                 $user_address->user_id = auth()->user()->id;
+                $user_address->region = $regionName;
                 $user_address->province = $request->input('province');
-                $user_address->city = $request->input('city');
+                $user_address->municipality = $request->input('municipality');
                 $user_address->barangay = $request->input('barangay');
                 $user_address->street = $request->input('street');
                 $user_address->label = $request->input('label');
                 $user_address->zip_code = $request->input('zip_code');
                 $user_address->default = 1;
                 $user_address->save();
-                $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('city') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
+                $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
             }
 
             Cart::where('user_id', $userId)->where('order_number', NULL)->update(['order_number' => $orderID]);
@@ -197,7 +319,9 @@ class CheckoutController extends Controller
             $order->user_address = $completeAddress;
             $order->remarks = $request->input('remarks');
             $order->grand_total = $cart->where('order_number', $orderID)->sum('total');
-            $order->payment_method = 'COD';
+            $order->payment_method = $paymentMethod->type;
+            $order->reference_number = $referenceNumber;
+            $order->payment_reciept = $filePath;
             $order->save();
         } else {
             $identifier = $request->cookie('device_identifier');
@@ -205,13 +329,17 @@ class CheckoutController extends Controller
             $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
             $cart = $guest->guest_cart->first();
 
-            $request->validate([
+            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+            $addressData = json_decode($jsonData, true);
+
+            $addresses = $request->validate([
                 'first_name' => ['string', 'required', 'max:255'],
                 'last_name' => ['string', 'required', 'max:255'],
                 'mobile_number' => ['required', 'numeric', 'digits:10', 'regex:/^9[0-9]{9}$/'],
+                'region' => ['string', 'required', 'max:255'],
                 'province' => ['string', 'required', 'max:255'],
                 'barangay' => ['string', 'required', 'max:255'],
-                'city' => ['string', 'required', 'max:255'],
+                'municipality' => ['string', 'required', 'max:255'],
                 'street' => ['string', 'required', 'max:255'],
                 'label' => ['required', 'max:255', 'in:home,office'],
                 'zip_code' => ['integer', 'required', 'digits:4']
@@ -219,7 +347,22 @@ class CheckoutController extends Controller
                 'mobile_number.regex' => 'The :attribute must be a valid phone number with 10 characters and starting with 9.',
             ]);
 
-            $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('city') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
+            if (
+                isset($addressData[$addresses['region']]) &&
+                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
+                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
+                in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+            ) {
+                $regionName = $addressData[$request->input('region')]['region_name'];
+                // User input is valid
+            } else {
+                // User input is invalid
+                throw ValidationException::withMessages([
+                    'error' => 'Something went wrong on the address value, please try again.',
+                ]);
+            }
+
+            $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
 
             GuestCart::where('guest_user_id', $guest->id)->where('order_number', NULL)->update(['order_number' => $orderID]);
             $order = new GuestOrder;

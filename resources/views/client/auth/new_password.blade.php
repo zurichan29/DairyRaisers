@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
+   
     <form method="POST" action="{{ URL::secure(route('reset_password.verify_newpassword', ['number' => $number])) }}">
         @csrf
         <label for="password">New Password:</label>
@@ -16,5 +16,4 @@
         <button type="submit">Submit</button>
     </form>
 
-    @include('client.components.footer')
 @endsection

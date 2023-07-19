@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('user_address');
             $table->string('remarks');
             $table->string('payment_method');
-            $table->string('delivery_status')->default('recieved');
+            $table->string('reference_number');
+            $table->string('payment_reciept');
+            $table->string('status')->default('Pending');
             $table->timestamps();
         });
     }

@@ -38,7 +38,8 @@
 
                 <div class="mb-4">
                     <label for="img" class="block text-gray-700 font-semibold mb-2">Update Image</label>
-                    <input type="file" name="img" id="img" class="form-input rounded-md border-gray-300 @error('img') border-red-500 @enderror">
+                    <input type="file" name="img" id="img"
+                        class="form-input rounded-md border-gray-300 @error('img') border-red-500 @enderror">
                     @error('img')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -46,8 +47,12 @@
 
                 <div class="mb-4">
                     <label for="variant" class="block text-gray-700 font-semibold mb-2">Variant</label>
-                    <input type="text" name="variant" id="variant" value="{{ old('variant', $product->variant) }}"
-                        class="form-input rounded-md border-gray-300 @error('variant') border-red-500 @enderror" required>
+                    <select name="variant" id="variant">
+                        @foreach ($variants as $variant)
+                            <option value="{{ $variant->name }}"
+                                {{ $variant->name == $product->variant ? 'selected' : '' }}>{{ $variant->name }}</option>
+                        @endforeach
+                    </select>
                     @error('variant')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror

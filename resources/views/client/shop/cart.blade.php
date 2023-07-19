@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-    @include('client.components.header')
 
     <section class="icons carts">
 
@@ -21,10 +20,11 @@
                         <div class="cart-item grid grid-cols-5 bg-white p-4 border-b-[.1rem] border-gray-300 grid grid-cols-4 gap-4 justify-center items-center text-right py-8"
                             data-cart-id="{{ $item['cartId'] }}">
                             {{-- INCLUDE THE PICTURE --}}
-                           
+
                             <div>
-                                <span class="text-[#c98c3e] text-xl font-semibold pb-2"> <img src="{{ asset($item['img']) }}" alt=""
-                                    class="logo w-[100px] hover:animate-pulse ml-[4.5rem]" />{{ $item['name'] }}</span>
+                                <span class="text-[#c98c3e] text-xl font-semibold pb-2"> <img
+                                        src="{{ asset($item['img']) }}" alt=""
+                                        class="logo w-[100px] hover:animate-pulse ml-[4.5rem]" />{{ $item['name'] }}</span>
                             </div>
                             <div>
                                 <span class="text-[#199696] text-xl font-bold pb-2">₱ {{ $item['price'] }}.00</span>
@@ -74,10 +74,5 @@
         </div>
     </section>
 
-    
-
-    <div class="pt-[7%]">
-        @include('client.components.footer')
-        <script src="{{ asset('js/cart.js') }}"></script>
-    </div>
+    <script src="{{ asset('js/cart.js') }}"></script>
 @endsection
