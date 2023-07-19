@@ -1,51 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-        <div class="toast" id="successNotification" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-            <div class="toast-header">
-                <strong class="me-auto text-success"><i class="fa-solid fa-circle-check text-success"></i> Success</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Payment method successfully added.
-            </div>
-        </div>
-
-        <div class="toast" id="deleteNotification" role="alert" aria-live="assertive" aria-atomic="true"
-            data-bs-delay="5000">
-            <div class="toast-header">
-                <strong class="me-auto text-danger"><i class="fa-solid fa-circle-xmark text-danger"></i> Deleted</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Payment method deleted.
-            </div>
-        </div>
-
-        <div class="toast" id="statusNotification" role="alert" aria-live="assertive" aria-atomic="true"
-            data-bs-delay="5000">
-            <div class="toast-header">
-                <strong class="me-auto text-info"><i class="fa-solid fa-circle-info text-info"></i> Status Change</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Payment method status changed.
-            </div>
-        </div>
-
-        <div class="toast" id="updateNotification" role="alert" aria-live="assertive" aria-atomic="true"
-            data-bs-delay="5000">
-            <div class="toast-header">
-                <strong class="me-auto text-info"><i class="fa-solid fa-circle-info text-info"></i> Update</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Payment method updated successfully.
-            </div>
-        </div>
-    </div>
-
     <!-- Page Heading -->
     <div class="mb-4 d-flex align-items-center justify-content-between">
         <h1 class="h3 text-gray-800">Payment Methods</h1>
@@ -71,7 +26,8 @@
                         <form id="createPaymentForm">
                             @csrf
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="type" id="type" placeholder="Type">
+                                <input type="text" class="form-control" name="type" id="type"
+                                    placeholder="Type">
                                 <label for="type">Type</label>
                             </div>
                             <div class="form-floating mb-3">
@@ -140,14 +96,14 @@
                                             <i class="fa-solid fa-ellipsis-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
-                                            <a class="dropdown-item edit-btn" href="#"
-                                                data-id="{{ $method->id }}">Edit</a>
+                                            <button type="button" class="dropdown-item edit-btn"
+                                                data-id="{{ $method->id }}">Edit</button>
 
-                                            <a class="dropdown-item status-btn" href="#"
-                                                data-id="{{ $method->id }}">{{ $method->status == 'ACTIVATED' ? 'Deactivate payment method' : 'Activate payment method' }}</a>
+                                            <button type="button" class="dropdown-item status-btn" 
+                                                data-id="{{ $method->id }}">{{ $method->status == 'ACTIVATED' ? 'Deactivate payment method' : 'Activate payment method' }}</button>
                                             <hr class="dropdown-divider">
-                                            <a class="dropdown-item delete-btn" href="#"
-                                                data-id="{{ $method->id }}">Delete</a>
+                                            <button type="button" class="dropdown-item delete-btn"
+                                                data-id="{{ $method->id }}">Delete</button>
                                         </div>
                                     </div>
                                 </td>
@@ -214,10 +170,11 @@
         </div>
     </div>
 
+   
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+
             var dataTable = $('#dataTable').DataTable({
                 columns: [
                     null, // Type column
@@ -233,6 +190,55 @@
                 ],
             });
 
+            function showNotification(status, message) {
+                var notification = $('#Notification');
+                var notificationHeader = notification.find('.toast-header');
+                var notificationBody = notification.find('.toast-body');
+                var iconClass = '';
+                var headerClass = '';
+                var headerText = '';
+    
+                // Update classes, icon, and header text based on the status
+                switch (status) {
+                    case 'success':
+                        headerClass = 'bg-success';
+                        iconClass = 'fa-solid fa-circle-check';
+                        headerText = 'Success';
+                        break;
+                    case 'updated':
+                        headerClass = 'bg-info';
+                        iconClass = 'fa-solid fa-circle-info';
+                        headerText = 'Updated';
+                        break;
+                    case 'deleted':
+                        headerClass = 'bg-warning';
+                        iconClass = 'fa-solid fa-trash';
+                        headerText = 'Deleted';
+                        break;
+                    case 'error':
+                        headerClass = 'bg-danger';
+                        iconClass = 'fa-solid fa-circle-xmark';
+                        headerText = 'Error';
+                        break;
+                    default:
+                        break;
+                }
+    
+                // Update the notification content and classes
+                notificationHeader.find('strong').removeClass().addClass('me-auto').html(
+                    '<i class="me-2 fa-solid ' + iconClass + '"></i> ' + headerText);
+                notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(headerClass);
+                notificationBody.text(message);
+    
+                // Show the notification with fade-in and fade-out animations
+                notification.toast({
+                    animation: true
+                });
+    
+                // Show the notification
+                notification.toast('show');
+            }
+            
             $('#createPaymentForm').submit(function(e) {
                 e.preventDefault(); // Prevent form submission
 
@@ -262,8 +268,7 @@
                         modal.modal('hide');
 
                         // Show success notification
-                        var successNotification = $('#successNotification');
-                        successNotification.toast('show');
+                        showNotification('success', 'Payment Method successfully addded.');
 
                         // Add new row to DataTable
                         var newRow = [
@@ -339,9 +344,8 @@
                             statusBadge.addClass(newBg);
                             statusBadge.text(newStatus);
 
-                            // Show success notification
-                            var statusNotification = $('#statusNotification');
-                            statusNotification.toast('show');
+                            // Show notification
+                            showNotification('updated', 'Payment Method status changed.');
                         },
                         error: function(error) {
                             console.error(error);
@@ -361,7 +365,7 @@
                 $('#editType').val(type);
                 $('#editAccountName').val(accountName);
                 $('#editAccountNumber').val(accountNumber);
-
+                
                 // Store the row data as a data attribute on the form
                 var row = $(this).closest('tr');
                 $('#editPaymentMethodForm').data('row', row);
@@ -384,8 +388,7 @@
                         $('#editPaymentMethodModal').modal('hide');
 
                         // Show success notification
-                        var updateNotification = $('#updateNotification');
-                        updateNotification.toast('show');
+                        showNotification('updated', ' Payment method updated successfully.');
 
                         // Update the corresponding row in the table
                         var paymentMethodId = response.id;
@@ -452,9 +455,8 @@
                             var row = deleteButton.closest('tr');
                             dataTable.row(row).remove().draw();
 
-                            // Show success notification
-                            var deleteNotification = $('#deleteNotification');
-                            deleteNotification.toast('show');
+                            // Show notification
+                            showNotification('deleted', 'Payment Method deleted.');
                         },
                         error: function(error) {
                             console.error(error);
@@ -477,31 +479,6 @@
             }
         });
 
-        // Hide the success notification after a certain duration
-        $(document).ready(function() {
-            var successNotification = $('#successNotification');
-            successNotification.on('hidden.bs.toast', function() {
-                successNotification.toast('dispose');
-                successNotification.removeClass('fade-in');
-            });
-
-            var deleteNotification = $('#deleteNotification');
-            deleteNotification.on('hidden.bs.toast', function() {
-                deleteNotification.toast('dispose');
-                deleteNotification.removeClass('fade-in');
-            });
-
-            var statusNotification = $('#statusNotification');
-            statusNotification.on('hidden.bs.toast', function() {
-                statusNotification.toast('dispose');
-                statusNotification.removeClass('fade-in');
-            });
-
-            var editNotification = $('#editNotification');
-            editNotification.on('hidden.bs.toast', function() {
-                editNotification.toast('dispose');
-                editNotification.removeClass('fade-in');
-            });
-        });
     </script>
+   
 @endsection

@@ -16,7 +16,9 @@ class Order extends Model
       'payment_method',
       'user_address',
       'remarks',
-      'delivery_status'  
+      'status',
+      'reference_number',
+      'payment_reciept'  
     ];
 
     protected $table = 'order';

@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 class PaymentMethodController extends Controller
 {
     //
-    public function index(Request $request)
+    public function index()
     {
         if (auth()->guard('admin')->check()) {
             $payment_methods = PaymentMethod::all();

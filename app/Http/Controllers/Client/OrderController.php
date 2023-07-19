@@ -22,7 +22,7 @@ class OrderController extends Controller
         if (auth()->check()) {
 
             $user = User::with('cart.product')->with('order')->with('address')->where('id', auth()->user()->id)->first();
-            $orders = $user->order->where('delivery_status', '<>', 'delivered');
+            $orders = $user->order->where('status', '<>', 'delivered');
 
             if ($orders) {
                 foreach ($orders as $order) {

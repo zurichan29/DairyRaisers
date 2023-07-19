@@ -1,4 +1,6 @@
 import './bootstrap';
+import 'datatables.net-bs5';
+import $ from 'jquery';
 
 document.getElementById('openModalButton').addEventListener('click', function () {
     document.getElementById('myModal').classList.add('active');

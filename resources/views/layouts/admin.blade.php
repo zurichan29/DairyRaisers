@@ -9,11 +9,11 @@
         .dropdown {
             position: relative;
         }
-    
+
         .dropdown-toggle::after {
             display: none;
         }
-    
+
         .dropdown-menu {
             position: absolute;
             top: 100%;
@@ -22,23 +22,44 @@
             min-width: 10rem;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script> --}}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
+    <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-    <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/app.js') }}" defer></script>
     <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
     <title>Admin | Dairy Raisers</title>
 </head>
 
 <body id="page-top">
+    {{-- Notificaiton --}}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+        <div class="toast" id="Notification" role="alert" aria-live="assertive" aria-atomic="true"
+            data-bs-delay="5000">
+            <div class="toast-header bg-success">
+                <strong class="me-auto"><i class="fa-solid fa-circle-check"></i> Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Notification
+            </div>
+        </div>
+    </div>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -92,6 +113,12 @@
                             href="{{ route('admin.products.variants') }}">Variants</a>
                     </div>
                 </div>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.orders.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.orders.index') }}">
+                    <i class="fa-solid fa-truck-moving"></i>
+                    <span>Orders</span></a>
             </li>
 
             <li class="nav-item {{ Request::routeIs('admin.payment_method.index') ? 'active' : '' }}">
@@ -242,7 +269,7 @@
                                 </h6>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="...">
+                                        {{-- <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="..."> --}}
                                         <div class="status-indicator bg-success"></div>
                                     </div>
                                     <div class="font-weight-bold">
@@ -253,7 +280,7 @@
                                 </a>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="...">
+                                        {{-- <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="..."> --}}
                                         <div class="status-indicator"></div>
                                     </div>
                                     <div>
@@ -264,7 +291,7 @@
                                 </a>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="...">
+                                        {{-- <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="..."> --}}
                                         <div class="status-indicator bg-warning"></div>
                                     </div>
                                     <div>
@@ -381,22 +408,12 @@
         </div>
     </div>
 
-
-    <!-- Bootstrap core JavaScript-->
-    
-    <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
-    {{-- <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script> --}}
-
-    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
-
-    <!-- Custom scripts for all pages-->
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
-
-    <!-- Page level plugins -->
-    <script src="{{ asset('js/sb-admin-2/Chart.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
 </body>
 
 </html>

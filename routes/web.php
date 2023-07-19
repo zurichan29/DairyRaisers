@@ -5,12 +5,13 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\VariantController;
+use App\Http\Controllers\Admin\OrderController as OrderManagement;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\RegisterController;
-use App\Http\Controllers\Client\OrderController;
+// use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
@@ -82,8 +83,8 @@ Route::get('/order', [OrderController::class, 'show'])->name('order_history');
 
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit_address');
 Route::post('/checkout/edit_address/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit_address.validate');
+Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit_address');
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
 Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
@@ -127,11 +128,13 @@ Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])
 Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
 
 Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
-// Route::get('/admin/payment_method/create', [PaymentMethodController::class, 'create'])->name('admin.payment_method.create');
 Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
 Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
 Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
 Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
+
+Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
+Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('products', ProductsController::class);

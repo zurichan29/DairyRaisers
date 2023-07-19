@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
 
-    <script src="//unpkg.com/alpinejs" defer></script>
+    {{-- <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <link
@@ -17,8 +17,17 @@
 
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/app.js') }}" defer></script>
-    <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
+    <script src="{{ asset('js/app.js') }}" defer></script> --}}
+
+    <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
 
     <title>Dairy Raisers</title>
 
@@ -119,7 +128,7 @@
     </nav>
      <!-- Navigation -->
      
-    <main id="main-content" class="p-3">
+    <main id="main-content" class="py-3 px-5">
         @yield('content')
     </main>
 
@@ -228,13 +237,18 @@
     <script>
         var isLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
     </script>
+     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
+     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
+     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
+     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
+     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/load_address.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
-    <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script> --}}
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             var navbarHeight = document.querySelector('.navbar').offsetHeight;

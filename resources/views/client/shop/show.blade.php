@@ -72,7 +72,7 @@
                         <form method="GET" action="{{ URL::secure(route('product.view', ['id' => $product->id])) }}"
                             class="item relative p-8 bg-[#deb88757] rounded-2xl shadow-[5px_5px_20px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_15px_rgb(0,0,0,.3)] cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-[#deb88757] duration-300"
                             method="POST">
-                            <img src="{{ asset($product->img) }}" class="w-full" alt="">
+                            <img src="{{ asset($product->img) }}" class="w-25" alt="">
                             <div class="name text-xl text-[#5f9ea0] pt-0 pr-0 capitalize">{{ $product->name }}</div>
                             <div class="pt-2 pr-0 text-[#d2691e] text-2xl">₱ <span>{{ $product->price }}</span></div>
                             <button

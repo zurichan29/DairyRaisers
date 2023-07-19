@@ -32,7 +32,9 @@
     "license": "ISC",
     "dependencies": {
         "chart.js": "^4.3.0",
+        "datatables.net-bs5": "^1.13.5",
         "firebase": "^9.23.0",
+        "jquery": "^3.7.0",
         "tesseract.js": "^4.1.1"
     }
 }
