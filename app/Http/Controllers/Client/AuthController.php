@@ -26,6 +26,7 @@ class AuthController extends Controller
 
     public function show_admin()
     {
+        // auth()->guard('admin')->logout();
         if (auth()->guard('admin')->check()) {
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }

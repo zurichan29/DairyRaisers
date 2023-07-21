@@ -332,7 +332,6 @@ class CheckoutController extends Controller
             $order->reference_number = $referenceNumber;
             $order->delivery_option = $deliveryOption;
            
-
             if ($request->input('payment_method') != 'Cash On Delivery') {
                 // Create a new PaymentReceipt instance and save it
                 // $payment_receipt = new PaymentReciept;

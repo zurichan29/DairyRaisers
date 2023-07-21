@@ -1,13 +1,16 @@
 <?php
+use Illuminate\Support\Facades\Route;
 
+// ADMIN
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\VariantController;
 use App\Http\Controllers\Admin\OrderController as OrderManagement;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\BuffaloController;
 
+// CLIENT
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\RegisterController;
@@ -67,7 +70,7 @@ Route::post('/check-reset-password-form', [AuthController::class, 'checkRPForm']
 Route::post('/verify-reset-password-form', [AuthController::class, 'verifyRPForm'])->name('reset_password.verify');
 Route::get('/reset-password/{number}', [AuthController::class, 'newPasswordForm'])->name('reset_password.newpassword');
 Route::post('/reset-password/{number}/verify', [AuthController::class, 'verifyNewPass'])->name('reset_password.verify_newpassword');
-
+// LOGOUT
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout/admin', [AuthController::class, 'logout_admin'])->name('logout.admin');
 
@@ -88,20 +91,20 @@ Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddres
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
 Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
+
 /** USER PROFILE OR SETTINGS */
 Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
 Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
-
 Route::get('/profile/change_password', [ClientController::class, 'showChangePassForm'])->name('profile.change_password');
 Route::post('/profile/change_password/validate', [ClientController::class, 'validatePass'])->name('profile.change_password.validate');
-
+// ADDRESS
 Route::get('/profile/address', [ClientController::class, 'address'])->name('profile.address');
 Route::post('/profile/create_address', [ClientController::class, 'createAddress'])->name('create.address');
 Route::delete('/profile/address/delete/{id}', [ClientController::class, 'deleteAddress'])->name('delete.address');
 Route::get('/profile/address/edit/{id}', [ClientController::class, 'editAddress'])->name('edit.address');
 Route::put('/profile/address/update/{id}', [ClientController::class, 'updateAddress'])->name('update.address');
 Route::post('/profile/address/make_default', [ClientController::class, 'defaultAddress'])->name('default.address');
-
+// EMAIL
 Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
 Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
 Route::get('/profile/email/verify', [ClientController::class, 'EmailVerifyShow'])->name('email.show');
@@ -111,9 +114,10 @@ Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'
 Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 // ADMIN
-
+// DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
+//PRODUCTS (INVENTORY AND VARIANT)
 Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
 Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
@@ -126,22 +130,22 @@ Route::get('/admin/products/stock/{product}', [ProductStockController::class, 'i
 Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
 Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
 Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
+Route::resource('products', ProductsController::class);
 
+// PAYMENT METHODS
 Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
 Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
 Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
 Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
 Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
 
+// ORDERS
 Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
 Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
 Route::put('/admin/orders/{id}/approved', [OrderManagement::class, 'approved'])->name('admin.orders.approved');
 Route::put('/admin/orders/{id}/otw', [OrderManagement::class, 'onTheWay'])->name('admin.orders.otw');
 Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
 Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
-// Route::put('/admin/orders/{id}/reject/update', [OrderManagement::class, 'grant'])->name('admin.orders.grant');
 
-// Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::resource('products', ProductsController::class);
+// BUFFALOS
+Route::get('/admin/buffalos', [BuffaloController::class, 'index'])->name('admin.buffalos.index');

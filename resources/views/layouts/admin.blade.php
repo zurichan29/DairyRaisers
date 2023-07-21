@@ -38,7 +38,7 @@
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 
 
 
@@ -94,7 +94,13 @@
             <div class="sidebar-heading">
                 Interface
             </div>
-
+            {{-- BUFFALOS --}}
+            <li class="nav-item {{ Request::routeIs('admin.buffalos.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.buffalos.index') }}">
+                    <i class="fa-solid fa-cow"></i>
+                    <span>Buffalos</span></a>
+            </li>
+            {{-- PRODUCTS --}}
             <li
                 class="nav-item {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? 'active' : null }}">
                 <a class="nav-link {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? null : 'collapsed' }}"
@@ -114,13 +120,13 @@
                     </div>
                 </div>
             </li>
-
+            {{-- ORDERS --}}
             <li class="nav-item {{ Request::routeIs('admin.orders.index') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.orders.index') }}">
                     <i class="fa-solid fa-truck-moving"></i>
                     <span>Orders</span></a>
             </li>
-
+            {{-- PAYMENT METHODS --}}
             <li class="nav-item {{ Request::routeIs('admin.payment_method.index') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.payment_method.index') }}">
                     <i class="fa-solid fa-credit-card"></i>

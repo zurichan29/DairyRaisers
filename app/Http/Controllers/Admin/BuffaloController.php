@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class BuffaloController extends Controller
@@ -9,6 +10,10 @@ class BuffaloController extends Controller
     public function index()
     {
         // Your logic here
-        return view('index');
+        if(auth()->guard('admin')->check()) {
+            return view('admin.buffalos.index');
+        } else {
+            return redirect()->back();
+        }
     }
 }
