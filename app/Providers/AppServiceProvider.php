@@ -27,11 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(Request $request): void
     {
-
+    
         //
         //Model::unguard();
 
-        View::composer('layouts.client', function ($view) use ($request) {
+        View::composer('client.components.header', function ($view) use ($request) {
             if (auth()->check()) {
                 $user = User::with('cart.product')->where('id', auth()->user()->id)->first();
                 $carts = $user->cart->where('order_number', NULL);

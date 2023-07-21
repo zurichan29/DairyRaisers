@@ -7530,6 +7530,7 @@
         },
         {
             "name": "mockery/mockery",
+<<<<<<< HEAD
             "version": "1.6.3",
             "source": {
                 "type": "git",
@@ -7540,6 +7541,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/mockery/mockery/zipball/b1be135c1ba7632f0248e07ee5e6e412576a309d",
                 "reference": "b1be135c1ba7632f0248e07ee5e6e412576a309d",
+=======
+            "version": "1.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mockery/mockery.git",
+                "reference": "d1413755e26fe56a63455f7753221c86cbb88f66"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/d1413755e26fe56a63455f7753221c86cbb88f66",
+                "reference": "d1413755e26fe56a63455f7753221c86cbb88f66",
+>>>>>>> newest
                 "shasum": ""
             },
             "require": {
@@ -7553,6 +7566,10 @@
             "require-dev": {
                 "phpunit/phpunit": "^8.5 || ^9.3",
                 "psalm/plugin-phpunit": "^0.18.4",
+<<<<<<< HEAD
+=======
+                "symplify/easy-coding-standard": "^11.5.0",
+>>>>>>> newest
                 "vimeo/psalm": "^5.13.1"
             },
             "type": "library",
@@ -7610,7 +7627,11 @@
                 "security": "https://github.com/mockery/mockery/security/advisories",
                 "source": "https://github.com/mockery/mockery"
             },
+<<<<<<< HEAD
             "time": "2023-07-18T17:47:29+00:00"
+=======
+            "time": "2023-07-19T15:51:02+00:00"
+>>>>>>> newest
         },
         {
             "name": "myclabs/deep-copy",
