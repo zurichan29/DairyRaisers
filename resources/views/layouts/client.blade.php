@@ -147,20 +147,17 @@
                 <a href="#" class="text-white me-4">
                     <i class="fa-brands fa-facebook"></i>
                 </a>
-                <a href="#" class="text-white me-4">
+                <a href="https://twitter.com/gentrisbest" class="text-white me-4">
                     <i class="fa-brands fa-twitter"></i>
                 </a>
-                <a href="#" class="text-white me-4">
+                <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#search/gentridairympc%40ymail.com%E2%80%8B​" class="text-white me-4">
                     <i class="fa-brands fa-google"></i>
                 </a>
-                <a href="#" class="text-white me-4">
+                <a href="https://www.instagram.com/gentrisbest/" class="text-white me-4">
                     <i class="fa-brands fa-instagram"></i>
                 </a>
-                <a href="#" class="text-white me-4">
+                <a href="https://www.linkedin.com/company/general-trias-dairy-raisers-multi-purpose-cooperative" class="text-white me-4">
                     <i class="fa-brands fa-linkedin"></i>
-                </a>
-                <a href="#" class="text-white me-4">
-                    <i class="fa-brands fa-github"></i>
                 </a>
             </div>
             <!-- Right -->
@@ -179,9 +176,7 @@
                         <hr class="mb-4 mt-0 d-inline-block mx-auto"
                             style="width: 60px; background-color: #7c4dff; height: 2px" />
                         <p>
-                            Here you can use rows and columns to organize your footer
-                            content. Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit.
+                            Dependable is what we are. Quality milk since 2005.
                         </p>
                     </div>
                     <!-- Grid column -->
