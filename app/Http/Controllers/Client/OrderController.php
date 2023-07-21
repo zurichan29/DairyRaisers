@@ -21,8 +21,8 @@ class OrderController extends Controller
         $user_order = [];
         if (auth()->check()) {
 
-            $user = User::with('cart.product')->with('order')->with('address')->where('id', auth()->user()->id)->first();
-            $orders = $user->order->where('status', '<>', 'delivered');
+            $user = User::with('cart.product')->with('order')->with('address')->with('payment_reciept')->where('id', auth()->user()->id)->first();
+            $orders = $user->order->where('status', '<>', 'Delivered');
 
             if ($orders) {
                 foreach ($orders as $order) {
@@ -95,6 +95,6 @@ class OrderController extends Controller
             }
         }
 
-        return view('client.order.show', ['user_order' => $user_order]);
+        return view('client.order.show', ['user_order' => $user_order, 'orders' => $orders, 'user' => $user]);
     }
 }

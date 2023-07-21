@@ -15,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\Product;
+use App\Models\PaymentReciept;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\Order;
@@ -53,7 +54,6 @@ class CheckoutController extends Controller
                     'total' => $cartItem->total
                 ];
             }
-            $grandTotal += $shippingFee;
         } else {
             $identifier = $request->cookie('device_identifier');
             $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
@@ -69,7 +69,7 @@ class CheckoutController extends Controller
         return view('client.checkout.show', [
             'defaultAddress' => $defaultAddress,
             'addresses' => $address,
-            'items' => $cart,
+            'items' => $cartItems,
             'grandTotal' => $grandTotal,
             'payment_methods' => $paymentMethod,
             'user' => $user
@@ -108,7 +108,6 @@ class CheckoutController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 
     public function showEditAddressForm(Request $request)
     {
@@ -225,33 +224,45 @@ class CheckoutController extends Controller
         }
 
         $orderID = generateOrderId();
+
         $request->validate([
-            'remarks' => ['string', 'max:255'],
+            'remarks' => ['max:255'],
             'payment_method' => ['required'],
-            'reference_number' => ['required', 'max:255']
+            'delivery_option' => ['required', 'in:Delivery,Pick Up'],
         ]);
 
-        $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
-        $referenceNumber = $request->input('reference_number');
-
-        if (!$paymentMethod) {
-            throw ValidationException::withMessages([
-                'payment_method' => 'Something went wrong on the payment method, please try again.',
+        $deliveryOption = $request->input('delivery_option');
+        if ($request->input('payment_method') != 'Cash On Delivery') {
+            $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
+            $request->validate([
+                'reference_number' => ['required', 'max:255'],
             ]);
-        }
-        $validator = Validator::make($request->all(), [
-            'formFile' => 'required|image|mimes:png,jpg,jpeg',
-        ]);
+            $referenceNumber = $request->input('reference_number');
+            if (!$paymentMethod) {
+                throw ValidationException::withMessages([
+                    'payment_method' => 'Something went wrong on the payment method, please try again.',
+                ]);
+            }
+            $validator = Validator::make($request->all(), [
+                'formFile' => 'required|image|mimes:png,jpg,jpeg',
+            ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            $file = $request->file('formFile');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::random(40) . '.' . $extension;
+            $file->storeAs('public/images/payment_reciept', $fileName);
+            $filePath = 'images/payment_reciept/' . $fileName;
+        } else {
+            $paymentMethod = 'Cash On Delivery';
+            $referenceNumber = NULL;
+            $filePath = NULL;
         }
 
-        $file = $request->file('formFile');
-        $extension = $file->getClientOriginalExtension();
-        $fileName = Str::random(40) . '.' . $extension;
-        $file->storeAs('public/images/payment_reciept', $fileName);
-        $filePath = 'images/payment_reciept' . $fileName;
+
         if (auth()->check()) {
             $userId = auth()->user()->id;
             $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
@@ -260,15 +271,11 @@ class CheckoutController extends Controller
                 throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
 
-            // if (!$user->address->where('default', 1)->first()) {
-            //     throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            // }
-
             $cart = $user->cart->first();
             $address = $user->address->where('default', true)->first();
 
             if ($address) {
-                $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->city . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
+                $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->municipality . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
             } else {
                 $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
                 $addressData = json_decode($jsonData, true);
@@ -313,6 +320,8 @@ class CheckoutController extends Controller
             }
 
             Cart::where('user_id', $userId)->where('order_number', NULL)->update(['order_number' => $orderID]);
+
+            // Create a new Order instance and save it
             $order = new Order;
             $order->user_id = $userId;
             $order->order_number = $orderID;
@@ -321,7 +330,20 @@ class CheckoutController extends Controller
             $order->grand_total = $cart->where('order_number', $orderID)->sum('total');
             $order->payment_method = $paymentMethod->type;
             $order->reference_number = $referenceNumber;
-            $order->payment_reciept = $filePath;
+            $order->delivery_option = $deliveryOption;
+           
+
+            if ($request->input('payment_method') != 'Cash On Delivery') {
+                // Create a new PaymentReceipt instance and save it
+                // $payment_receipt = new PaymentReciept;
+                // $payment_receipt->status = 'read';
+                // $payment_receipt->reciept =  $filePath;
+                // $payment_receipt->user_id = $userId;
+                // $payment_receipt->order_id = $order->id; // Set the order_id here
+                // $payment_receipt->save();
+                $order->payment_reciept = $filePath;
+                // $order->payment_reciept()->associate($payment_receipt);
+            }
             $order->save();
         } else {
             $identifier = $request->cookie('device_identifier');

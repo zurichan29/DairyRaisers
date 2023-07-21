@@ -128,8 +128,135 @@
         </div>
         <div class="tab-pane fade" id="pills-manage-order" role="tabpanel" aria-labelledby="pills-manage-order-tab"
             tabindex="0">
-            <div class="">
-                <p>this is manage order</p>
+            <div class="row justify-content-center">
+                @switch($order->status)
+                    @case('Pending')
+                        <div class="col-md-7 d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="">
+                                        <h5 class="font-weight-bold text-primary">Manage Order *</h5>
+                                    </div>
+                                    <form class="form mb-3" method="POST"
+                                        action="{{ route('admin.orders.approved', ['id' => $order->id]) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-sm btn-primary"><i
+                                                    class="fa-solid fa-thumbs-up me-1"></i> Approved</button>
+                                        </div>
+                                    </form>
+                                    <div class="border-top mb-3"></div>
+                                    <form class="form" method="POST"
+                                        action="{{ route('admin.orders.reject', ['id' => $order->id]) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" name="remarks" id="remarks"
+                                                placeholder="remarks" required>
+                                            <label for="remarks">Remarks:</label>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-sm btn-danger"><i
+                                                    class="fa-solid fa-ban me-1"></i> Reject</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 d-flex align-self-stretch">
+                            <div class="d-grid text-center">
+                                <img src="{{ asset('images/manage_order.png') }}" class="img-fluid" alt="Manage Order Picture">
+                                <h5 class="font-weight-light">Order is waiting to be processed...</h5>
+                            </div>
+                        </div>
+                    @break
+
+                    @case('Approved')
+                        <div class="col-md-7 d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="">
+                                        <h5 class="font-weight-bold text-primary">Manage Order *</h5>
+                                    </div>
+                                    <form class="form" method="POST"
+                                        action="{{ route('admin.orders.otw', ['id' => $order->id]) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-sm btn-warning"><i
+                                                    class="fa-solid fa-truck-fast me-1"></i> On The Way</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 d-flex align-self-stretch">
+                            <div class="d-grid text-center">
+                                <img src="{{ asset('images/processing.png') }}" class="img-fluid" alt="Manage Order Picture">
+                                <h5 class="font-weight-light">Order is waiting to be deliver...</h5>
+                            </div>
+                        </div>
+                    @break
+
+                    @case('On The Way')
+                        <div class="col-md-7 d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="">
+                                        <h5 class="font-weight-bold text-primary">Manage Order *</h5>
+                                    </div>
+                                    <form class="form" method="POST"
+                                        action="{{ route('admin.orders.delivered', ['id' => $order->id]) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-sm btn-success"><i
+                                                    class="fa-solid fa-circle-check me-1"></i> Delivered</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 d-flex align-self-stretch">
+                            <div class="d-grid text-center">
+                                <img src="{{ asset('images/on_the_way.png') }}" class="img-fluid" alt="Manage Order Picture">
+                                <h5 class="font-weight-light">Order is on the way!</h5>
+                            </div>
+                        </div>
+                    @break
+
+                    @case('Rejected')
+                        <div class="col d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="d-grid text-center">
+                                        <h5 class="mt-2 font-weight-light">Order has been rejected...</h5>
+                                        <img src="{{ asset('images/rejected.png') }}" class="img-fluid"
+                                            alt="Manage Order Picture">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @break
+
+                    @case('Delivered')
+                        <div class="col d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="d-grid text-center">
+                                        <h5 class="mt-2 font-weight-light">Order has been delivered successfully!</h5>
+                                        <img src="{{ asset('images/delivered.png') }}" class="img-fluid"
+                                            alt="Manage Order Picture">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @break
+
+                    @default
+                @endswitch
+
             </div>
         </div>
     </div>

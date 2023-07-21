@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\RegisterController;
-// use App\Http\Controllers\Client\OrderController;
+use App\Http\Controllers\Client\OrderController as ClientOrder;
 use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
@@ -79,7 +79,7 @@ Route::get('/register-details/number/{mobile_number}', [RegisterController::clas
 Route::post('register/details/validate', [RegisterController::class, 'checkDetails'])->name('register.details.validate');
 
 /** ORDER HISTORY */
-Route::get('/order', [OrderController::class, 'show'])->name('order_history');
+Route::get('/order', [ClientOrder::class, 'show'])->name('order_history');
 
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
@@ -135,6 +135,13 @@ Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'up
 
 Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
 Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
+Route::put('/admin/orders/{id}/approved', [OrderManagement::class, 'approved'])->name('admin.orders.approved');
+Route::put('/admin/orders/{id}/otw', [OrderManagement::class, 'onTheWay'])->name('admin.orders.otw');
+Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
+Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
+// Route::put('/admin/orders/{id}/reject/update', [OrderManagement::class, 'grant'])->name('admin.orders.grant');
+
+// Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('products', ProductsController::class);

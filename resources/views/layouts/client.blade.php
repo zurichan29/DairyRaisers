@@ -34,6 +34,12 @@
 </head>
 <!-- Custome style -->
 <style>
+    /* Custom CSS for hover dropdown */
+    .dropdown:hover .dropdown-menu {
+        display: block;
+       
+    }
+
     .logo {
         width: 80px;
         /* Adjust the width as per your needs */
@@ -98,7 +104,7 @@
                         <a class="nav-link nav-link-hover" href="{{ route('shop') }}">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('orders') }}">Orders</a>
+                        <a class="nav-link nav-link-hover" href="{{ route('order_history') }}">Orders</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-hover" href="{{ route('about') }}">About</a>
@@ -114,20 +120,91 @@
                     </li>
                 </ul>
             </div>
-            <div>
-                @auth
-                    <a href="{{ route('cart') }}">Cart</a>
-                    <p>Cart Item: {{ $cartCount }}</p>
-                    <p>Cart Total: {{ $cartTotal }}</p>
-                @else
-                    <a href="{{ route('register') }}" class="btn btn-outline-dark">Register</a>
+            @auth
+                <div class="navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto"></ul>
+                    <div class="d-flex gap-5 align-items-center">
+                        <div class="btn-group btn-group-sm me-2" role="group"
+                            aria-label="Button group with nested dropdown">
+                            <button type="button"
+                                class="btn btn-sm btn-dark font-weight-bolder">₱{{ $cartTotal . '.00' }}</button>
+                            <div class="dropdown position-static btn-group" role="group">
+                                <a href="{{ route('cart') }}"
+                                    class="btn btn-sm btn-outline-primary position-relative dropdown-toggle"
+                                    id="hoverDropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa-solid fa-cart-shopping me-2"></i> Cart
+                                    <span
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ $cartCount }}
+                                        <span class="visually-hidden">your shopping cart</span>
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" style="width: 300px"
+                                    aria-labelledby="cartDropdown">
+                                    @if ($carts->count() != 0)
+                                        <div class="row p-2">
+                                            <div class="col-md-12">
+                                                @foreach ($carts as $item)
+                                                    <div class="row align-items-center mb-3">
+                                                        <div class="col-3">
+                                                            <img src="{{ asset($item->product->img) }}" class="img-fluid"
+                                                                alt="Item picture">
+                                                        </div>
+                                                        <div class="col">
+                                                            <p class="font-weight-normal mb-0">
+                                                                {{ $item->product->name }}
+                                                                <span class="text-secondary">
+                                                                    {{ ' | ' . $item->product->variant }}
+                                                                </span>
+                                                            </p>
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <p class="text-secondary fw-light mb-0">
+                                                                        ₱{{ $item->price . '.00' }}
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <p class="text-secondary fw-light mb-0">
+                                                                        Quantity: {{ $item->quantity }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="border-top mt-0 mb-1"></div>
+                                                            <p class="font-weight-bold">
+                                                                Total: ₱{{ $item->price * $item->quantity . '.00' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                                <div class="d-grid ">
+                                                    <a href="{{ route('checkout') }}"
+                                                        class="btn btn-sm btn-primary">Checkout</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <img src="{{ asset('images/empty_cart.png') }}" class="img-fluid" alt="empty cart">
+                                        <h5 class="text-center">Empty Cart</h5>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ route('profile') }}" class=" btn  btn-dark">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </a>
+                    </div>
+                </div>
+            @else
+                <div class="btn-group">
+                    <a href="{{ route('register') }}" class="me-2 btn btn-outline-dark">Register</a>
                     <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                @endauth
-            </div>
+                </div>
+
+            @endauth
         </div>
     </nav>
-     <!-- Navigation -->
-     
+    <!-- Navigation -->
+
     <main id="main-content" class="py-3 px-5">
         @yield('content')
     </main>
@@ -237,12 +314,12 @@
     <script>
         var isLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
     </script>
-     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
-     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
-     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
-     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
-     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
-     <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/load_address.js') }}"></script>
     {{-- <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>

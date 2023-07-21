@@ -32,4 +32,8 @@ class Order extends Model
     {
       return $this->hasMany(Cart::class);
     }
+
+    public function payment_reciept() {
+      return $this->hasMany(PaymentReciept::class, 'order_id');
+    }
 }

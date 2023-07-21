@@ -17,10 +17,12 @@ return new class extends Migration
             $table->string('order_number');
             $table->integer('grand_total');
             $table->string('user_address');
-            $table->string('remarks');
+            $table->string('remarks')->nullable();
+            $table->string('comments')->nullable();
+            $table->string('delivery_option');
             $table->string('payment_method');
-            $table->string('reference_number');
-            $table->string('payment_reciept');
+            $table->string('reference_number')->nullable();
+            $table->string('payment_reciept')->nullable();
             $table->string('status')->default('Pending');
             $table->timestamps();
         });

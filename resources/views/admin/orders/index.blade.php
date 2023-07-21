@@ -40,21 +40,39 @@
                     </tfoot>
                     <tbody>
                         @foreach ($orders as $order)
+                            @php
+                                $statusBadge = null;
+                                $icon = null;
+                                switch ($order->status) {
+                                    case 'Pending':
+                                        $statusBadge = 'badge-info';
+                                        $icon = 'fa-solid fa-spinner me-1';
+                                        break;
+                                    case 'Approved':
+                                        $statusBadge = 'badge-primary';
+                                        $icon = 'fa-solid fa-thumbs-up me-1';
+                                        break;
+                                    case 'On The Way':
+                                        $statusBadge = 'badge-warning';
+                                        $icon = 'fa-solid fa-truck-fast me-1';
+                                        break;
+                                    case 'Delivered':
+                                        $statusBadge = 'badge-success';
+                                        $icon = 'fa-solid fa-circle-check me-1';
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            @endphp
                             <tr>
                                 <td>{{ $order->order_number }}</td>
                                 <td>{{ $order->reference_number }}</td>
                                 <td>{{ $order->user->first_name . ' ' . $order->user->last_name }}</td>
-                                <td class="text-center">
-                                    @if ($order->status == 'Pending')
-                                        <p class="badge bg-info text-center text-wrap status-badge" style="width: 6rem;">
-                                            <i class="fa-solid fa-spinner"></i>
-                                            {{ $order->status }}
-                                        </p>
-                                    @else
-                                        <p class="badge bg-danger text-center text-wrap status-badge" style="width: 6rem;">
-                                            {{ $order->status }}
-                                        </p>
-                                    @endif
+                                <td class=" text-center">
+                                    <p class="badge {{ $statusBadge }} text-center text-wrap py-2" style="width: 8rem;">
+                                        <i class="{{ $icon }}"></i>
+                                        {{ $order->status }}
+                                    </p>
                                 </td>
                                 <td>
                                     <div class="dropdown">

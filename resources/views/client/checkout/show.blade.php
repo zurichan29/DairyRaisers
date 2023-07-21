@@ -69,6 +69,17 @@
         </div>
     </div>
 
+    @error('remarks')
+        <p>{{ $message }}</p>
+    @enderror
+
+    @error('delivery_option')
+        <p>{{ $message }}</p>
+    @enderror
+
+    @error('reference_number')
+        <p>{{ $message }}</p>
+    @enderror
 
     <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -85,35 +96,38 @@
             @csrf
             <div class="">
                 <div class="row justify-content-center">
-                    <div class="col-sm-6 d-flex align-self-stretch">
+                    <div class="col-sm-6 d-flex flex-column align-self-stretch">
                         <div class="card-body d-flex and flex-column">
                             <div class="card w-100">
                                 <div class="card-body d-flex and flex-column">
                                     <div class="">
                                         @if (auth()->check())
-                                            @if ($defaultAddress)
-                                                <div class="col">
-                                                    <div class="row mb-3">
-                                                        <h4 class="text-primary">CONTACT INFORMATION</h4>
-                                                    </div>
-                                                    <div class="form-floating-like form-floating-like-sm mb-4">
-                                                        <span class="form-floating-label">Name</span>
-                                                        <p class="form-control-static ms-2">{{ Auth::user()->first_name . ' ' . Auth::user()->last_name }}</p>
-                                                    </div>
-                                                    <div class="form-floating-like form-floating-like-sm mb-4">
-                                                        <span class="form-floating-label">Email</span>
-                                                        <p class="form-control-static ms-2">{{ Auth::user()->email }}</p>
-                                                    </div>
-                                                    <div class="form-floating-like form-floating-like-sm mb-2">
-                                                        <span class="form-floating-label">Mobile No.</span>
-                                                        <p class="form-control-static ms-2">+63{{ Auth::user()->mobile_number }}</p>
-                                                    </div>
-                                                    <div class="border-top my-4"></div>
+                                            <div class="col">
+                                                <div class="row mb-3">
+                                                    <h4 class="text-primary">CONTACT INFORMATION</h4>
+                                                </div>
+                                                <div class="form-floating-like form-floating-like-sm mb-4">
+                                                    <span class="form-floating-label">Name</span>
+                                                    <p class="form-control-static ms-2">
+                                                        {{ Auth::user()->first_name . ' ' . Auth::user()->last_name }}
+                                                    </p>
+                                                </div>
+                                                <div class="form-floating-like form-floating-like-sm mb-4">
+                                                    <span class="form-floating-label">Email</span>
+                                                    <p class="form-control-static ms-2">{{ Auth::user()->email }}</p>
+                                                </div>
+                                                <div class="form-floating-like form-floating-like-sm mb-2">
+                                                    <span class="form-floating-label">Mobile No.</span>
+                                                    <p class="form-control-static ms-2">
+                                                        +63{{ Auth::user()->mobile_number }}</p>
+                                                </div>
+                                                <div class="border-top border-secondary my-4"></div>
+                                                @if ($defaultAddress)
                                                     <div class="row mb-3">
                                                         <h4 class="text-primary">ADDRESS</h4>
                                                     </div>
                                                     <div class="row mb-3">
-                                                        <a class="btn btn-sm btn-primary"
+                                                        <a class="btn btn-sm btn-outline-primary"
                                                             href="{{ URL::secure(route('checkout.edit_address')) }}">Edit
                                                             this address</a>
                                                     </div>
@@ -136,185 +150,228 @@
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        {{-- <p id="completeAddressDisplay">
-                                                            {{ $defaultAddress->street .
-                                                                ', ' .
-                                                                $defaultAddress->barangay .
-                                                                ', ' .
-                                                                $defaultAddress->municipality .
-                                                                ', ' .
-                                                                $defaultAddress->province .
-                                                                ', ' .
-                                                                $defaultAddress->zip_code .
-                                                                ' Philippines' }}
-                                                        </p> --}}
                                                     </div>
                                                     <div class="row mb-2">
                                                         <p id="remarksAddressDisplay" class="text-secondary">remarks:
                                                             {{ $defaultAddress->remarks ? $defaultAddress->remarks : 'None' }}
                                                         </p>
                                                     </div>
-                                                </div>
+                                                @else
+                                                    @include('client.checkout.inputAddressForm')
+                                                @endif
                                             @else
-                                                @include('client.checkout.inputAddressForm');
-                                            @endif
-                                        @else
-                                            @include('client.checkout.inputAddressForm');
+                                                @include('client.checkout.inputAddressForm')
                                         @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 d-flex align-self-stretch">
-                        <div class="card-body d-flex and flex-column">
-                            <div class="card w-100">
-                                <div class="card-body d-flex and flex-column">
-                                    <div class="">
-                                        <div class="row">
-                                            <div class="col mb-3">
-                                                <h4 class="text-primary">PAYMENTS</h4>
-                                            </div>
-                                            <div class="col">
-                                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                    <button type="button" class="ms-2 btn btn-sm btn-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#viewPaymentOptions">
-                                                        View Payment Options
-                                                    </button>
-                                                </div>
-                                            </div>
+                    <div class="card-body d-flex and flex-column">
+                        <div class="card w-100">
+                            <div class="card-body d-flex and flex-column">
+                                <div class="">
+                                    <div class="row">
+                                        <div class="col mb-3">
+                                            <h4 class="text-primary">DELIVERY OPTIONS</h4>
                                         </div>
-
-                                        <div class="modal fade" id="viewPaymentOptions" data-bs-backdrop="static"
-                                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                                            aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">Accepting
-                                                            Payments:</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="table-responsive">
-                                                            <table class="table table-bordered width="100%" cellspacing="0">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Type</th>
-                                                                        <th>Account Name</th>
-                                                                        <th>Account No.</th>
-                                                                        <th>Status</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach ($payment_methods as $method)
-                                                                        <tr>
-                                                                            <td>{{ $method->type }}</td>
-                                                                            <td>{{ $method->account_name }}
-                                                                            </td>
-                                                                            <td>{{ $method->account_number }}</td>
-                                                                            <td class="text-center">
-                                                                                @if ($method->status == 'ACTIVATED')
-                                                                                    <p class="badge bg-success text-center text-wrap status-badge"
-                                                                                        style="width: 6rem;">
-                                                                                        ONLINE
-                                                                                    </p>
-                                                                                @else
-                                                                                    <p class="badge bg-danger text-center text-wrap status-badge"
-                                                                                        style="width: 6rem;">
-                                                                                        OFFLINE
-                                                                                    </p>
-                                                                                @endif
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        <div class="px-3">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="radio" name="delivery_option"
+                                                    id="delivery" value="Delivery" checked>
+                                                <label class="form-check-label" for="delivery">
+                                                    Delivery
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="radio" name="delivery_option"
+                                                    id="pickup" value="Pick Up">
+                                                <label class="form-check-label" for="pickup">
+                                                    Pick Up
+                                                </label>
                                             </div>
                                         </div>
-
-                                        <div class="form-floating mb-3">
-                                            <select class="form-select" id="payment_method" name="payment_method"
-                                                aria-label="Payment Method">
-                                                <option selected>Select</option>
-                                                @foreach ($payment_methods as $method)
-                                                    @if ($method->status == 'ACTIVATED')
-                                                        <option value="{{ $method->id }}">{{ $method->type }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                            <label for="payment_method">Payment Method *</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" name="reference_number"
-                                                id="reference_number" placeholder="Reference number or control number">
-                                            <label for="reference_number">Reference / Control No. *</label>
-                                        </div>
-
-                                        <div class="mb-2">
-                                            <label for="formFile" class="form-label">Uploade or Browse your Payment
-                                                Reciept *</label>
-                                            <input class="form-control" type="file" name="formFile" id="formFile">
-                                        </div>
-                                        @error('formFile')
-                                            <div class="error">{{ $message }}</div>
-                                        @enderror
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex and flex-column">
+                        <div class="card w-100">
+                            <div class="card-body d-flex and flex-column">
+                                <div class="">
+                                    <div class="row">
+                                        <div class="col mb-3">
+                                            <h4 class="text-primary">PAYMENTS</h4>
+                                        </div>
+                                        <div class="col">
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <button type="button" class="ms-2 btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#viewPaymentOptions">
+                                                    View Payment Options
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal fade" id="viewPaymentOptions" data-bs-backdrop="static"
+                                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel">Accepting
+                                                        Payments:</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered width="100%" cellspacing="0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Type</th>
+                                                                    <th>Account Name</th>
+                                                                    <th>Account No.</th>
+                                                                    <th>Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($payment_methods as $method)
+                                                                    <tr>
+                                                                        <td>{{ $method->type }}</td>
+                                                                        <td>{{ $method->account_name }}
+                                                                        </td>
+                                                                        <td>{{ $method->account_number }}</td>
+                                                                        <td class="text-center">
+                                                                            @if ($method->status == 'ACTIVATED')
+                                                                                <p class="badge bg-success text-center text-wrap status-badge"
+                                                                                    style="width: 6rem;">
+                                                                                    ONLINE
+                                                                                </p>
+                                                                            @else
+                                                                                <p class="badge bg-danger text-center text-wrap status-badge"
+                                                                                    style="width: 6rem;">
+                                                                                    OFFLINE
+                                                                                </p>
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="payment_method" name="payment_method"
+                                            aria-label="Payment Method">
+                                            <option selected>Select</option>
+                                            @foreach ($payment_methods as $method)
+                                                <option value="Cash On Delivery">Cash On Delivery</option>
+                                                @if ($method->status == 'ACTIVATED')
+                                                    <option value="{{ $method->id }}">{{ $method->type }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <label for="payment_method">Payment Method *</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="reference_number"
+                                            id="reference_number" placeholder="Reference number or control number"
+                                            disabled readonly>
+                                        <label for="reference_number" id="reference_label">Reference / Control No.</label>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label for="formFile" class="form-label" id="file_label">Uploade or Browse your
+                                            Payment
+                                            Reciept</label>
+                                        <input class="form-control" type="file" name="formFile" id="formFile"
+                                            disabled readonly>
+                                    </div>
+                                    @error('formFile')
+                                        <div class="error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 d-flex align-self-stretch">
+                    <div class="card-body d-flex and flex-column">
+                        <div class="card w-100">
+                            <div class="card-body d-flex and flex-column">
+                                <div class="">
+                                    <div class="row mb-3">
+                                        <h4 class="text-primary">CART</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            @foreach ($items as $item)
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-3">
+                                                        <img src="{{ asset($item->product->img) }}" class="img-fluid"
+                                                            alt="Item picture">
+                                                    </div>
+                                                    <div class="col-9">
+                                                        <h6 class="font-weight-normal">
+                                                            {{ $item->product->name }}
+                                                            <span class="text-secondary">
+                                                                {{ ' | ' . $item->product->variant }}
+                                                            </span>
+                                                        </h6>
+                                                        <div class="row gx-5">
+                                                            <div class="col">
+                                                                <div class="">
+                                                                    <h6 class="text-secondary">
+                                                                        ₱{{ $item->price . '.00' }}
+                                                                    </h6>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="">
+                                                                    <h6 class="text-secondary">
+                                                                        {{ $item->quantity }} PCS
+                                                                    </h6>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-top border-secondary mb-2"></div>
+                                                        <h5 class="font-weight-bold">
+                                                            Total: ₱{{ $item->price * $item->quantity . '.00' }}
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                            <div class="border-top mb-3"></div>
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" name="remarks" id="remarks"
+                                                    placeholder="Remarks">
+                                                <label for="remarks">Remarks</label>
+                                            </div>
+                                            <div class="border-top mb-3"></div>
+                                            <div class="row align-items-center mb-4">
+                                                <h4 class="font-weight-bold text-primary">GRAND TOTAL:
+                                                    ₱{{ $grandTotal . '.00' }}</h4>
+                                            </div>
+                                            <div class="row align-items-center mb-4">
+                                                <button type="submit" class="btn btn-primary">Place Order</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-            @foreach ($items as $item)
-                <div class="col-sm-3 grid grid-cols-3 gap-1 justify-center items-center px-[10%]">
-                    <a href="detail/{{ $item['productId'] }}">
-                        <img src="{{ $item['img'] }}" class="w-50">
-                    </a>
-
-                    <div class="">
-                        <h2 class="text-2xl text-[#5f9ea0] font-semibold">{{ $item['name'] }}</h2>
-                        <a href="/removecart/{{ $item['cartId'] }}"
-                            class="option-btn block w-[8rem] mt-4 text-lg p-[.3rem] relative rounded-xl bg-[#d3a870] text-white text-center shadow-[0_.5rem_1rem_rgba(0,0,0,0.3)] hover:shadow-[1px_1px_15px_rgb(0,0,0,.6)]">Remove</a>
-                    </div>
-
-
-                    <div class="flex flex-wrap gap-2 py-6 pl-[6rem]">
-                        <h2 class="text-[#d2691e] text-2xl font-semibold pb-2">₱ {{ $item['price'] }}</h5>
-                            <input type="number" min="1" value="1" name="p_qty"
-                                class="qty mt-2 mr-0 py-[.5rem] pl-4 pr-2 rounded-lg text-[#199696] w-[5rem] text-center shadow-[0_.5px_10px_rgba(0,0,0,.3)]">
-                    </div>
-
-                    <div class="mt-4 grid grid-cols-1 w-[34rem] border-t-[.1rem] border-solid border-[#136d6d]">
-                        <p class="option-btn text-2xl text-center text-[#5f9ea0] pt-4 pl-[45%]">
-                            Subtotal: <span class="text-[#d2691e] text-2xl font-semibold pl-10">₱
-                                {{ $item['total'] }}</span></p>
-                        <div class="mt-4 w-[34rem] border-t-[.1rem] border-solid border-[#136d6d]">
-                            <p class="option-btn text-2xl text-center text-[#5f9ea0] pt-4 pl-[45%]">
-                                Total: <span class="text-[#d2691e] text-2xl font-semibold pl-10">₱
-                                    {{ $item['total'] }}</span></p>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-            <label for="remarks">Remarks:</label>
-            <input type="text" name="remarks" id="remarks" value="{{ old('remarks') }}">
-            <h1>{{ $grandTotal }}</h1>
-
-
-
-            <button type="submit">Place Order</button>
+            </div>
         </form>
     </section>
 
@@ -334,11 +391,13 @@
                         console.log(result);
 
                         var referenceNumberLine = null;
-                        var pattern = /Ref No\. (\d+\s\d+\s\d+)/;
+                        var gcashPattern = /Ref No\. (\d+\s\d+\s\d+)/;
+                        var paymayaPattern = /Reference ID ([A-Z0-9]+)/;
 
                         // Iterate over the words and find the line with the reference number
                         result.data.words.forEach(function(word) {
-                            if (pattern.test(word.line.text)) {
+                            if (gcashPattern.test(word.line.text) || paymayaPattern.test(word.line
+                                .text)) {
                                 referenceNumberLine = word.line.text;
                                 return false; // Exit the loop if a match is found
                             }
@@ -348,14 +407,18 @@
                         var referenceNumberWithoutSpaces = null;
 
                         if (referenceNumberLine) {
-                            var matches = referenceNumberLine.match(pattern);
-                            referenceNumber = matches ? matches[1] : null;
+                            var gcashMatches = referenceNumberLine.match(gcashPattern);
+                            var paymayaMatches = referenceNumberLine.match(paymayaPattern);
+
+                            if (gcashMatches) {
+                                referenceNumber = gcashMatches[1];
+                            } else if (paymayaMatches) {
+                                referenceNumber = paymayaMatches[1];
+                            }
+
                             referenceNumberWithoutSpaces = referenceNumber ? referenceNumber.replace(/\s/g,
                                 '') : null;
                         }
-
-                        console.log('Reference Number:', referenceNumber);
-                        console.log('Reference Number without Spaces:', referenceNumberWithoutSpaces);
 
                         // Hide the loading animation
                         $('#loading-animation-id').hide();
@@ -372,31 +435,24 @@
                     });
             });
         }
+
         $(document).ready(function() {
             $('#loading-animation-id').hide();
             $('#formFile').on('change', function() {
                 var fileInput = this;
                 var file = fileInput.files[0];
-                // Check if Gcash type is selected in the form
-                // Replace 'select-form-id' with the ID or selector of your select form element
-                // Get the selected payment method text
-                var selectedPaymentMethod = $('#payment_method option:selected').text();
 
-                // Check if the selected payment method is 'gcash'
-                if (selectedPaymentMethod === 'Gcash') {
-                    console.log(file);
-                    // Call the function to extract the reference number
-                    extractReferenceNumber(file)
-                        .then(function(referenceNumberWithoutSpaces) {
-                            // Assign the extracted reference number to an input text field
-                            // Replace 'input-text-id' with the ID or selector of your input text field
-                            $('#reference_number').val(referenceNumberWithoutSpaces);
-                        })
-                        .catch(function(error) {
-                            // Handle the error if extraction fails
-                            console.error(error);
-                        });
-                }
+                // Call the function to extract the reference number
+                extractReferenceNumber(file)
+                    .then(function(referenceNumberWithoutSpaces) {
+                        // Assign the extracted reference number to an input text field
+                        // Replace 'input-text-id' with the ID or selector of your input text field
+                        $('#reference_number').val(referenceNumberWithoutSpaces);
+                    })
+                    .catch(function(error) {
+                        // Handle the error if extraction fails
+                        console.error(error);
+                    });
             });
         });
     </script>
@@ -404,6 +460,22 @@
     <script>
         // Get the CSRF token value
         var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        $('#payment_method').change(function() {
+            if ($(this).val() === 'Cash On Delivery') {
+                // Payment method is 'Cash On Delivery'
+                $('#reference_number').prop('disabled', true).prop('readonly', true);
+                $('#formFile').prop('disabled', true).prop('readonly', true);
+                $('#reference_label').text('Reference / Control No.');
+                $('#file_label').text('Upload or Browse your Payment Receipt');
+            } else {
+                // Payment method is not 'Cash On Delivery'
+                $('#reference_number').prop('disabled', false).prop('readonly', false);
+                $('#formFile').prop('disabled', false).prop('readonly', false);
+                $('#reference_label').text('Reference / Control No. *');
+                $('#file_label').text('Upload or Browse your Payment Receipt *');
+            }
+        });
 
         // Handle the change event of the select element
         document.getElementById('defaultAddressSelect').addEventListener('change', function() {

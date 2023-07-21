@@ -54,20 +54,21 @@ class DatabaseSeeder extends Seeder
             'type' => 'Gcash',
             'account_name' => 'Christian Jay Jacalne',
             'account_number' => '09262189072',
-            'status' => 'Activated'
+            'status' => 'ACTIVATED'
         ]);
 
-        // User_Address::Create([
-        //     'user_id' => 1,
-        //     'province' => 'Cavite',
-        //     'city' => 'Tanza',
-        //     'barangay' => 'julugan 8',
-        //     'street' => 'Sta. Cecilia 2',
-        //     'label' => 'home',
-        //     'zip_code' => '4108',
-        //     'default' => '1',
-        //     'remarks' => 'This is my remark'
-        // ]);
+        User_Address::Create([
+            'user_id' => 1,
+            'region' => 'REGION IV-A',
+            'province' => 'CAVITE',
+            'municipality' => 'TANZA',
+            'barangay' => 'JULUGAN VIII',
+            'street' => 'Sta. Cecilia 2',
+            'label' => 'home',
+            'zip_code' => '4108',
+            'default' => '1',
+            'remarks' => 'This is my remark'
+        ]);
 
         // Order::Create([
         //     'user_id' => 1,

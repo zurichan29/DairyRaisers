@@ -66,4 +66,8 @@ class User extends Model implements AuthenticatableContract
     {
         return $this->hasMany(Order::class);
     }
+
+    public function payment_reciept() {
+        return $this->hasMany(PaymentReciept::class);
+    }
 }
