@@ -10,9 +10,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="fw-bold fs-3">Total Lactating Buffalos: <?= $total_pregnant; ?></p>
+                    <p class="fw-bold fs-3">Total Lactating Buffalos: </p>
                     <div class="form-floating mb-3">
-                        <input type="date" min="2020-01-01" max="" class="form-control" id="mf_date" name="mf_date" value="<?= $date; ?>" placeholder="select date" required>
+                        <input type="date" min="2020-01-01" max="" class="form-control" id="mf_date" name="mf_date" value="" placeholder="select date" required>
                         <label for="mf_date">Select Date :</label>
                     </div>
                     <div class="form-floating mb-3">
@@ -42,11 +42,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-floating mb-3">
-                        <input type="date" min="2020-01-01" class="form-control" id="mf_date_1" name="mf_date_1" value="<?= $date; ?>" placeholder="select date" required>
+                        <input type="date" min="2020-01-01" class="form-control" id="mf_date_1" name="mf_date_1" value="" placeholder="select date" required>
                         <label for="mf_date_1">Select Date Value 1:</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="date" min="2020-01-01" class="form-control" id="mf_date_2" name="mf_date_2" value="<?= $date; ?>" placeholder="select date" required>
+                        <input type="date" min="2020-01-01" class="form-control" id="mf_date_2" name="mf_date_2" value="" placeholder="select date" required>
                         <label for="mf_date_2">Select Date Value 2:</label>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                             <label class="text-success" for="increase_ms">IN:</label>
                         </div>
                         <div class="px-2 py-2 text-center">
-                            <p class="lead">Current Milk Stock: <?= $milk_stock[0]->milk_stock; ?> liters</p><!-- CURRENT -->
+                            <p class="lead">Current Milk Stock:  liters</p><!-- CURRENT -->
                         </div>
                         <!-- OUT -->
                         <div class="form-floating w-100">
@@ -94,12 +94,12 @@
     <!-- HEADER CONTAINER -->
     <div class="mb-2 pb-2 border-bottom d-flex flex-row justify-content-between align-items-center overflow-hidden">
         <div class=" d-flex justify-content-center align-items-center flex-row">
-            <div class="header-container bg-primary d-flex flex-column justify-content-end align-items-center">
-                <img src="../../img/buffalo3.svg" alt="buffalo" class="img-fluid me-4" style="width: 70px;">
+            <div class="header-container bg-primary d-flex flex-column justify-content-end align-items-center" style="width: 70px;">
+                <i class="fa-solid fa-cow img-fluid me-4" style="font-size:3rem; color:whitesmoke; padding:1rem;"></i>
             </div>
             <div class=" d-flex flex-column justify-content-center align-items-start">
-                <p class="lead py-0 my-0 mb-2" style="font-size: 16px;"> Milk Stocks <i class="bi bi-box-seam me-1"></i> :: <span class=" fw-bold"> <?= $milk_stock[0]->milk_stock; ?> LITERS</span> <button type="button" class="ms-1 my-0 btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#milk_stocks">Update</button></p>
-                <p class="lead py-0 my-0" style="font-size: 16px;"> Last Update <i class="bi bi-calendar-check me-1"></i> :: <span class="fw-bold"><?= $milk_date; ?></span></p>
+                <p class="lead py-0 my-0 mb-2" style="font-size: 16px;"> Milk Stocks <i class="bi bi-box-seam me-1"></i> :: <span class=" fw-bold">  LITERS</span> <button type="button" class="ms-1 my-0 btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#milk_stocks">Update</button></p>
+                <p class="lead py-0 my-0" style="font-size: 16px;"> Last Update <i class="bi bi-calendar-check me-1"></i> :: <span class="fw-bold"> </span></p>
             </div>
         </div>
         <div class="px-3 py-2 rounded d-flex bg-primary flex-row justify-content-center align-items-center text-center">

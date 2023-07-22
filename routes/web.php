@@ -149,3 +149,4 @@ Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->nam
 
 // BUFFALOS
 Route::get('/admin/buffalos', [BuffaloController::class, 'index'])->name('admin.buffalos.index');
+Route::get('/admin/buffalos/buffalo_stock', [BuffaloController::class, 'milk_stock'])->name('admin.buffalos.buffalo_stock');
