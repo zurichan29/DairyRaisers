@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Models\Buffalo;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class BuffaloController extends Controller
 {
@@ -15,5 +16,12 @@ class BuffaloController extends Controller
         } else {
             return redirect()->back();
         }
+    }
+
+    public function milk_stock()
+    {
+        // Add any necessary logic for managing buffalos
+        $buffalo = Buffalo::all();
+        return view('admin.buffalos.buffalo_stock.milk_stock', compact('buffalo'));
     }
 }
