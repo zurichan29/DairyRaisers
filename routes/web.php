@@ -31,9 +31,7 @@ use App\Http\Controllers\Client\CheckoutController;
 */
 
 /* HOME */
-Route::get('/testing', function () {
-    return view('test');
-});
+
 
 Route::get('/', [PageController::class, 'index'])->name('index');
 
