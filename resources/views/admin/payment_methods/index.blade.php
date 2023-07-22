@@ -26,8 +26,7 @@
                         <form id="createPaymentForm">
                             @csrf
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="type" id="type"
-                                    placeholder="Type">
+                                <input type="text" class="form-control" name="type" id="type" placeholder="Type">
                                 <label for="type">Type</label>
                             </div>
                             <div class="form-floating mb-3">
@@ -78,13 +77,11 @@
                                 <td class="account-number-column">{{ $method->account_number }}</td>
                                 <td class="text-center">
                                     @if ($method->status == 'ACTIVATED')
-                                        <p class="badge bg-success text-center text-wrap status-badge"
-                                            style="width: 6rem;">
+                                        <p class="badge bg-success text-center text-wrap status-badge" style="width: 6rem;">
                                             {{ $method->status }}
                                         </p>
                                     @else
-                                        <p class="badge bg-danger text-center text-wrap status-badge"
-                                            style="width: 6rem;">
+                                        <p class="badge bg-danger text-center text-wrap status-badge" style="width: 6rem;">
                                             {{ $method->status }}
                                         </p>
                                     @endif
@@ -99,7 +96,7 @@
                                             <button type="button" class="dropdown-item edit-btn"
                                                 data-id="{{ $method->id }}">Edit</button>
 
-                                            <button type="button" class="dropdown-item status-btn" 
+                                            <button type="button" class="dropdown-item status-btn"
                                                 data-id="{{ $method->id }}">{{ $method->status == 'ACTIVATED' ? 'Deactivate payment method' : 'Activate payment method' }}</button>
                                             <hr class="dropdown-divider">
                                             <button type="button" class="dropdown-item delete-btn"
@@ -170,8 +167,6 @@
         </div>
     </div>
 
-   
-
     <script>
         $(document).ready(function() {
 
@@ -197,7 +192,7 @@
                 var iconClass = '';
                 var headerClass = '';
                 var headerText = '';
-    
+
                 // Update classes, icon, and header text based on the status
                 switch (status) {
                     case 'success':
@@ -223,22 +218,133 @@
                     default:
                         break;
                 }
-    
+
                 // Update the notification content and classes
                 notificationHeader.find('strong').removeClass().addClass('me-auto').html(
                     '<i class="me-2 fa-solid ' + iconClass + '"></i> ' + headerText);
-                notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(headerClass);
+                notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(
+                    headerClass);
                 notificationBody.text(message);
-    
+
                 // Show the notification with fade-in and fade-out animations
                 notification.toast({
                     animation: true
                 });
-    
+
                 // Show the notification
                 notification.toast('show');
             }
-            
+
+            function initializeRowEvents(row) {
+                // Edit button click event
+                row.find('.edit-btn').click(function() {
+                    var paymentMethodId = $(this).data('id');
+                    var type = row.find('.type-column').text();
+                    var accountName = row.find('.account-name-column').text();
+                    var accountNumber = row.find('.account-number-column').text();
+
+                    // Populate the form fields with the existing data
+                    $('#editPaymentMethodId').val(paymentMethodId);
+                    $('#editType').val(type);
+                    $('#editAccountName').val(accountName);
+                    $('#editAccountNumber').val(accountNumber);
+
+                    // Store the row data as a data attribute on the form
+                    $('#editPaymentMethodForm').data('row', row);
+
+                    // Show the edit modal
+                    $('#editPaymentMethodModal').modal('show');
+                });
+
+                // Status button click event
+                row.find('.status-btn').click(function() {
+                    // ... Your existing status button click event ...
+                    var statusButton = $(this);
+                    var paymentMethodId = statusButton.data('id');
+                    var confirmationMessage = '';
+
+                    // Determine the new status based on the current status
+                    var currentStatus = statusButton.closest('tr').find('.status-badge').text().trim();
+                    var newStatus = '';
+                    var newBg = '';
+                    if (currentStatus === 'ACTIVATED') {
+                        newStatus = 'DEACTIVATED';
+                        confirmationMessage = 'Do you want to deactivate this payment method?';
+                        newBg = 'bg-danger';
+                    } else {
+                        newStatus = 'ACTIVATED';
+                        confirmationMessage = 'Do you want to activate this payment method?';
+                        newBg = 'bg-success';
+                    }
+
+                    showConfirmationModal(confirmationMessage, function() {
+                        // Proceed with updating the payment method status
+                        $.ajax({
+                            url: '{{ route('admin.payment_method.status') }}', // Replace with the actual URL for updating the payment method status
+                            type: 'POST',
+                            data: {
+                                id: paymentMethodId,
+                                status: newStatus,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                // Update the status button text
+                                statusButton.text((newStatus === 'ACTIVATED') ?
+                                    'Deactivate payment method' :
+                                    'Activate payment method');
+
+                                // Update the status badge
+                                var statusBadge = statusButton.closest('tr').find(
+                                    '.status-badge');
+                                statusBadge.removeClass('bg-success bg-danger');
+                                statusBadge.addClass(newBg);
+                                statusBadge.text(newStatus);
+
+                                // Show notification
+                                showNotification('updated',
+                                    'Payment Method status changed.');
+                            },
+                            error: function(error) {
+                                console.error(error);
+                            }
+                        });
+                    });
+                    // Same as before...
+                });
+
+                // Delete button click event
+                row.find('.delete-btn').click(function() {
+                    // ... Your existing delete button click event ...
+                    var deleteButton = $(this);
+                    var paymentMethodId = deleteButton.data('id');
+                    var confirmationMessage = "Are you sure? You won't be able to revert this!";
+
+                    showConfirmationModal(confirmationMessage, function() {
+                        // Proceed with deleting the payment method
+                        $.ajax({
+                            url: '{{ route('admin.payment_method.delete') }}', // Replace with the actual URL for deleting the payment method
+                            type: 'POST',
+                            data: {
+                                id: paymentMethodId,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                // Remove the row from the table
+                                var row = deleteButton.closest('tr');
+                                dataTable.row(row).remove().draw();
+
+                                // Show notification
+                                showNotification('deleted', 'Payment Method deleted.');
+                            },
+                            error: function(error) {
+                                console.error(error);
+                            }
+                        });
+                    });
+                    // Same as before...
+                });
+            }
+
             $('#createPaymentForm').submit(function(e) {
                 e.preventDefault(); // Prevent form submission
 
@@ -294,6 +400,9 @@
                         ];
 
                         $('#dataTable').DataTable().row.add(newRow).draw();
+                        dataTable.rows().every(function() {
+                            initializeRowEvents($(this.node()));
+                        });
                     },
                     error: function(error) {
                         console.error(error);
@@ -345,7 +454,8 @@
                             statusBadge.text(newStatus);
 
                             // Show notification
-                            showNotification('updated', 'Payment Method status changed.');
+                            showNotification('updated',
+                                'Payment Method status changed.');
                         },
                         error: function(error) {
                             console.error(error);
@@ -365,7 +475,7 @@
                 $('#editType').val(type);
                 $('#editAccountName').val(accountName);
                 $('#editAccountNumber').val(accountNumber);
-                
+
                 // Store the row data as a data attribute on the form
                 var row = $(this).closest('tr');
                 $('#editPaymentMethodForm').data('row', row);
@@ -478,7 +588,5 @@
                 });
             }
         });
-
     </script>
-   
 @endsection

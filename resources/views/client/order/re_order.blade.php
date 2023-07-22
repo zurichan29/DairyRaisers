@@ -1,72 +1,56 @@
 @extends('layouts.client')
+<style>
+    .form-floating-like {
+        position: relative;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .form-floating-like-sm {
+        padding: 0.125rem 0.25rem;
+    }
+
+    .form-floating-label {
+        position: absolute;
+        top: -0.5rem;
+        left: 0.5rem;
+        padding: 0.125rem 0.25rem;
+        font-size: 0.875rem;
+        background-color: #fff;
+        transform-origin: top left;
+        transform: translate(0, 0) scale(1);
+        transition: all 0.2s ease-in-out;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-control-static {
+        padding-top: 0.5rem;
+    }
+
+    .form-floating-like:focus-within .form-floating-label,
+    .form-floating-like:not(:placeholder-shown) .form-floating-label {
+        transform: translate(0, -0.375rem) scale(0.85);
+        background-color: #fff;
+        color: #6c757d;
+    }
+
+    .form-floating-like:focus-within {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
+</style>
 @section('content')
-    <style>
-        .form-floating-like {
-            position: relative;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .form-floating-like-sm {
-            padding: 0.125rem 0.25rem;
-        }
-
-        .form-floating-label {
-            position: absolute;
-            top: -0.5rem;
-            left: 0.5rem;
-            padding: 0.125rem 0.25rem;
-            font-size: 0.875rem;
-            background-color: #fff;
-            transform-origin: top left;
-            transform: translate(0, 0) scale(1);
-            transition: all 0.2s ease-in-out;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .form-control-static {
-            padding-top: 0.5rem;
-        }
-
-        .form-floating-like:focus-within .form-floating-label,
-        .form-floating-like:not(:placeholder-shown) .form-floating-label {
-            transform: translate(0, -0.375rem) scale(0.85);
-            background-color: #fff;
-            color: #6c757d;
-        }
-
-        .form-floating-like:focus-within {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
-        }
-    </style>
-
-    @error('remarks')
-        <p>{{ $message }}</p>
-    @enderror
-
-    @error('delivery_option')
-        <p>{{ $message }}</p>
-    @enderror
-
-    @error('reference_number')
-        <p>{{ $message }}</p>
-    @enderror
-
-    <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('cart') }}">Cart</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            <li class="breadcrumb-item"><a href="{{ route('order_history') }}">All Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Re-Order: {{ $order->order_number }}</li>
         </ol>
     </nav>
-
-    <h2 class="my-3 text-center font-weight-bold text-primary">CHECKOUT ORDER</h2>
-    <div class="border-top mb-2"></div>
-    <section>
-        <form method="POST" action="{{ route('checkout.place_order') }}" class="" id="addressForm"
-            enctype="multipart/form-data">
+    <section class="mt-12">
+        <form method="POST" action="{{ route('orders.re-order.place', ['id' => $order->id]) }}" class=""
+            id="addressForm" enctype="multipart/form-data">
             @csrf
             <div class="container-fluid mt-4">
                 <div class="row w-100 justify-content-center">
@@ -81,15 +65,18 @@
                                         <div class="px-3">
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="delivery" value="Delivery" checked>
+                                                    id="delivery" value="Delivery"
+                                                    {{ $order->delivery_option === 'Delivery' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="delivery">Delivery</label>
                                             </div>
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="pickup" value="Pick Up">
+                                                    id="pickup" value="Pick Up"
+                                                    {{ $order->delivery_option === 'Pick Up' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="pickup">Pick Up</label>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +111,7 @@
                                                 </div>
                                                 <div class="row mb-3">
                                                     <a id="editAddressBtn" class="btn btn-sm btn-outline-primary"
-                                                        href="{{ URL::secure(route('checkout.edit.address', ['prev' => 'checkout'])) }}">Edit
+                                                        href="{{ URL::secure(route('checkout.edit.address', ['prev' => $order->id])) }}">Edit
                                                         this address</a>
                                                 </div>
                                                 <div class="row mb-3">
@@ -153,7 +140,7 @@
                                                     </p>
                                                 </div>
                                             @else
-                                                @include('client.checkout.inputAddressForm')
+                                                @include('client.checkout.inputAddressForm')])
                                             @endif
                                         </div>
                                     @else
@@ -249,13 +236,11 @@
                                         <input type="text" class="form-control" name="reference_number"
                                             id="reference_number" placeholder="Reference number or control number"
                                             disabled readonly>
-                                        <label for="reference_number" id="reference_label">Reference / Control
-                                            No.</label>
+                                        <label for="reference_number" id="reference_label">Reference / Control No.</label>
                                     </div>
 
                                     <div class="mb-2">
-                                        <label for="formFile" class="form-label" id="file_label">Uploade or Browse
-                                            your
+                                        <label for="formFile" class="form-label" id="file_label">Uploade or Browse your
                                             Payment
                                             Reciept</label>
                                         <input class="form-control" type="file" name="formFile" id="formFile"
@@ -342,89 +327,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
     <script>
-        function extractReferenceNumber(file) {
-            return new Promise(function(resolve, reject) {
-                // Show loading animation while processing
-                // You can customize this based on your preferred loading animation
-                // For example, display a spinner or show a loading message
-                // Replace 'loading-animation-id' with the ID or selector of your loading animation element
-                $('#loading-animation-id').show();
-
-                Tesseract.recognize(file, 'eng')
-                    .then(function(result) {
-                        console.log(result);
-
-                        var referenceNumberLine = null;
-                        var gcashPattern = /Ref No\. (\d+\s\d+\s\d+)/;
-                        var paymayaPattern = /Reference ID ([A-Z0-9]+)/;
-
-                        // Iterate over the words and find the line with the reference number
-                        result.data.words.forEach(function(word) {
-                            if (gcashPattern.test(word.line.text) || paymayaPattern.test(word.line
-                                    .text)) {
-                                referenceNumberLine = word.line.text;
-                                return false; // Exit the loop if a match is found
-                            }
-                        });
-
-                        var referenceNumber = null;
-                        var referenceNumberWithoutSpaces = null;
-
-                        if (referenceNumberLine) {
-                            var gcashMatches = referenceNumberLine.match(gcashPattern);
-                            var paymayaMatches = referenceNumberLine.match(paymayaPattern);
-
-                            if (gcashMatches) {
-                                referenceNumber = gcashMatches[1];
-                            } else if (paymayaMatches) {
-                                referenceNumber = paymayaMatches[1];
-                            }
-
-                            referenceNumberWithoutSpaces = referenceNumber ? referenceNumber.replace(/\s/g,
-                                '') : null;
-                        }
-
-                        // Hide the loading animation
-                        $('#loading-animation-id').hide();
-
-                        // Resolve the promise with the extracted reference number
-                        resolve(referenceNumberWithoutSpaces);
-                    })
-                    .catch(function(error) {
-                        console.error(error);
-                        // Hide the loading animation
-                        $('#loading-animation-id').hide();
-                        // Reject the promise with the error
-                        reject(error);
-                    });
-            });
-        }
-
-        $(document).ready(function() {
-            $('#loading-animation-id').hide();
-            $('#formFile').on('change', function() {
-                var fileInput = this;
-                var file = fileInput.files[0];
-
-                // Call the function to extract the reference number
-                extractReferenceNumber(file)
-                    .then(function(referenceNumberWithoutSpaces) {
-                        // Assign the extracted reference number to an input text field
-                        // Replace 'input-text-id' with the ID or selector of your input text field
-                        $('#reference_number').val(referenceNumberWithoutSpaces);
-                    })
-                    .catch(function(error) {
-                        // Handle the error if extraction fails
-                        console.error(error);
-                    });
-            });
-        });
-    </script>
-
-    <script>
-        // Get the CSRF token value
         var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
         // Function to disable elements when Pick Up option is selected
         function disablePickUpElements() {
             $('#editAddressBtn').prop('disabled', true);
@@ -487,8 +390,8 @@
             $('#label').prop('readonly', false);
         }
 
-        // Initially call the appropriate function based on the selected radio button
-        if ($('#pickup').prop('checked')) {
+         // Initially call the appropriate function based on the selected radio button
+         if ($('#pickup').prop('checked')) {
             disablePickUpElements();
         } else {
             enablePickUpElements();
@@ -502,6 +405,88 @@
                 enablePickUpElements();
             }
         });
+
+        function extractReferenceNumber(file) {
+            return new Promise(function(resolve, reject) {
+                // Show loading animation while processing
+                // You can customize this based on your preferred loading animation
+                // For example, display a spinner or show a loading message
+                // Replace 'loading-animation-id' with the ID or selector of your loading animation element
+                $('#loading-animation-id').show();
+
+                Tesseract.recognize(file, 'eng')
+                    .then(function(result) {
+                        console.log(result);
+
+                        var referenceNumberLine = null;
+                        var gcashPattern = /Ref No\. (\d+\s\d+\s\d+)/;
+                        var paymayaPattern = /Reference ID ([A-Z0-9]+)/;
+
+                        // Iterate over the words and find the line with the reference number
+                        result.data.words.forEach(function(word) {
+                            if (gcashPattern.test(word.line.text) || paymayaPattern.test(word.line
+                                    .text)) {
+                                referenceNumberLine = word.line.text;
+                                return false; // Exit the loop if a match is found
+                            }
+                        });
+
+                        var referenceNumber = null;
+                        var referenceNumberWithoutSpaces = null;
+
+                        if (referenceNumberLine) {
+                            var gcashMatches = referenceNumberLine.match(gcashPattern);
+                            var paymayaMatches = referenceNumberLine.match(paymayaPattern);
+
+                            if (gcashMatches) {
+                                referenceNumber = gcashMatches[1];
+                            } else if (paymayaMatches) {
+                                referenceNumber = paymayaMatches[1];
+                            }
+
+                            referenceNumberWithoutSpaces = referenceNumber ? referenceNumber.replace(/\s/g,
+                                '') : null;
+                        }
+
+                        // Hide the loading animation
+                        $('#loading-animation-id').hide();
+
+                        // Resolve the promise with the extracted reference number
+                        resolve(referenceNumberWithoutSpaces);
+                    })
+                    .catch(function(error) {
+                        console.error(error);
+                        // Hide the loading animation
+                        $('#loading-animation-id').hide();
+                        // Reject the promise with the error
+                        reject(error);
+                    });
+            });
+        }
+
+        $(document).ready(function() {
+            $('#formFile').on('change', function() {
+                var fileInput = this;
+                var file = fileInput.files[0];
+
+                // Call the function to extract the reference number
+                extractReferenceNumber(file)
+                    .then(function(referenceNumberWithoutSpaces) {
+                        // Assign the extracted reference number to an input text field
+                        // Replace 'input-text-id' with the ID or selector of your input text field
+                        $('#reference_number').val(referenceNumberWithoutSpaces);
+                    })
+                    .catch(function(error) {
+                        // Handle the error if extraction fails
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
+
+    <script>
+        // Get the CSRF token value
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         $('#payment_method').change(function() {
             if ($(this).val() === 'Cash On Delivery') {

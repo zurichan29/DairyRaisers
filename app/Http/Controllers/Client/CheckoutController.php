@@ -122,8 +122,10 @@ class CheckoutController extends Controller
                 $regions = array_filter($addressData, function ($regionCode) use ($allowedRegionCodes) {
                     return in_array($regionCode, $allowedRegionCodes);
                 }, ARRAY_FILTER_USE_KEY);
+                
+                $prev = $request->query('prev');
 
-                return view('client.checkout.editAddressForm', compact('address', 'regions', 'addressData'));
+                return view('client.checkout.editAddressForm', compact('address', 'regions', 'addressData', 'prev'));
             } else {
                 throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
             }
@@ -134,6 +136,7 @@ class CheckoutController extends Controller
     public function checkEditAddress(Request $request)
     {
         $id = $request->query('id');
+        $prev = $request->query('prev');
         if (auth()->check()) {
             $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->firstOrFail();
             if ($address) {
@@ -174,8 +177,12 @@ class CheckoutController extends Controller
                 $address->zip_code = $addresses['zip_code'];
 
                 $address->save();
-
-                return redirect()->route('checkout')->with('message', 'Address updated successfully');
+                
+                if($prev == 'checkout') {
+                    return redirect()->route('checkout')->with('message', 'Address updated successfully');
+                } else {
+                    return redirect()->route('orders.re-order', ['id' => $prev])->with('message', 'Address updated successfully');                    
+                }
             }
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }

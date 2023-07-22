@@ -11,6 +11,15 @@ use Illuminate\Http\Response;
 
 class PaymentMethodController extends Controller
 {
+    public function create()
+    {
+        if (auth()->guard('admin')->check()) {
+
+            return view('admin.payment_methods.create');
+        } else {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+    }
     //
     public function index()
     {
@@ -23,15 +32,6 @@ class PaymentMethodController extends Controller
         }
     }
 
-    public function create()
-    {
-        if (auth()->guard('admin')->check()) {
-
-            return view('admin.payment_methods.create');
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-        }
-    }
 
     public function store(Request $request)
     {

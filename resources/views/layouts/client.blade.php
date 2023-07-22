@@ -34,10 +34,29 @@
 </head>
 <!-- Custome style -->
 <style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner-border {
+        width: 4rem;
+        /* Adjust the size as needed */
+        height: 4rem;
+        /* Adjust the size as needed */
+    }
+
     /* Custom CSS for hover dropdown */
-    .dropdown:hover .dropdown-menu {
+    .dropdowns:hover .dropdown-menu {
         display: block;
-       
     }
 
     .logo {
@@ -88,6 +107,11 @@
 </style>
 
 <body class="">
+    <div id="loading-animation-id" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow fixed-top">
         <div class="container d-flex align-items-center justify-content-between">
@@ -128,7 +152,7 @@
                             aria-label="Button group with nested dropdown">
                             <button type="button"
                                 class="btn btn-sm btn-dark font-weight-bolder">₱{{ $cartTotal . '.00' }}</button>
-                            <div class="dropdown position-static btn-group" role="group">
+                            <div class="dropdown dropdowns position-static btn-group" role="group">
                                 <a href="{{ route('cart') }}"
                                     class="btn btn-sm btn-outline-primary position-relative dropdown-toggle"
                                     id="hoverDropdown" aria-haspopup="true" aria-expanded="false">
@@ -183,7 +207,8 @@
                                             </div>
                                         </div>
                                     @else
-                                        <img src="{{ asset('images/empty_cart.png') }}" class="img-fluid" alt="empty cart">
+                                        <img src="{{ asset('images/empty_cart.png') }}" class="img-fluid"
+                                            alt="empty cart">
                                         <h5 class="text-center">Empty Cart</h5>
                                     @endif
                                 </div>
@@ -227,13 +252,15 @@
                 <a href="https://twitter.com/gentrisbest" class="text-white me-4">
                     <i class="fa-brands fa-twitter"></i>
                 </a>
-                <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#search/gentridairympc%40ymail.com%E2%80%8B​" class="text-white me-4">
+                <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#search/gentridairympc%40ymail.com%E2%80%8B​"
+                    class="text-white me-4">
                     <i class="fa-brands fa-google"></i>
                 </a>
                 <a href="https://www.instagram.com/gentrisbest/" class="text-white me-4">
                     <i class="fa-brands fa-instagram"></i>
                 </a>
-                <a href="https://www.linkedin.com/company/general-trias-dairy-raisers-multi-purpose-cooperative" class="text-white me-4">
+                <a href="https://www.linkedin.com/company/general-trias-dairy-raisers-multi-purpose-cooperative"
+                    class="text-white me-4">
                     <i class="fa-brands fa-linkedin"></i>
                 </a>
             </div>
@@ -323,6 +350,7 @@
     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script> --}}
     <script>
         window.addEventListener('DOMContentLoaded', function() {
+            $('#loading-animation-id').hide();
             var navbarHeight = document.querySelector('.navbar').offsetHeight;
             var mainContent = document.getElementById('main-content');
             mainContent.style.marginTop = navbarHeight + 'px';

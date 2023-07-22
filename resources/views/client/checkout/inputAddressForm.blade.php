@@ -50,12 +50,12 @@
         <label for="barangaySelect">Barangay *</label>
     </div>
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" name="street"
+        <input type="text" class="form-control" name="street" id="street"
             placeholder="enter street">
         <label for="street">Street Name, Building, House No. *</label>
     </div>
     <div class="form-floating mb-3">
-        <input type="number" class="form-control" name="zip_code"
+        <input type="number" class="form-control" name="zip_code" id="zip_code"
             placeholder="enter zip_code">
         <label for="zip_code">Zip Code *</label>
     </div>

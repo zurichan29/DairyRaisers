@@ -17,7 +17,6 @@
                 type="button" role="tab" aria-controls="pills-manage-order" aria-selected="false"><i
                     class="fa-solid fa-gear"></i> Manage Order</button>
         </li>
-
     </ul>
     <div class="tab-content p-2" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-order-invoice" role="tabpanel"
@@ -103,6 +102,11 @@
                                                 class="badge {{ $statusBadge }}">{{ $order->status }}</span>
                                         </h6>
                                     </div>
+                                    <div class="col">
+                                        <h6 class="text-center">Method: <span
+                                                class="badge badge-light">{{ $order->delivery_option }}</span>
+                                        </h6>
+                                    </div>
                                 </div>
                                 <br>
                                 <div class="d-grid gap-2 col-6 mx-auto">
@@ -112,9 +116,9 @@
                                 </div>
                                 <div class="collapse mt-3" id="PaymentReciept">
                                     <div class="card card-body">
-                                        <a href="{{ asset($order->payment_reciept) }}" data-fancybox="gallery"
+                                        <a href="{{ asset('storage/' . $order->payment_reciept) }}" data-fancybox="gallery"
                                             data-caption="Payment Reciept">
-                                            <img src="{{ asset($order->payment_reciept) }}" class="img-fluid"
+                                            <img src="{{ asset('storage/' . $order->payment_reciept) }}" class="img-fluid"
                                                 alt="Image">
                                         </a>
                                     </div>
@@ -179,15 +183,28 @@
                                     <div class="">
                                         <h5 class="font-weight-bold text-primary">Manage Order *</h5>
                                     </div>
-                                    <form class="form" method="POST"
-                                        action="{{ route('admin.orders.otw', ['id' => $order->id]) }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-sm btn-warning"><i
-                                                    class="fa-solid fa-truck-fast me-1"></i> On The Way</button>
-                                        </div>
-                                    </form>
+                                    @if ($order->delivery_option == 'Delivery')
+                                        <form class="form" method="POST"
+                                            action="{{ route('admin.orders.otw', ['id' => $order->id]) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-sm btn-warning"><i
+                                                        class="fa-solid fa-truck-fast me-1"></i> On The Way</button>
+                                            </div>
+                                        </form>
+                                    @elseif ($order->delivery_option == 'Pick Up')
+                                        <form class="form" method="POST"
+                                            action="{{ route('admin.orders.pick_up', ['id' => $order->id]) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-sm btn-warning"><i
+                                                        class="fa-solid fa-box-archive me-1"></i> Read to Pick Up</button>
+                                            </div>
+                                        </form>
+                                    @endif
+
                                 </div>
                             </div>
                         </div>
@@ -226,6 +243,33 @@
                         </div>
                     @break
 
+                    @case('Ready To Pick Up')
+                        <div class="col-md-7 d-flex align-self-stretch">
+                            <div class="card w-100">
+                                <div class="card-body d-flex and flex-column">
+                                    <div class="">
+                                        <h5 class="font-weight-bold text-primary">Manage Order *</h5>
+                                    </div>
+                                    <form class="form" method="POST"
+                                        action="{{ route('admin.orders.delivered', ['id' => $order->id]) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-sm btn-success"><i
+                                                    class="fa-solid fa-circle-check me-1"></i> Recieved</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 d-flex align-self-stretch">
+                            <div class="d-grid text-center">
+                                <img src="{{ asset('images/ready_to_pick_up.png') }}" class="img-fluid" alt="Manage Order Picture">
+                                <h5 class="font-weight-light">Order is ready to pick up!</h5>
+                            </div>
+                        </div>
+                    @break
+
                     @case('Rejected')
                         <div class="col d-flex align-self-stretch">
                             <div class="card w-100">
@@ -240,12 +284,19 @@
                         </div>
                     @break
 
-                    @case('Delivered')
+                    @case('Delivered' || 'Recieved')
+                        @php
+                            if ($order->delivery_option == 'Delivery') {
+                                $message = 'Order has been delivered successfully!';
+                            } elseif ($order->delivery_option == 'Pick Up') {
+                                $message = 'The customer has successfully picked up the order!';
+                            }
+                        @endphp
                         <div class="col d-flex align-self-stretch">
                             <div class="card w-100">
                                 <div class="card-body d-flex and flex-column">
                                     <div class="d-grid text-center">
-                                        <h5 class="mt-2 font-weight-light">Order has been delivered successfully!</h5>
+                                        <h5 class="mt-2 font-weight-light">{{ $message }}</h5>
                                         <img src="{{ asset('images/delivered.png') }}" class="img-fluid"
                                             alt="Manage Order Picture">
                                     </div>

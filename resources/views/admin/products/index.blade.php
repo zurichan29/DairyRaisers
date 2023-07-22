@@ -1,30 +1,22 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="bg-white rounded shadow-sm p-4">
-        <h1 class="text-2xl font-bold mb-4">Inventory</h1>
+     <!-- Page Heading -->
+     <div class="mb-4 d-flex align-items-center justify-content-between">
+        <h1 class="h3 text-gray-800">Inventory</h1>
+    </div>
 
-        <a href="{{ route('admin.products.create') }}"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
-            Add Product
-        </a>
-
+    <div class="card shadow mb-4">
         <p>{{ now()->format('Y-m-d') }}</p>
-
-        @if (session('success'))
-            <div class="bg-green-200 text-green-800 py-2 px-4 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <table class="table-auto w-full">
-            <thead>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <tr>
-                    <th class="px-4 py-2">Name</th>
-                    <th class="px-4 py-2">Variant</th>
-                    <th class="px-4 py-2">Price</th>
-                    <th class="px-4 py-2">Qty</th>
-                    <th class="px-4 py-2">Actions</th>
+                    <th class="">Name</th>
+                    <th class="">Variant</th>
+                    <th class="">Price</th>
+                    <th class="">Qty</th>
+                    <th class=""></th>
                 </tr>
             </thead>
             <tbody>

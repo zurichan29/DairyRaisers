@@ -28,7 +28,7 @@ class OrderController extends Controller
     public function index()
     {
         if (auth()->guard('admin')->check()) {
-            $orders = Order::with('user')->get();
+            $orders = Order::with('user')->get()->sortBy('created_at');
             
             return view('admin.orders.index', compact('orders'));
         } else {
@@ -43,6 +43,11 @@ class OrderController extends Controller
             $user = User::with('cart.product')->with('order')->with('address')->where('id', $order->user->id)->first();
             $cart = $user->cart->where('order_number', $order->order_number);
             $statusBadge = null;
+            if ($order->delivery_option == 'Delivery') {
+
+            } elseif($order->delivery_option == 'Pick Up') {
+
+            }
             switch ($order->status) {
                 case 'Pending':
                     $statusBadge = 'badge-info';
@@ -97,12 +102,32 @@ class OrderController extends Controller
         }
     }
 
+    public function pickUp($id)
+    {
+        if (auth()->guard('admin')->check()) {
+            $order = Order::findOrFail($id);
+            if ($order->status == 'Approved') {
+                $order->status = 'Ready To Pick Up';
+                $order->save();
+                return redirect()->route('admin.orders.show', ['id' => $id]);
+            } else {
+                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
+            }
+        } else {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+    }
+
     public function delivered($id)
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
             if ($order->status == 'On The Way') {
                 $order->status = 'Delivered';
+                $order->save();
+                return redirect()->route('admin.orders.show', ['id' => $id]);
+            } elseif($order->status == 'Ready To Pick Up') {
+                $order->status = 'Recieved';
                 $order->save();
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {

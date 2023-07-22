@@ -82,15 +82,19 @@ Route::get('/register-details/number/{mobile_number}', [RegisterController::clas
 Route::post('register/details/validate', [RegisterController::class, 'checkDetails'])->name('register.details.validate');
 
 /** ORDER HISTORY */
-Route::get('/order', [ClientOrder::class, 'show'])->name('order_history');
+Route::get('/orders', [ClientOrder::class, 'index'])->name('order_history');
+Route::get('/orders/{id}', [ClientOrder::class, 'show'])->name('orders.show');
+Route::get('/orders/re-order/{id}', [ClientOrder::class, 're_order'])->name('orders.re-order');
+Route::post('/orders/re-order/{id}/place', [ClientOrder::class, 'place'])->name('orders.re-order.place');
 
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-Route::post('/checkout/edit_address/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit_address.validate');
-Route::get('/checkout/edit_address', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit_address');
-Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
 Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
+
+Route::get('/checkout/address/edit', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit.address');
+Route::post('/checkout/address/edit/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit.address.validate');
+Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 
 /** USER PROFILE OR SETTINGS */
 Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
@@ -104,6 +108,7 @@ Route::delete('/profile/address/delete/{id}', [ClientController::class, 'deleteA
 Route::get('/profile/address/edit/{id}', [ClientController::class, 'editAddress'])->name('edit.address');
 Route::put('/profile/address/update/{id}', [ClientController::class, 'updateAddress'])->name('update.address');
 Route::post('/profile/address/make_default', [ClientController::class, 'defaultAddress'])->name('default.address');
+
 // EMAIL
 Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
 Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
@@ -144,6 +149,7 @@ Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orde
 Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
 Route::put('/admin/orders/{id}/approved', [OrderManagement::class, 'approved'])->name('admin.orders.approved');
 Route::put('/admin/orders/{id}/otw', [OrderManagement::class, 'onTheWay'])->name('admin.orders.otw');
+Route::put('/admin/orders/{id}/pickup', [OrderManagement::class, 'pickUp'])->name('admin.orders.pick_up');
 Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
 Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
 

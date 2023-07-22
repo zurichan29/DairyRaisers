@@ -24,6 +24,7 @@
                         <tr>
                             <th>Order No.</th>
                             <th>Reference No.</th>
+                            <th>Method</th>
                             <th>Customer</th>
                             <th>Status</th>
                             <th></th>
@@ -33,6 +34,7 @@
                         <tr>
                             <th>Order No.</th>
                             <th>Reference No.</th>
+                            <th>Method</th>
                             <th>Customer</th>
                             <th>Status</th>
                             <th></th>
@@ -56,7 +58,15 @@
                                         $statusBadge = 'badge-warning';
                                         $icon = 'fa-solid fa-truck-fast me-1';
                                         break;
+                                    case 'Ready To Pick Up':
+                                        $statusBadge = 'badge-warning';
+                                        $icon = 'fa-solid fa-box-archive me-1';
+                                        break;
                                     case 'Delivered':
+                                        $statusBadge = 'badge-success';
+                                        $icon = 'fa-solid fa-circle-check me-1';
+                                        break;
+                                    case 'Recieved':
                                         $statusBadge = 'badge-success';
                                         $icon = 'fa-solid fa-circle-check me-1';
                                         break;
@@ -67,6 +77,7 @@
                             <tr>
                                 <td>{{ $order->order_number }}</td>
                                 <td>{{ $order->reference_number }}</td>
+                                <td>{{ $order->delivery_option }}</td>
                                 <td>{{ $order->user->first_name . ' ' . $order->user->last_name }}</td>
                                 <td class=" text-center">
                                     <p class="badge {{ $statusBadge }} text-center text-wrap py-2" style="width: 8rem;">
