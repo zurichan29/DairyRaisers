@@ -96,12 +96,12 @@
             </div>
             {{-- BUFFALOS --}}
             <li class="nav-item {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'active' : null }}">
-                <a class="nav-link" href="{{ route('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? null : 'collapsed' }} href="#" data-toggle="collapse" data-target="#collapseProducts" aria-expanded="true"
-                aria-controls="collapseProducts">
+                <a class="nav-link" href="{{ route('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? null : 'collapsed' }} href="#" data-toggle="collapse" data-target="#collapseBuffalos" aria-expanded="true"
+                aria-controls="collapseBuffalos">
                     <i class="fa-solid fa-cow"></i>
                     <span>Buffalos</span>
                 </a>
-                <div id="collapseProducts"
+                <div id="collapseBuffalos"
                     class="collapse {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'show' : null }}"
                     aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
