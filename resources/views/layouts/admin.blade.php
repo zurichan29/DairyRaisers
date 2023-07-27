@@ -5,28 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <style>
-        .dropdown {
-            position: relative;
-        }
 
-        .dropdown-toggle::after {
-            display: none;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            transform: translateX(-100%);
-            min-width: 10rem;
-        }
-    </style>
     {{-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
+    <!-- Add this script tag to include moment.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
@@ -36,36 +23,78 @@
     <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ asset('js/jquery.min.js') }}"></script>
 
+    <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 
 
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        function orderNotification(order) {
+            toastr.options.closeButton = true;
+            toastr.options.timeOut = 0;
+            toastr.options.extendedTimeOut = 0;
+            toastr.info(order.order_number + ': for ' + order.delivery_option, 'New Order');
+        }
+
+        function showNotification(status, title, message) {
+            toastr.options.closeButton = true;
+            toastr.options.timeOut = 10000;
+            toastr.options.extendedTimeOut = 10000;
+            toastr.options.progressBar = true;
+
+            switch (status) {
+                case 'success':
+                    toastr.success(message, title)
+                    break;
+                case 'info':
+                    toastr.info(message, title)
+                    break;
+                case 'warning':
+                    toastr.warning(message, title)
+                    break;
+                case 'error':
+                    toastr.error(message, title)
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('f25da7ad5e99d90d9214', {
+            cluster: 'ap1'
+        });
+
+        var channel = pusher.subscribe('admin-channel');
+        channel.bind('order-notification', function(data) {
+
+            var order = JSON.parse(JSON.stringify(data));
+            orderNotification(order.order);
+        });
+    </script>
+
+    <style>
+
+    </style>
 
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
     <title>Admin | Dairy Raisers</title>
 </head>
 
 <body id="page-top">
-    {{-- Notificaiton --}}
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-        <div class="toast" id="Notification" role="alert" aria-live="assertive" aria-atomic="true"
-            data-bs-delay="5000">
-            <div class="toast-header bg-success">
-                <strong class="me-auto"><i class="fa-solid fa-circle-check"></i> Success</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Notification
-            </div>
-        </div>
-    </div>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" style="width: 800px"
+            id="accordionSidebar">
 
             <a class="sidebar-brand d-flex align-items-center justify-content-between"
                 href="{{ route('admin.dashboard') }}">
@@ -95,9 +124,12 @@
                 Interface
             </div>
             {{-- BUFFALOS --}}
-            <li class="nav-item {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'active' : null }}">
-                <a class="nav-link" href="{{ route('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? null : 'collapsed' }} href="#" data-toggle="collapse" data-target="#collapseBuffalos" aria-expanded="true"
-                aria-controls="collapseBuffalos">
+            <li
+                class="nav-item {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'active' : null }}">
+                <a class="nav-link"
+                    href="{{ route('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? null : 'collapsed' }} href="#"
+                    data-toggle="collapse" data-target="#collapseBuffalos" aria-expanded="true"
+                    aria-controls="collapseBuffalos">
                     <i class="fa-solid fa-cow"></i>
                     <span>Buffalos</span>
                 </a>
@@ -113,7 +145,12 @@
                 </div>
             </li>
             {{-- PRODUCTS --}}
-            <li
+            <li class="nav-item {{ Request::routeIs('admin.products.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.products.index') }}">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Product Management</span></a>
+            </li>
+            {{-- <li
                 class="nav-item {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? 'active' : null }}">
                 <a class="nav-link {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? null : 'collapsed' }}"
                     href="#" data-toggle="collapse" data-target="#collapseProducts" aria-expanded="true"
@@ -131,12 +168,12 @@
                             href="{{ route('admin.products.variants') }}">Variants</a>
                     </div>
                 </div>
-            </li>
+            </li> --}}
             {{-- ORDERS --}}
             <li class="nav-item {{ Request::routeIs('admin.orders.index') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.orders.index') }}">
                     <i class="fa-solid fa-truck-moving"></i>
-                    <span>Orders</span></a>
+                    <span>Order Management</span></a>
             </li>
             {{-- PAYMENT METHODS --}}
             <li class="nav-item {{ Request::routeIs('admin.payment_method.index') ? 'active' : '' }}">
@@ -144,14 +181,27 @@
                     <i class="fa-solid fa-credit-card"></i>
                     <span>Payment Methods</span></a>
             </li>
+            {{-- ACTIVITY LOGS --}}
+            <li class="nav-item {{ Request::routeIs('admin.activity_logs') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.activity_logs') }}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Activity Logs</span></a>
+            </li>
 
-            {{-- <!-- Divider -->
+            <!-- Divider -->
             <hr class="sidebar-divider">
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Addons
-            </div> --}}
+                Analytics
+            </div>
+
+            {{-- ACTIVITY LOGS --}}
+            <li class="nav-item {{ Request::routeIs('admin.sales_report.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.sales_report.index') }}">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span>Sales Report</span></a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -178,7 +228,7 @@
                     </button>
 
                     <!-- Topbar Search -->
-                    <form
+                    {{-- <form
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
                             <input type="text" class="form-control bg-light border-0 small"
@@ -189,13 +239,13 @@
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form> --}}
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
                         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
+                        {{-- <li class="nav-item dropdown no-arrow d-sm-none">
                             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-search fa-fw"></i>
@@ -269,10 +319,10 @@
                                 <a class="dropdown-item text-center small text-gray-500" href="#">Show All
                                     Alerts</a>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <!-- Nav Item - Messages -->
-                        <li class="nav-item dropdown no-arrow mx-1">
+                        {{-- <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-envelope fa-fw"></i>
@@ -287,7 +337,6 @@
                                 </h6>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        {{-- <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="..."> --}}
                                         <div class="status-indicator bg-success"></div>
                                     </div>
                                     <div class="font-weight-bold">
@@ -298,7 +347,6 @@
                                 </a>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        {{-- <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="..."> --}}
                                         <div class="status-indicator"></div>
                                     </div>
                                     <div>
@@ -309,7 +357,6 @@
                                 </a>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <div class="dropdown-list-image mr-3">
-                                        {{-- <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="..."> --}}
                                         <div class="status-indicator bg-warning"></div>
                                     </div>
                                     <div>
@@ -334,7 +381,7 @@
                                 <a class="dropdown-item text-center small text-gray-500" href="#">Read More
                                     Messages</a>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -420,7 +467,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="{{ route('logout.admin') }}">Logout</a>
                 </div>
             </div>
         </div>

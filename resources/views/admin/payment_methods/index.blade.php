@@ -1,6 +1,11 @@
 @extends('layouts.admin')
 
 @section('content')
+    <style>
+        #dataTable {
+            font-size: 14px;
+        }
+    </style>
     <!-- Page Heading -->
     <div class="mb-4 d-flex align-items-center justify-content-between">
         <h1 class="h3 text-gray-800">Payment Methods</h1>
@@ -28,18 +33,27 @@
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name="type" id="type" placeholder="Type">
                                 <label for="type">Type</label>
+                                <div id="add-type-error" class="add-method-error"></div>
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name="account_name" id="account_name"
                                     placeholder="Account Name">
                                 <label for="account_name">Account Name</label>
+                                <div id="add-account_name-error" class="add-method-error"></div>
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name="account_number" id="account_number"
                                     placeholder="Account Number">
                                 <label for="account_number">Account Number</label>
+                                <div id="add-account_number-error" class="add-method-error"></div>
                             </div>
-                            <button type="submit" class="btn float-end btn-primary">Submit</button>
+                            <button type="submit" id="addMethodBtn" class="btn btn-primary mb-3">
+                                <span class="loading-spinner" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </span>
+                                <span class="btn-text">Submit</span>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -53,19 +67,19 @@
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Account Name</th>
-                            <th>Account No.</th>
-                            <th>Status</th>
+                            <th>TYPE</th>
+                            <th>ACCOUNT NAME</th>
+                            <th>ACCOUNT NO.</th>
+                            <th>STATUS</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>Type</th>
-                            <th>Account Name</th>
-                            <th>Account No.</th>
-                            <th>Status</th>
+                            <th>TYPE</th>
+                            <th>ACCOUNT NAME</th>
+                            <th>ACCOUNT NO.</th>
+                            <th>STATUS</th>
                             <th></th>
                         </tr>
                     </tfoot>
@@ -149,18 +163,27 @@
                             <input type="text" class="form-control" name="type" id="editType"
                                 placeholder="Type">
                             <label for="editType">Type</label>
+                            <div id="edit-type-error" class="edit-method-error"></div>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" name="account_name" id="editAccountName"
                                 placeholder="Account Name">
                             <label for="editAccountName">Account Name</label>
+                            <div id="edit-account_name-error" class="edit-method-error"></div>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="account_number" id="editAccountNumber"
+                            <input type="text" class="form-control" name="account_number" id="editAccountNumber"
                                 placeholder="Account Number">
                             <label for="editAccountNumber">Account Number</label>
+                            <div id="edit-account_number-error" class="edit-method-error"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" id="updateMethodBtn" class="btn btn-primary mb-3">
+                            <span class="loading-spinner" style="display: none;">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Loading...
+                            </span>
+                            <span class="btn-text">Save Changes</span>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -169,12 +192,18 @@
 
     <script>
         $(document).ready(function() {
-
-            var dataTable = $('#dataTable').DataTable({
-                columns: [
-                    null, // Type column
-                    null, // Account Name column
-                    null, // Account Number column
+            var dataTable = null;
+            var currentDataTablePage = 1;
+            dataTable = $('#dataTable').DataTable({
+                columns: [{
+                        className: 'type-column',
+                    },
+                    {
+                        className: 'account-name-column',
+                    },
+                    {
+                        className: 'account-number-column',
+                    },
                     { // Status column
                         className: 'text-center',
                     },
@@ -185,54 +214,105 @@
                 ],
             });
 
-            function showNotification(status, message) {
-                var notification = $('#Notification');
-                var notificationHeader = notification.find('.toast-header');
-                var notificationBody = notification.find('.toast-body');
-                var iconClass = '';
-                var headerClass = '';
-                var headerText = '';
+            function clearErrorMessages() {
+                $('.add-method-error').empty();
+                $('.edit-method-error').empty();
+            }
 
-                // Update classes, icon, and header text based on the status
-                switch (status) {
-                    case 'success':
-                        headerClass = 'bg-success';
-                        iconClass = 'fa-solid fa-circle-check';
-                        headerText = 'Success';
-                        break;
-                    case 'updated':
-                        headerClass = 'bg-info';
-                        iconClass = 'fa-solid fa-circle-info';
-                        headerText = 'Updated';
-                        break;
-                    case 'deleted':
-                        headerClass = 'bg-warning';
-                        iconClass = 'fa-solid fa-trash';
-                        headerText = 'Deleted';
-                        break;
-                    case 'error':
-                        headerClass = 'bg-danger';
-                        iconClass = 'fa-solid fa-circle-xmark';
-                        headerText = 'Error';
-                        break;
-                    default:
-                        break;
-                }
+            // Function to initialize DataTable
+            function initializeDataTable(data) {
+                console.log(data);
+                dataTable = $('#dataTable').DataTable({ // Store the DataTable instance in the dataTable variable
+                    data: data,
+                    columns: [{
+                            data: 'type',
+                            title: 'TYPE',
+                            className: 'type-column'
+                        },
+                        {
+                            data: 'account_name',
+                            title: 'ACCOUNT NAME',
+                            className: 'account-name-column'
+                        },
+                        {
+                            data: 'account_number',
+                            title: 'ACCOUNT NO.',
+                            className: 'account-number-column'
+                        },
+                        {
+                            data: 'status',
+                            title: 'STATUS',
+                            className: 'text-center',
+                            render: function(data, type, row) {
+                                var statusBadge = data === 'ACTIVATED' ?
+                                    '<p class="badge bg-success text-wrap status-badge" style="width: 6rem;">ACTIVATED</p>' :
+                                    '<p class="badge bg-danger text-wrap status-badge" style="width: 6rem;">DEACTIVATED</p>';
 
-                // Update the notification content and classes
-                notificationHeader.find('strong').removeClass().addClass('me-auto').html(
-                    '<i class="me-2 fa-solid ' + iconClass + '"></i> ' + headerText);
-                notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(
-                    headerClass);
-                notificationBody.text(message);
+                                return statusBadge;
+                            }
+                        },
+                        {
+                            data: null,
+                            title: '',
+                            className: 'text-center',
+                            render: function(data, type, row) {
+                                var statusBadge = data.status == 'ACTIVATED' ?
+                                    '<p class="badge bg-success text-wrap status-badge" style="width: 6rem;">ACTIVATED</p>' :
+                                    '<p class="badge bg-danger text-wrap status-badge" style="width: 6rem;">DEACTIVATED</p>';
 
-                // Show the notification with fade-in and fade-out animations
-                notification.toast({
-                    animation: true
+                                return `
+                            <div class="dropdown">
+                                <button class="btn rounded-3 btn-light" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
+                                    <button type="button" class="dropdown-item edit-btn" data-id="${data.id}">Edit</button>
+                                    <button type="button" class="dropdown-item status-btn" data-id="${data.id}">${data.status === 'ACTIVATED' ? 'Deactivate payment method' : 'Activate payment method'}</button>
+                                    <hr class="dropdown-divider">
+                                    <button type="button" class="dropdown-item delete-btn" data-id="${data.id}">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                            }
+                        }
+                    ]
                 });
+            }
 
-                // Show the notification
-                notification.toast('show');
+            // Function to fetch updated data and refresh DataTable
+            function refreshDataTable() {
+                // Save the current page number before refreshing the table
+                currentDataTablePage = dataTable.page.info().page + 1;
+                // Get the CSRF token value
+                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken // Set the CSRF token in the AJAX request headers
+                    }
+                });
+                $.ajax({
+                    url: "{{ route('admin.payment_method.data') }}", // Replace with your route URL
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Call the function to initialize DataTable with updated data
+                        // Destroy the existing DataTable instance before re-initializing with updated data
+                        if (dataTable) {
+                            dataTable.destroy();
+                        }
+                        console.log(response);
+                        console.log(response.status);
+                        initializeDataTable(response);
+
+                        // Restore the current page after the table is refreshed
+                        dataTable.page(currentDataTablePage - 1).draw('page');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
             }
 
             function initializeRowEvents(row) {
@@ -345,10 +425,20 @@
                 });
             }
 
-            $('#createPaymentForm').submit(function(e) {
+            $('#createPaymentForm').on('submit', function(e) {
                 e.preventDefault(); // Prevent form submission
-
+                var form = this;
                 var formData = new FormData(this); // Create FormData object
+
+                // Get the submit button, loading spinner, and button text elements within the form
+                var submitBtn = $(this).find('#addMethodBtn');
+                var loadingSpinner = submitBtn.find('.loading-spinner');
+                var buttonText = submitBtn.find('.btn-text');
+
+                // Disable the submit button and hide the button text, then show the loading spinner
+                submitBtn.prop('disabled', true);
+                buttonText.hide();
+                loadingSpinner.show();
 
                 // Get the CSRF token value
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -366,52 +456,55 @@
                     processData: false, // Prevent jQuery from processing the data
                     contentType: false, // Prevent jQuery from setting content type
                     success: function(response) {
+                        // Show success notification
+                        showNotification('success', 'Payment Method Added', response.type +
+                            ' successfully addded.');
+
                         // Clear input fields
-                        $('#createPaymentForm')[0].reset();
+                        form.reset();
+
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
+
+                        refreshDataTable();
 
                         // Close the modal
                         var modal = $('#createPaymentMethod');
                         modal.modal('hide');
-
-                        // Show success notification
-                        showNotification('success', 'Payment Method successfully addded.');
-
-                        // Add new row to DataTable
-                        var newRow = [
-                            response.type,
-                            response.account_name,
-                            response.account_number,
-                            '<p class="badge bg-success text-center text-wrap" style="width: 6rem;">' +
-                            response.status +
-                            '</p>',
-                            '<div class="dropdown">' +
-                            '  <button class="btn rounded-3 btn-light" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                            '    <i class="fa-solid fa-ellipsis-vertical"></i>' +
-                            '  </button>' +
-                            '  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">' +
-                            '    <a class="dropdown-item" href="#">Edit</a>' +
-                            '    <a class="dropdown-item status-btn" href="#" data-id="' +
-                            response.id + '">Deactivate</a>' +
-                            '    <hr class="dropdown-divider">' +
-                            '    <a class="dropdown-item delete-btn" href="#" data-id="' +
-                            response.id + '">Delete</a>' +
-                            '  </div>' +
-                            '</div>'
-                        ];
-
-                        $('#dataTable').DataTable().row.add(newRow).draw();
-                        dataTable.rows().every(function() {
-                            initializeRowEvents($(this.node()));
-                        });
+                      
                     },
-                    error: function(error) {
-                        console.error(error);
+                    error: function(xhr) {
+                        var errorResponse = xhr.responseJSON;
+
+                        if (errorResponse && errorResponse.errors) {
+                            // Reset all error divs before showing new errors
+                            $('.add-method-error').html('');
+
+                            // Handle the validation errors
+                            var errorFields = Object.keys(errorResponse.errors);
+
+                            errorFields.forEach(function(field) {
+                                var errorMessage = errorResponse.errors[field][0];
+                                var errorDiv = $('#add-' + field + '-error');
+
+                                // Display the error message in the respective error div
+                                errorDiv.html('<p class="text-danger">' + errorMessage +
+                                    '</p>');
+                            });
+                        } else {
+                            // Handle other error cases
+                            console.error(xhr.responseText);
+                        }
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
                     }
                 });
             });
 
             // Status button click event
-            $('.status-btn').click(function() {
+            $(document).on('click', '.status-btn', function() {
                 var statusButton = $(this);
                 var paymentMethodId = statusButton.data('id');
                 var confirmationMessage = '';
@@ -446,16 +539,12 @@
                                 'Deactivate payment method' :
                                 'Activate payment method');
 
-                            // Update the status badge
-                            var statusBadge = statusButton.closest('tr').find(
-                                '.status-badge');
-                            statusBadge.removeClass('bg-success bg-danger');
-                            statusBadge.addClass(newBg);
-                            statusBadge.text(newStatus);
+                            refreshDataTable();
 
                             // Show notification
-                            showNotification('updated',
-                                'Payment Method status changed.');
+                            showNotification('info', 'Payment Method status changed',
+                                response.type +
+                                ' status changed to ' + response.status + '.');
                         },
                         error: function(error) {
                             console.error(error);
@@ -465,7 +554,7 @@
             });
 
             // Edit button click event
-            $('.edit-btn').click(function() {
+            $(document).on('click', '.edit-btn', function() {
                 var paymentMethodId = $(this).data('id');
                 var type = $(this).closest('tr').find('.type-column').text();
                 var accountName = $(this).closest('tr').find('.account-name-column').text();
@@ -485,68 +574,73 @@
             });
 
             // Edit form submit event
-            $('#editPaymentMethodForm').submit(function(e) {
+            $('#editPaymentMethodForm').on('submit', function(e) {
                 e.preventDefault();
                 var row = $(this).data('row');
+                var form = this;
+                var formData = new FormData(this);
+                // Get the submit button, loading spinner, and button text elements within the form
+                var submitBtn = $(this).find('#updateMethodBtn');
+                var loadingSpinner = submitBtn.find('.loading-spinner');
+                var buttonText = submitBtn.find('.btn-text');
+
+                // Disable the submit button and hide the button text, then show the loading spinner
+                submitBtn.prop('disabled', true);
+                buttonText.hide();
+                loadingSpinner.show();
                 // Perform the AJAX request to update the payment method
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
+                        // Show success notification
+                        showNotification('info', 'Payment Method update', response.type +
+                            ' updated successfully.');
+
+                        // Clear input fields
+                        form.reset();
+
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
+
+                        refreshDataTable();
+
                         // Close the edit modal
                         $('#editPaymentMethodModal').modal('hide');
-
-                        // Show success notification
-                        showNotification('updated', ' Payment method updated successfully.');
-
-                        // Update the corresponding row in the table
-                        var paymentMethodId = response.id;
-
-                        var rowData = dataTable.row(row)
-                            .data(); // Get the data for the selected row
-
-                        var newData = [
-                            response.type,
-                            response.account_name,
-                            response.account_number,
-                            '<p class="badge ' + ((response.status === 'ACTIVATED') ?
-                                'bg-success' : 'bg-danger'
-                            ) +
-                            ' text-center text-wrap status-badge" style="width: 6rem;">' +
-                            response.status + '</p>',
-                            '<div class="dropdown">' +
-                            '  <button class="btn rounded-3 btn-light" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                            '    <i class="fa-solid fa-ellipsis-vertical"></i>' +
-                            '  </button>' +
-                            '  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">' +
-                            '    <a class="dropdown-item edit-btn" href="#" data-id="' +
-                            paymentMethodId + '">Edit</a>' +
-                            '    <a class="dropdown-item status-btn" href="#" data-id="' +
-                            paymentMethodId + '">' +
-                            '      ' + ((response.status === 'ACTIVATED') ?
-                                'Deactivate payment method' : 'Activate payment method'
-                            ) + '' +
-                            '    </a>' +
-                            '    <hr class="dropdown-divider">' +
-                            '    <a class="dropdown-item delete-btn" href="#" data-id="' +
-                            paymentMethodId + '">Delete</a>' +
-                            '  </div>' +
-                            '</div>'
-                        ];
-
-                        dataTable.row(row).data(newData);
-                        dataTable.draw();
                     },
-                    error: function(error) {
-                        console.error(error.responseJSON.message);
+                    error: function(xhr) {
+                        var errorResponse = xhr.responseJSON;
+
+                        if (errorResponse && errorResponse.errors) {
+                            // Reset all error divs before showing new errors
+                            $('.edit-method-error').html('');
+
+                            // Handle the validation errors
+                            var errorFields = Object.keys(errorResponse.errors);
+
+                            errorFields.forEach(function(field) {
+                                var errorMessage = errorResponse.errors[field][0];
+                                var errorDiv = $('#edit-' + field + '-error');
+
+                                // Display the error message in the respective error div
+                                errorDiv.html('<p class="text-danger">' + errorMessage +
+                                    '</p>');
+                            });
+                        } else {
+                            // Handle other error cases
+                            console.error(xhr.responseText);
+                        }
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
                     }
                 });
             });
 
-
             /// Delete button click event
-            $('.delete-btn').click(function() {
+            $(document).on('click', '.delete-btn', function() {
                 var deleteButton = $(this);
                 var paymentMethodId = deleteButton.data('id');
                 var confirmationMessage = "Are you sure? You won't be able to revert this!";
@@ -562,11 +656,14 @@
                         },
                         success: function(response) {
                             // Remove the row from the table
-                            var row = deleteButton.closest('tr');
-                            dataTable.row(row).remove().draw();
-
+                            // var row = deleteButton.closest('tr');
+                            // dataTable.row(row).remove().draw();
                             // Show notification
-                            showNotification('deleted', 'Payment Method deleted.');
+                            showNotification('error', 'Payment Method deleted', response
+                                .type + ' deleted.');
+
+                            refreshDataTable();
+
                         },
                         error: function(error) {
                             console.error(error);

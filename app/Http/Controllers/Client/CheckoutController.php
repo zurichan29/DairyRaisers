@@ -17,6 +17,7 @@ use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\Product;
 use App\Models\PaymentReciept;
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\User_Address;
@@ -25,6 +26,8 @@ use App\Models\GuestCart;
 use App\Models\GuestOrder;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Notification;
+use App\Events\OrderNotification;
 
 class CheckoutController extends Controller
 {
@@ -122,7 +125,7 @@ class CheckoutController extends Controller
                 $regions = array_filter($addressData, function ($regionCode) use ($allowedRegionCodes) {
                     return in_array($regionCode, $allowedRegionCodes);
                 }, ARRAY_FILTER_USE_KEY);
-                
+
                 $prev = $request->query('prev');
 
                 return view('client.checkout.editAddressForm', compact('address', 'regions', 'addressData', 'prev'));
@@ -177,11 +180,11 @@ class CheckoutController extends Controller
                 $address->zip_code = $addresses['zip_code'];
 
                 $address->save();
-                
-                if($prev == 'checkout') {
+
+                if ($prev == 'checkout') {
                     return redirect()->route('checkout')->with('message', 'Address updated successfully');
                 } else {
-                    return redirect()->route('orders.re-order', ['id' => $prev])->with('message', 'Address updated successfully');                    
+                    return redirect()->route('orders.re-order', ['id' => $prev])->with('message', 'Address updated successfully');
                 }
             }
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
@@ -338,7 +341,7 @@ class CheckoutController extends Controller
             $order->payment_method = $paymentMethod->type;
             $order->reference_number = $referenceNumber;
             $order->delivery_option = $deliveryOption;
-           
+
             if ($request->input('payment_method') != 'Cash On Delivery') {
                 // Create a new PaymentReceipt instance and save it
                 // $payment_receipt = new PaymentReciept;
@@ -350,7 +353,9 @@ class CheckoutController extends Controller
                 $order->payment_reciept = $filePath;
                 // $order->payment_reciept()->associate($payment_receipt);
             }
+            // dd($order);
             $order->save();
+            event(new OrderNotification($order));
         } else {
             $identifier = $request->cookie('device_identifier');
             $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();

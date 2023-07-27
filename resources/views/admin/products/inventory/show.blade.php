@@ -1,7 +1,39 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">All Products</a></li>
+            <li class="breadcrumb-item ">{{ $product->variant->name }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
+        </ol>
+    </nav>
+
+    <div class="container-fluid mt-2">
+        <div class="row w-100 justify-content-center">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="{{ asset($product->img) }}" class="img-fluid" alt="product picture">
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>{{ $product->name }}</h3>
+                        <h5>Variant: {{ $product->variant->name }}</h5>
+                        <h5>{{ '₱' . $product->price . '.00' }}</h5>
+                        <br>
+                        <h5>{{ $product->stocks }} Items left</h5>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded shadow-sm p-4">
             <h1 class="text-2xl font-bold mb-4">{{ $product->name }}</h1>
 
@@ -64,10 +96,15 @@
 
             <a href="{{ route('admin.products.index') }}" class="text-blue-500 hover:text-blue-700">Back</a>
         </div>
-    </div>
+    </div> --}}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
     <script>
+        $(document).ready(function() {
+
+        });
+    </script>
+    {{-- <script>
         // Generate pie chart for product stock
         var ctx = document.getElementById('productStockChart').getContext('2d');
         var productStockChart = new Chart(ctx, {
@@ -91,5 +128,5 @@
             }
         });
 
-    </script>
+    </script> --}}
 @endsection

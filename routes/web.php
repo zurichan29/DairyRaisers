@@ -1,4 +1,6 @@
 <?php
+
+use App\Events\OrderNotification;
 use Illuminate\Support\Facades\Route;
 
 // ADMIN
@@ -9,6 +11,8 @@ use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\VariantController;
 use App\Http\Controllers\Admin\OrderController as OrderManagement;
 use App\Http\Controllers\Admin\BuffaloController;
+use App\Http\Controllers\Admin\ActivityLogsController;
+use App\Http\Controllers\Admin\SalesReportController;
 
 // CLIENT
 use App\Http\Controllers\Client\ClientController;
@@ -20,7 +24,6 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Client\CheckoutController;
 
-// use App\Http\Controllers\ProductController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -116,41 +119,71 @@ Route::post('/profile/create/email', [ClientController::class, 'createEmail'])->
 Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'])->name('email.resend');
 Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
+
+Route::get('/sample-page', function() {
+    return view('test');
+});
+use App\Models\Order;
+Route::post('/sample-page', function() {
+    
+    $name = request()->name;
+    $order = Order::where('id', 1)->first();    
+    event(new OrderNotification($order));
+    return view('test');
+})->name('test.send');
+
+
 // ADMIN
-// DASHBOARD
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::group(['middleware' => 'admin'], function () {
+    Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
+    // DASHBOARD
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    // ACTIVITY LOGS
+    Route::get('/admin/activity_logs', [ActivityLogsController::class, 'index'])->name('admin.activity_logs');
+    //PRODUCTS (INVENTORY AND VARIANT)
+    Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+    Route::get('/admin/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');
+    Route::post('/admin/products/data', [ProductController::class, 'getProductsData'])->name('admin.products.data');
+    Route::post('/admin/products/update-status', [ProductController::class, 'updateStatus'])->name('admin.products.updateStatus');
+    Route::post('/admin/products/add-stocks', [ProductController::class, 'addStocks'])->name('admin.products.addStocks');
+    Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
+    Route::post('/admin/products/update', [ProductController::class, 'update'])->name('admin.products.update');
+    Route::post('/admin/variants/data', [VariantController::class, 'getVariantsData'])->name('admin.variants.data');
+    Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
+    Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
 
-//PRODUCTS (INVENTORY AND VARIANT)
-Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
-Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
-Route::post('/admin/products/store', [ProductController::class, 'store'])->name('admin.products.store');
-Route::get('/admin/variants', [VariantController::class, 'index'])->name('admin.products.variants');
-Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.products.variants.store');
-Route::get('/admin/products/{product}', [ProductController::class, 'show'])->name('admin.products.show');
-Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
-Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
-Route::get('/admin/products/stock/{product}', [ProductStockController::class, 'index'])->name('admin.products.stock');
-Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
-Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
-Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
-Route::resource('products', ProductsController::class);
+    // Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
+    // Route::get('/admin/variants', [VariantController::class, 'index'])->name('admin.products.variants');
+    // Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
+    // Route::get('/admin/products/stock/{id}', [ProductStockController::class, 'index'])->name('admin.products.stock');
+    // Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
+    // Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
+    // Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
+    // Route::resource('products', ProductsController::class);
 
-// PAYMENT METHODS
-Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
-Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
-Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
-Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
-Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
+    // PAYMENT METHODS
+    Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
+    Route::post('/admin/payment_method/data', [PaymentMethodController::class, 'getPaymentMethodData'])->name('admin.payment_method.data');
+    Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
+    Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
+    Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
+    Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
 
-// ORDERS
-Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
-Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
-Route::put('/admin/orders/{id}/approved', [OrderManagement::class, 'approved'])->name('admin.orders.approved');
-Route::put('/admin/orders/{id}/otw', [OrderManagement::class, 'onTheWay'])->name('admin.orders.otw');
-Route::put('/admin/orders/{id}/pickup', [OrderManagement::class, 'pickUp'])->name('admin.orders.pick_up');
-Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
-Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
+    // ORDERS
+    Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
+    Route::post('/admin/orders/edit/ref', [OrderManagement::class, 'ref'])->name('admin.orders.ref');
+    Route::post('/admin/orders/fetch', [OrderManagement::class, 'fetch'])->name('admin.orders.fetch');
+    Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
+    Route::put('/admin/orders/{id}/approved', [OrderManagement::class, 'approved'])->name('admin.orders.approved');
+    Route::put('/admin/orders/{id}/otw', [OrderManagement::class, 'onTheWay'])->name('admin.orders.otw');
+    Route::put('/admin/orders/{id}/pickup', [OrderManagement::class, 'pickUp'])->name('admin.orders.pick_up');
+    Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
+    Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
 
-// BUFFALOS
-Route::get('/admin/buffalos', [BuffaloController::class, 'index'])->name('admin.buffalos.index');
-Route::get('/admin/buffalos/buffalo_stock', [BuffaloController::class, 'milk_stock'])->name('admin.buffalos.buffalo_stock');
+    // BUFFALOS
+    Route::get('/admin/buffalos', [BuffaloController::class, 'index'])->name('admin.buffalos.index');
+    Route::get('/admin/buffalos/buffalo_stock', [BuffaloController::class, 'milk_stock'])->name('admin.buffalos.buffalo_stock');
+
+    // SALES REPORT
+    Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
+});

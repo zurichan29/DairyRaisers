@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\ActivityLog;
 use App\Models\Cart;
 use App\Models\PaymentMethod;
 use App\Models\PaymentReciept;
@@ -12,27 +13,64 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 use App\Mail\RejectedMailNotif;
 use Illuminate\Support\Facades\Mail;
+
 class OrderController extends Controller
 {
     //
-    public function send() {
-        $orderData = [
-            'order_number' => 2345,
-            'created_at' => 'today',
-            'remarks' => 'invalid ammount'
-        ];
-        Mail::to('christianjayjacalne@gmail.com')->send(new RejectedMailNotif($orderData));
-    }
     public function index()
     {
         if (auth()->guard('admin')->check()) {
             $orders = Order::with('user')->get()->sortBy('created_at');
-            
+
             return view('admin.orders.index', compact('orders'));
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
+        }
+    }
+
+    public function ref(Request $request)
+    {
+        if (auth()->guard('admin')->check()) {
+            $validator = Validator::make($request->all(), [
+                'ref' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $order = Order::findOrFail($request->input('order_id'));
+            $order->reference_number = $request->input('ref');
+            $order->save();
+
+            $validatedData = $validator->validated();
+            $data = [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'ref' => $request->input('ref')
+            ];
+
+            return response()->json($data);
+        } else {
+        }
+    }
+
+    public function fetch(Request $request)
+    {
+        if (auth()->guard('admin')->check()) {
+
+            $order = Order::findOrFail($request->input('order_id'));
+
+            $data = [
+                // 'order_id' => $order->id,
+                // 'order_number' => $order->order_number,
+                'ref' => $order->reference_number
+            ];
+
+            return response()->json($data);
         }
     }
 
@@ -44,9 +82,7 @@ class OrderController extends Controller
             $cart = $user->cart->where('order_number', $order->order_number);
             $statusBadge = null;
             if ($order->delivery_option == 'Delivery') {
-
-            } elseif($order->delivery_option == 'Pick Up') {
-
+            } elseif ($order->delivery_option == 'Pick Up') {
             }
             switch ($order->status) {
                 case 'Pending':
@@ -64,77 +100,83 @@ class OrderController extends Controller
                 default:
                     break;
             }
+            
             return view('admin.orders.show', compact('order', 'user', 'cart', 'statusBadge'));
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function approved($id)
+    public function approved(Request $request, $id)
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
             if ($order->status == 'Pending') {
                 $order->status = 'Approved';
                 $order->save();
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
             }
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function onTheWay($id)
+    public function onTheWay(Request $request, $id)
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
             if ($order->status == 'Approved') {
                 $order->status = 'On The Way';
                 $order->save();
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
             }
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function pickUp($id)
+    public function pickUp(Request $request, $id)
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
             if ($order->status == 'Approved') {
                 $order->status = 'Ready To Pick Up';
                 $order->save();
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
             }
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function delivered($id)
+    public function delivered(Request $request, $id)
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
             if ($order->status == 'On The Way') {
                 $order->status = 'Delivered';
                 $order->save();
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
-            } elseif($order->status == 'Ready To Pick Up') {
+            } elseif ($order->status == 'Ready To Pick Up') {
                 $order->status = 'Recieved';
                 $order->save();
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
             }
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
@@ -162,33 +204,45 @@ class OrderController extends Controller
                     'first_name' => $user->first_name,
                 ];
                 Mail::to($user->email)->send(new RejectedMailNotif($orderData));
-
+                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
             }
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function grant(Request $request, $id)
+    // Method to log the activity
+    private function logActivity($activityDescription, $request)
     {
         if (auth()->guard('admin')->check()) {
-            $order = Order::findOrFail($id);
-            $request->validate([
-                'remarks' => ['required', 'max:255'],
+            $activityLog = new ActivityLog([
+                'admin_id' => auth()->guard('admin')->user()->id,
+                'activity_type' => $this->getActivityType($request),
+                'description' => $activityDescription,
+                'ip_address' => $request->ip(),
             ]);
-            if ($order->status == 'Rejected') {
-                $order->status = 'Approved';
-                $order->comments = $request->input('remarks');
-                $order->save();
-                return redirect()->route('admin.orders.show', ['id' => $id]);
-            } else {
-                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
-            }
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+
+            $activityLog->save();
+        }
+    }
+
+    private function getActivityType($request)
+    {
+        if ($request->is('admin/orders/{id}/approved')) {
+            return 'Orders';
+        } elseif ($request->is('admin/orders/{id}/otw')) {
+            return 'Orders';
+        } elseif ($request->is('admin/orders/{id}/pickup')) {
+            return 'Orders';
+        } elseif ($request->is('admin/orders/{id}/delivered')) {
+            return 'Orders';
+        } elseif ($request->is('admin/orders/{id}/reject')) {
+            return 'Orders';
+        }  else {
+            return 'Others';
         }
     }
 }

@@ -18,26 +18,28 @@ class DeviceIdentifierMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $deviceIdentifier = $request->cookie('device_identifier');
+        if (!auth()->guard('admin')->check()) {
+            $deviceIdentifier = $request->cookie('device_identifier');
 
-        if (!$deviceIdentifier) {
-            $deviceIdentifier = Str::uuid()->toString();
-            
-            // Set the device identifier as a cookie that expires in 30 days
-            $response = $next($request);
-            $response->cookie('device_identifier', $deviceIdentifier, 30 * 24 * 60);
-        } else {
-            $response = $next($request);
+            if (!$deviceIdentifier) {
+                $deviceIdentifier = Str::uuid()->toString();
+
+                // Set the device identifier as a cookie that expires in 30 days
+                $response = $next($request);
+                $response->cookie('device_identifier', $deviceIdentifier, 30 * 24 * 60);
+            } else {
+                $response = $next($request);
+            }
+
+            $guestUser = GuestUser::where('guest_identifier', $deviceIdentifier)->first();
+
+            if (!$guestUser) {
+                $newGuest = new GuestUser();
+                $newGuest->guest_identifier = $deviceIdentifier;
+                $newGuest->save();
+            }
         }
 
-        $guestUser = GuestUser::where('guest_identifier', $deviceIdentifier)->first();
-
-        if (!$guestUser) {
-            $newGuest = new GuestUser();
-            $newGuest->guest_identifier = $deviceIdentifier;
-            $newGuest->save();
-        }
-
-        return $response;
+        return $next($request);
     }
 }

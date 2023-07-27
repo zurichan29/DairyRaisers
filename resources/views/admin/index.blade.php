@@ -1,8 +1,23 @@
 @extends('layouts.admin')
 @section('content')
+
     <h1>Hello {{ auth()->guard('admin')->user()->first_name }}</h1>
 
-    <div class="container mx-auto px-4 py-8">
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+    {{-- <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded shadow-sm p-4">
             <h1 class="text-2xl font-bold mb-4">Manage Product Stock</h1>
 
@@ -40,10 +55,10 @@
                 <canvas id="stockChart"></canvas>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Add the JavaScript code to handle form submission and update the chart -->
-    <script>
+    {{-- <script>
         // Get the product select dropdown and the add stock form
         const productSelect = document.getElementById('product');
         const addStockFormContainer = document.getElementById('addStockFormContainer');
@@ -151,5 +166,5 @@
         // Automatically select the first product and load the necessary graph
         const firstProductId = productSelect.options[0].value;
         loadStockData(firstProductId);
-    </script>
+    </script> --}}
 @endsection

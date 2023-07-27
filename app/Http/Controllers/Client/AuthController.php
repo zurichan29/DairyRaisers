@@ -19,6 +19,7 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
+
     public function show()
     {
         return view('client.auth.login');
@@ -28,16 +29,18 @@ class AuthController extends Controller
     {
         // auth()->guard('admin')->logout();
         if (auth()->guard('admin')->check()) {
+                auth()->guard('admin')->logout();
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
         return view('client.auth.admin');
     }
-
+    // protected $redirectTo = 'admin/dashboard';
     public function admin_auth(Request $request)
     {
-        if (auth()->guard('admin')->check()) {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-        }
+        // if (auth()->guard('admin')->check()) {
+        //     dd('correct');
+        //     throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        // }   
 
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -46,7 +49,13 @@ class AuthController extends Controller
 
         if (Auth::guard('admin')->attempt($credentials)) {
             // Admin logged in successfully
-            return redirect()->intended('/admin/dashboard'); // Redirect to the admin dashboard or any desired page
+
+            // Update the last_activity field to the current time
+            $admin = Auth::guard('admin')->user();
+            $admin->last_activity = Carbon::now();
+            $admin->save();
+
+            return redirect()->route('admin.dashboard'); // Redirect to the admin dashboard
         } else {
             // Failed to log in admin
             return back()->withErrors(['email' => 'Invalid credentials']); // Redirect back to the login page with an error message
@@ -213,7 +222,7 @@ class AuthController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             auth()->guard('admin')->logout();
-            return redirect('/')->with('message', 'You have been logged out!');
+            return redirect()->route('login.administrator')->with('message', 'You have been logged out!');
         } else {
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }

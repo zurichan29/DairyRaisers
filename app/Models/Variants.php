@@ -14,4 +14,8 @@ class Variants extends Model
     ];
 
     protected $table = 'variants';
+
+    public function products() {
+        return $this->hasMany(Product::class, 'variants_id');
+    }
 }

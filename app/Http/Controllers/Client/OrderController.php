@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
+use App\Events\OrderNotification;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Order;
@@ -263,6 +264,7 @@ class OrderController extends Controller
                 $order->payment_reciept = $filePath;
             }
             $order->save();
+            event(new OrderNotification($order));
         }
 
         return redirect()->route('order_history')->with('message', 'You have placed your order');

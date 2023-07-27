@@ -1,5 +1,30 @@
 @extends('layouts.admin')
 @section('content')
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOrderLabel">Edit Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOrderForm" method="POST" action="{{ route('admin.orders.ref') }}">
+                        @csrf
+                        <input type="hidden" name="order_id" id="editOrderId">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" name="ref" id="editOrderRef" placeholder="ref">
+                            <label for="editOrderRef">Reference No. </label>
+                            <div class="error-container-edit"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}">All Orders</a></li>
@@ -89,7 +114,7 @@
                                 <br>
                                 <h4 class="font-weight-bold">Grand Total (₱): {{ $order->grand_total . '.00' }}</h4>
                                 <h6>Order No. {{ $order->order_number }}</h6>
-                                <h6>Referenace No. {{ $order->reference_number }}</h6>
+                                <h6>Referenace No. <span id="ref">{{ $order->reference_number }}</span></h6>
                                 <br>
                                 <div class="row">
                                     <div class="col">
@@ -109,6 +134,9 @@
                                     </div>
                                 </div>
                                 <br>
+                                <button type="button" class="btn btn-sm btn-info order-edit-btn"
+                                    data-order-id="{{ $order->id }}">Edit</button>
+                                <br>
                                 <div class="d-grid gap-2 col-6 mx-auto">
                                     <button type="button" class="mx-auto text-center btn btn-sm btn-primary"
                                         data-bs-toggle="collapse" data-bs-target="#PaymentReciept" aria-expanded="false"
@@ -116,10 +144,10 @@
                                 </div>
                                 <div class="collapse mt-3" id="PaymentReciept">
                                     <div class="card card-body">
-                                        <a href="{{ asset('storage/' . $order->payment_reciept) }}" data-fancybox="gallery"
-                                            data-caption="Payment Reciept">
-                                            <img src="{{ asset('storage/' . $order->payment_reciept) }}" class="img-fluid"
-                                                alt="Image">
+                                        <a href="{{ asset('storage/' . $order->payment_reciept) }}"
+                                            data-fancybox="gallery" data-caption="Payment Reciept">
+                                            <img src="{{ asset('storage/' . $order->payment_reciept) }}"
+                                                class="img-fluid" alt="Image">
                                         </a>
                                     </div>
                                 </div>
@@ -264,7 +292,8 @@
                         </div>
                         <div class="col-md-5 d-flex align-self-stretch">
                             <div class="d-grid text-center">
-                                <img src="{{ asset('images/ready_to_pick_up.png') }}" class="img-fluid" alt="Manage Order Picture">
+                                <img src="{{ asset('images/ready_to_pick_up.png') }}" class="img-fluid"
+                                    alt="Manage Order Picture">
                                 <h5 class="font-weight-light">Order is ready to pick up!</h5>
                             </div>
                         </div>
@@ -325,6 +354,113 @@
                     'fullScreen',
                     'close'
                 ]
+            });
+
+            function showNotification(status, message, productName) {
+                var notification = $('#Notification');
+                var notificationHeader = notification.find('.toast-header');
+                var notificationBody = notification.find('.toast-body');
+                var iconClass = '';
+                var headerClass = '';
+                var headerText = '';
+
+                // Update classes, icon, and header text based on the status
+                switch (status) {
+                    case 'success':
+                        headerClass = 'bg-success';
+                        iconClass = 'fa-solid fa-circle-check';
+                        headerText = 'Success';
+                        break;
+                    case 'updated':
+                        headerClass = 'bg-info';
+                        iconClass = 'fa-solid fa-circle-info';
+                        headerText = 'Updated';
+                        break;
+                    case 'deleted':
+                        headerClass = 'bg-warning';
+                        iconClass = 'fa-solid fa-trash';
+                        headerText = 'Deleted';
+                        break;
+                    case 'error':
+                        headerClass = 'bg-danger';
+                        iconClass = 'fa-solid fa-circle-xmark';
+                        headerText = 'Error';
+                        break;
+                    default:
+                        break;
+                }
+
+                // Update the notification content and classes
+                notificationHeader.find('strong').removeClass().addClass('me-auto').html(
+                    '<i class="me-2 fa-solid ' + iconClass + '"></i> ' + headerText);
+                notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(
+                    headerClass);
+                notificationBody.text(message);
+
+                // Show the notification with fade-in and fade-out animations
+                notification.toast({
+                    animation: true
+                });
+
+                // Show the notification
+                notification.toast('show');
+            }
+
+            $(document).on('click', '.order-edit-btn', function() {
+                var orderId = $('.order-edit-btn').data('order-id');
+
+                $.ajax({
+                    url: "{{ route('admin.orders.fetch') }}", // Replace with the desired URL for updating a product
+                    type: 'POST',
+                    data: {
+                        order_id: orderId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+
+                        $('#editOrderId').val(orderId);
+                        $('#editOrderRef').val(response.ref);
+
+                        // Show the edit modal
+                        $('#editOrderModal').modal('show');
+                    },
+                    error: function(error) {
+                        console.error(error.responseJSON.message);
+                    }
+                });
+
+
+            });
+
+            $('#editOrderForm').submit(function(e) {
+                e.preventDefault();
+
+                var orderId = $('#editOrderId').val();
+
+                // Perform the AJAX request to update the product and variant
+                $.ajax({
+                    url: "{{ route('admin.orders.ref') }}", // Replace with the desired URL for updating a product
+                    type: 'POST',
+                    data: {
+                        order_id: orderId,
+                        ref: $('#editOrderRef').val(),
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        // Close the edit modal
+                        $('#editOrderModal').modal('hide');
+
+                        // Show success notification
+                        showNotification('updated', 'Order: ' + response.order_number +
+                            ' updated successfully.');
+
+                        $('#ref').text(response.ref);
+
+                    },
+                    error: function(error) {
+                        console.error(error.responseJSON.message);
+                    }
+                });
             });
         });
     </script>

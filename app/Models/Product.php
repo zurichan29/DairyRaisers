@@ -9,12 +9,16 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'img', 'variant', 'price'];
+    protected $fillable = ['name', 'img', 'variants_id', 'price', 'stocks', 'status'];
     protected $table = 'product';
 
     public function carts()
     {
         return $this->hasMany(Cart::class);
+    }
+
+    public function variant() {
+        return $this->belongsTo(Variants::class, 'variants_id');
     }
 
     public function stocks()

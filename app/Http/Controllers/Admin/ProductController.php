@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Product;
-use App\Models\ProductStock;
+
 use App\Models\Variants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use App\Models\ActivityLog;
 
 class ProductController extends Controller
 {
@@ -18,40 +19,83 @@ class ProductController extends Controller
     public function index()
     {
         if (auth()->guard('admin')->check()) {
-            $products = Product::withSum('productStocks', 'stock')->get();
+            $products = Product::with('variant')->get();
             $variants = Variants::all();
             return view('admin.products.index', compact('products', 'variants'));
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function create()
+    public function show($id)
     {
         if (auth()->guard('admin')->check()) {
-            $variants = Variants::all();
-            return view('admin.products.inventory.create', compact('variants'));
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-        }
-    }
-
-    public function show(Product $product)
-    {
-        if (auth()->guard('admin')->check()) {
+            $product = Product::findOrFail($id);
+            // return response()->json($product);
             return view('admin.products.inventory.show', compact('product'));
         } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            return redirect()->route('login.administrator');
         }
     }
 
-    public function edit(Product $product)
+    public function getProductsData()
+    {
+        $products = Product::with('variant')->get();
+        // Modify the image URL to include the domain name or localhost
+        foreach ($products as $product) {
+            $product->img = asset($product->img);
+        }
+        return response()->json($products);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        if(auth()->guard('admin')->check()) {
+        $productId = $request->input('productId');
+        $currentStatus = $request->input('currentStatus');
+
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        // Determine the new status based on the current status
+        $newStatus = ($product->status == 'AVAILABLE') ? 'NOT AVAILABLE' : 'AVAILABLE';
+
+        $product->status = $newStatus;
+        $product->save();
+
+        $this->logActivity('Administrator has updated the status of ' . $product->name . ' to ' . $product->status, $request);
+
+        return response()->json($product);
+        }
+    }
+
+    public function addStocks(Request $request)
     {
         if (auth()->guard('admin')->check()) {
-            $variants = Variants::all();
-            return view('admin.products.inventory.edit', compact('product', 'variants'));
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            $validator = Validator::make($request->all(), [
+                'stock_quantity' => 'required|numeric',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $product = Product::find($request->input('product_id'));
+
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+            $oldStock = $product->stocks;
+            $product->stocks = $product->stocks + $request->input('stock_quantity');
+            $product->save();
+            $newStock = ($product->stocks >= 0) ? $product->stocks . ' stocks' : $product->stocks . 'stock';
+
+            $this->logActivity('Administrator has added ' . $newStock . ' to  ' . $product->name, $request);
+
+            return response()->json($product);
         }
     }
 
@@ -59,45 +103,65 @@ class ProductController extends Controller
     {
         if (auth()->guard('admin')->check()) {
 
-            $request->validate([
-                'name' => 'required',
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|min:5',
                 'img' => 'required|image|mimes:jpeg,jpg,png|max:5120',
                 'variant' => 'required|exists:variants,name',
                 'price' => 'required|numeric',
             ]);
 
-            // Handle the uploaded image
-            if ($request->hasFile('img')) {
-                $image = $request->file('img');
-                $imageName = 'picture.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images'), $imageName);
-
-                // Store the 'img' column in the database with the image path
-                $product = new Product;
-                $product->name = $request->name;
-                $product->img = 'images/' . $imageName;
-                $product->variant = $request->variant;
-                $product->price = $request->price;
-                $product->save();
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            $variant = Variants::where('name', $request->variant)->first();
+
+            // Handle the uploaded image
+            $image = $request->file('img');
+            $imageName = 'picture.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+
+            // Store the 'img' column in the database with the image path
+            $newProduct = new Product;
+            $newProduct->name = $request->name;
+            $newProduct->img = 'images/' . $imageName;
+            $newProduct->variants_id = $variant->id;
+            $newProduct->price = $request->price;
+            $newProduct->save();
+
+            $product = Product::where('id', $newProduct->id)->with('variant')->first();
+
+            $data = [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'variant' => $product->variant->name,
+            ];
+            $this->logActivity('Administrator added a new product: ' . $product->name, $request);
+
+            return response()->json($data);
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         if (auth()->guard('admin')->check()) {
-            $request->validate([
-                'name' => 'required',
-                'img' => 'image|mimes:jpeg,jpg,png|max:5120',
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|min:3',
+                // 'img' => 'image|mimes:jpeg,jpg,png|max:5120',
                 'variant' => 'required|exists:variants,name',
                 'price' => 'required|numeric',
             ]);
 
-            $product = Product::find($id);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            // Fetch the product data
+            $product = Product::find($request->input('product_id'));
+
+            // Fetch the variant data
+            $variant = Variants::where('name', $request->variant)->first();
 
             // Handle the uploaded image
             if ($request->hasFile('img')) {
@@ -107,35 +171,62 @@ class ProductController extends Controller
 
                 // Update the 'img' column in the database with the image path
                 $product->img = 'images/' . $imageName;
-                $product->save();
             }
+
+            // Update other product data
             $product->name = $request->input('name');
-            $product->variant = $request->input('variant');
+            $product->variants_id = $variant->id;
             $product->price = $request->input('price');
             $product->save();
 
-            return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
-        } else {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            // Fetch the updated variant data
+            $updatedVariant = $product->variant;
+
+            $data = [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'variant' => $updatedVariant->name,
+                'stock' => $product->stock,
+            ];
+
+            $this->logActivity('Administrator has updated a product: ' . $product->name, $request);
+
+            return response()->json($data);
+        } 
+    }
+
+    // Method to log the activity
+    private function logActivity($activityDescription, $request)
+    {
+        if (auth()->guard('admin')->check()) {
+            $activityLog = new ActivityLog([
+                'admin_id' => auth()->guard('admin')->user()->id,
+                'activity_type' => $this->getActivityType($request),
+                'description' => $activityDescription,
+                'ip_address' => $request->ip(),
+            ]);
+
+            $activityLog->save();
         }
     }
 
-    public function addStock(Request $request)
+    private function getActivityType($request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:product,id',
-            'stock' => 'required|integer',
-            'date_created' => 'required|date',
-            'expiration_date' => 'required|date|after_or_equal:date_created',
-        ]);
-
-        ProductStock::create([
-            'product_id' => $request->product_id,
-            'stock' => $request->stock,
-            'date_created' => $request->date_created,
-            'expiration_date' => $request->expiration_date,
-        ]);
-
-        return redirect()->route('admin.product.index')->with('success', 'Product stock added successfully.');
+        if ($request->is('admin/products/store')) {
+            return 'Products';
+        } elseif ($request->is('admin/products/update-status')) {
+            return 'Products';
+        } elseif ($request->is('admin/products/add-stocks')) {
+            return 'Products';
+        } elseif ($request->is('admin/products/update')) {
+            return 'Products';
+        } elseif ($request->is('admin/varaints/store')) {
+            return 'Variants';
+        } elseif ($request->is('admin/variants/update')) {
+            return 'Variants';
+        } else {
+            return 'Others';
+        }
     }
 }

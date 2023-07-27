@@ -292,7 +292,7 @@
                         <hr class="mb-4 mt-0 d-inline-block mx-auto"
                             style="width: 60px; background-color: #7c4dff; height: 2px" />
                         <p>
-                            <a href="{{ route('products.index') }}" class="text-dark">Products</a>
+                            <a href="{{ route('shop') }}" class="text-dark">Products</a>
                         </p>
                         <p>
                             <a href="{{ route('about') }}" class="text-dark">About</a>
