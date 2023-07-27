@@ -3,25 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Buffalo;
+use App\Models\MilkStock;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class BuffaloController extends Controller
 {
-    public function index()
-    {
-        // Your logic here
-        if(auth()->guard('admin')->check()) {
-            return view('admin.buffalos.index');
-        } else {
-            return redirect()->back();
-        }
-    }
 
-    public function milk_stock()
-    {
-        // Add any necessary logic for managing buffalos
-        $buffalo = Buffalo::all();
-        return view('admin.buffalos.buffalo_stock.milk_stock', compact('buffalo'));
+    public function status(Request $request) {
+        if (auth()->guard('admin')->check()) {
+            $buffalo = Buffalo::all();
+
+            return view('admin.buffalos.update_buffalo', compact('buffalo'));
+        } else {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
     }
 }

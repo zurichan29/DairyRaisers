@@ -2,23 +2,25 @@
 use Illuminate\Support\Facades\Route;
 
 // ADMIN
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\PaymentMethodController;
-use App\Http\Controllers\Admin\ProductStockController;
-use App\Http\Controllers\Admin\VariantController;
-use App\Http\Controllers\Admin\OrderController as OrderManagement;
+use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\PageController;
+use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BuffaloController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\VariantController;
 
 // CLIENT
 use App\Http\Controllers\Client\ClientController;
-use App\Http\Controllers\Client\AuthController;
-use App\Http\Controllers\Client\RegisterController;
-use App\Http\Controllers\Client\OrderController as ClientOrder;
-use App\Http\Controllers\Client\PageController;
-use App\Http\Controllers\Client\CartController;
-use App\Http\Controllers\Client\ShopController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MilkStockController;
 use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\RegisterController;
+use App\Http\Controllers\Admin\ProductStockController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Client\OrderController as ClientOrder;
+use App\Http\Controllers\Admin\OrderController as OrderManagement;
+use App\Models\Buffalo;
 
 // use App\Http\Controllers\ProductController;
 /*
@@ -152,5 +154,11 @@ Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered']
 Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
 
 // BUFFALOS
-Route::get('/admin/buffalos', [BuffaloController::class, 'index'])->name('admin.buffalos.index');
-Route::get('/admin/buffalos/buffalo_stock', [BuffaloController::class, 'milk_stock'])->name('admin.buffalos.buffalo_stock');
+Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
+Route::post('/submit.milk_stock', [MilkStockController::class, 'submitMilkStock'])->name('submit.milk_stock');
+Route::post('/admin/buffalos/store', [MilkStockController::class, 'store'])->name('admin.buffalos.store');
+Route::post('/admin/buffalos/delete', [MilkStockController::class, 'delete'])->name('admin.buffalos.delete');
+Route::get('/admin/buffalos/create', [BuffaloController::class, 'create'])->name('admin.buffalos.create');
+Route::post('/admin/buffalos/store', [BuffaloController::class, 'store'])->name('admin.buffalos.store');
+Route::post('/admin/buffalos/delete', [BuffaloController::class, 'delete'])->name('admin.buffalos.delete');
+Route::get('/buffalos', [BuffaloController::class, 'update_buffalo'])->name('buffalos');

@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Buffalo extends Model
+class MilkStock extends Model
 {
     use HasFactory;
-    
-    protected $table = 'buffalo';
 
+    protected $fillable = ['date_created', 'quantity'];
 }

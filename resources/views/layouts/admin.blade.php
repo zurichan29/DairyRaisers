@@ -95,22 +95,11 @@
                 Interface
             </div>
             {{-- BUFFALOS --}}
-            <li class="nav-item {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'active' : null }}">
-                <a class="nav-link" href="{{ route('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? null : 'collapsed' }} href="#" data-toggle="collapse" data-target="#collapseBuffalos" aria-expanded="true"
-                aria-controls="collapseBuffalos">
+            <li class="nav-item {{ Request::routeIs('admin.buffalos.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.buffalos.index') }}">
                     <i class="fa-solid fa-cow"></i>
-                    <span>Buffalos</span>
+                    <span>Buffalos & Milks</span>
                 </a>
-                <div id="collapseBuffalos"
-                    class="collapse {{ Request::routeIs('admin.buffalos.index') || Request::routeIs('admin.buffalos.buffalo_stock') ? 'show' : null }}"
-                    aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item {{ Request::routeIs('admin.buffalos.index') ? ' active' : null }}"
-                            href="{{ route('admin.buffalos.index') }}">Buffalos List</a>
-                        <a class="collapse-item {{ Request::routeIs('admin.buffalos.buffalo_stock') ? ' active' : null }}"
-                            href="{{ route('admin.buffalos.buffalo_stock') }}">Stocks & Yields</a>
-                    </div>
-                </div>
             </li>
             {{-- PRODUCTS --}}
             <li

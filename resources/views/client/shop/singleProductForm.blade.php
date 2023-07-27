@@ -7,8 +7,7 @@
 
             <form action="{{ route('product.add', ['productId' => $product->id]) }}" method="POST"
                 class=" relative p-4 w-[20rem] bg-[#deb88757] justify-center text-center rounded-2xl shadow-[5px_5px_20px_rgba(0,0,0,0.2)]">
-                <a href="{{ route('shop') }}"><i
-                        class="fa-solid fa-circle-xmark flex text-xl ml-[270px] text-red-500 cursor-pointer"></i></a>
+                <a href="{{ route('shop') }}"></a>
 
                 @csrf
                 <img src="{{ asset('images/Baka.png') }}" class="w-25 ml-16" alt="">
