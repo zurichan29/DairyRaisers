@@ -3,18 +3,20 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Product;
+use Carbon\Carbon;
 use App\Models\Cart;
 use App\Models\User;
-use App\Models\Variants;
-use App\Models\ProductStock;
-use App\Models\PaymentMethod;
-use App\Models\Order;
-use App\Models\User_Address;
 use App\Models\Admin;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Order;
+use App\Models\Buffalo;
+use App\Models\Product;
+use App\Models\Variants;
+use App\Models\MilkStock;
+use App\Models\ProductStock;
+use App\Models\User_Address;
+use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -311,6 +313,20 @@ class DatabaseSeeder extends Seeder
             'stock' => 22,
             'date_created' => Carbon::now()->toDateString(),
             'expiration_date' => Carbon::now()->addDays(7)->toDateString(), 
+        ]);
+
+        Buffalo::create([
+            'gender' => '',
+            'age' => '',
+            'quantity_sold' => '2',
+            'date_sold' => Carbon::now()->toDateString(),
+            'buyers_name' => 'Shania',
+            'buyers_address' =>  'Santiago, General Trias',
+        ]);
+
+        MilkStock::create([
+            'date_created' => Carbon::now()->toDateString(),
+            'quantity' => '20',
         ]);
     }
 }

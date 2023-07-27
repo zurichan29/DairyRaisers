@@ -31,6 +31,7 @@ class OrderController extends Controller
     {
         if (auth()->check()) {
             $user = User::with('cart.product')->with('order')->where('id', auth()->user()->id)->first();
+            
             $orders = $user->order->sortByDesc('created_at');
         } else {
             $identifier = $request->cookie('device_identifier');
