@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('buffalo', function (Blueprint $table) {
             $table->id();
             $table->string('gender');
-            $table->string('age');
-            $table->string('quantity_sold');
-            $table->date('date_sold');
+            $table->integer('age')->nullable();
+            $table->integer('quantity_sold');
+            $table->timestamp('date_sold')->nullable();
             $table->string('buyers_name');
             $table->string('buyers_address');
             $table->timestamps();

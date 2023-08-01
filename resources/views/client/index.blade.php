@@ -82,23 +82,23 @@
           </div>
       </div>
     </section>
+    
     <!-- Start about us Area -->
-    <section class="cown-down mt-4" style="padding-bottom: 5rem; position: relative; overflow:hidden;">
-      <div class="section-inner">
-        <div class="container-fluid">
-          <div class="row">
+    <section class="cown-down" style=" position: relative; overflow:hidden;">
+        <div class="container-fluid p-0">
+          <div class="row g-0">
             <div class="col-lg-6 col-10 padding-right" style="padding-right:0;">
               <div class="image">
-                <img src="{{asset('images/glass.png')}}" alt="#" style="width:100%; height:100%;">
+                <img src="{{asset('images/dairy.jpg')}}" alt="#" style="width:100%; height:100%;">
               </div>	
             </div>	
-            <div class="col-lg-6 col-12 padding-left" style="padding-right:0;">
-              <div class="content bg-light" style="text-align: center; height: 100%; position:relative;">
-                <div class="heading-block" style="position:absolute; left:0; top:45%; transform:translateY(-50%); padding: 75px;">
+            <div class="col-lg-6 col-12 padding-right" style="padding-left:0;">
+              <div class="content" style="text-align: center; height: 100%; position:relative;">
+                <div class="heading-block" style="position:absolute; left:0; top:45%; transform:translateY(-50%); padding: 55px;">
                   <h1 class="title" style="margin-bottom: 50px; color:#007bff;">
                     <strong>ABOUT US</strong>
                   </h1>
-                  <p class="text" style="font-size:15px; color:#666; text-transform:uppercase; text-align: justify;">The General
+                  <p class="text" style="font-size:15px; color:#666; text-align: justify;">The General
                     Trias Dairy Raisers Multi-Purpose Cooperative is an authorized distributor of dairy products, from
                     7-21 dairy products and flavor variants.
                     They also promote dairying and dairy enterprise that improves the quality of life of the carabao
@@ -112,10 +112,10 @@
             </div>	
           </div>
         </div>
-      </div>
     </section>
     <!-- /End about us Area -->
-    <section class="text-center" style="padding-bottom: 5rem;">
+
+    <section class="text-center bg-light" style="padding-bottom: 5rem; padding-top: 5rem;">
       <div class="container">
         <div class="row">
           <div class="col-md-12">
@@ -143,7 +143,7 @@
                           display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Cheeses</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Cheeses</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
@@ -174,7 +174,7 @@
                             display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Frozen Desserts</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Frozen Desserts</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
@@ -205,7 +205,7 @@
                             display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Jelly</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Jelly</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
@@ -240,7 +240,7 @@
                             display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Milks</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Milks</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
@@ -271,7 +271,7 @@
                             display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Pastillas</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Pastillas</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
@@ -302,7 +302,7 @@
                             display: inline-block; position: absolute; bottom: 0; margin: 0 auto; left: 0; right: 0;">
                         </div>
                         <div class="thumb-content">
-                          <h4 style="font-size: 20px; margin: 10px 0; color:#007bff"><strong>Yoghurts</strong></h4>
+                          <h4 style="font-size: 25px; margin: 10px 0; color:#007bff"><strong>Yoghurts</strong></h4>
                           <div class="star-rating">
                             <ul class="list-inline">
                               <li class="list-inline-item" style="padding: 0;">
