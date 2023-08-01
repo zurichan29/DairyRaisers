@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Buffalo;
 use App\Events\OrderNotification;
-use Illuminate\Support\Facades\Route;
 
 // ADMIN
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BarGraphController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\PageController;
@@ -11,20 +13,19 @@ use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BuffaloController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\VariantController;
-use App\Http\Controllers\Admin\OrderController as OrderManagement;
-use App\Http\Controllers\Admin\ActivityLogsController;
-use App\Http\Controllers\Admin\SalesReportController;
-use App\Http\Controllers\Admin\MilkStockController;
-
-// CLIENT
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Admin\DashboardController;
+
+// CLIENT
+use App\Http\Controllers\Admin\MilkStockController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\RegisterController;
+use App\Http\Controllers\Admin\SalesReportController;
+use App\Http\Controllers\Admin\ActivityLogsController;
 use App\Http\Controllers\Admin\ProductStockController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Client\OrderController as ClientOrder;
-use App\Models\Buffalo;
+use App\Http\Controllers\Admin\OrderController as OrderManagement;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,13 +171,12 @@ Route::group(['middleware' => 'admin'], function () {
 
     // BUFFALOS
     Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
-    Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('submit.milk_stock');
-    Route::post('/admin/buffalos/store', [MilkStockController::class, 'store'])->name('admin.buffalos.store');
-    Route::post('/admin/buffalos/delete', [MilkStockController::class, 'delete'])->name('admin.buffalos.delete');
-    Route::get('/admin/buffalos/create', [BuffaloController::class, 'create'])->name('admin.buffalos.create');
-    Route::post('/admin/buffalos/store', [BuffaloController::class, 'store'])->name('admin.buffalos.store');
-    Route::post('/admin/buffalos/delete', [BuffaloController::class, 'delete'])->name('admin.buffalos.delete');
-    Route::get('/buffalos', [BuffaloController::class, 'update_buffalo'])->name('buffalos');
+    Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
+    Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
+    Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
+    Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
+    Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
+    Route::get('/show-map', [BarGraphController::class, 'showMap']);
 
     // SALES REPORT
     Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');

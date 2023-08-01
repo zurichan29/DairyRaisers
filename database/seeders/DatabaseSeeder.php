@@ -316,8 +316,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Buffalo::create([
-            'gender' => '',
-            'age' => '',
+            'gender' => 'female',
+            'age' => '2',
             'quantity_sold' => '2',
             'date_sold' => Carbon::now()->toDateString(),
             'buyers_name' => 'Shania',
