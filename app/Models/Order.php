@@ -4,36 +4,66 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Order extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
-      'user_id',
-      'order_id',
-      'grand_total',
-      'payment_method',
-      'user_address',
-      'remarks',
-      'status',
-      'reference_number',
-      'payment_reciept'  
-    ];
+  protected $table = 'orders';
 
-    protected $table = 'order';
+  protected $casts = [
+    'items' => 'array',
+  ];
+  protected $fillable = [
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    'items',
+    'customer_id', 'customer_type', 'order_number', 'grand_total', 'user_address',
+    'remarks', 'comments', 'delivery_option', 'payment_method',
+    'reference_number', 'payment_receipt', 'status'
+  ];
 
-    public function cart()
-    {
-      return $this->hasMany(Cart::class);
-    }
+  // Add a mapping for customer types
+  protected static $customerTypeMap = [
+    'online_shopper' => OnlineShopper::class,
+    'retailer' => Retailer::class,
+  ];
 
-    public function payment_reciept() {
-      return $this->hasMany(PaymentReciept::class, 'order_id');
-    }
+  // Add a mapping for customer types using a custom morph map
+  protected static function boot()
+  {
+    parent::boot();
+
+    // Define the morph map
+    Relation::morphMap([
+      'online_shopper' => OnlineShopper::class,
+      'retailer' => Retailer::class,
+    ]);
+  }
+
+  // Define the relationship with Retailer model for retailers
+  public function customer()
+  {
+    return $this->morphTo();
+  }
+  // Define the relationship with User model for online shoppers
+  // public function user()
+  // {
+  //   return $this->belongsTo(User::class);
+  // }
+
+  public function product()
+  {
+    return $this->belongsTo(Product::class);
+  }
+
+  public function cart()
+  {
+    return $this->hasMany(Cart::class);
+  }
+
+  public function payment_reciept()
+  {
+    return $this->hasMany(PaymentReciept::class, 'order_id');
+  }
 }

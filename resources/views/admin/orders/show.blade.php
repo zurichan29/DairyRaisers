@@ -52,42 +52,56 @@
                         <div class="card-body d-flex and flex-column">
                             <div class="row">
                                 <div class="col-md-12">
-                                    @foreach ($cart as $item)
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-3">
-                                                <img src="{{ asset($item->product->img) }}" class="img-fluid"
-                                                    alt="Item picture">
-                                            </div>
-                                            <div class="col-9">
-                                                <h6 class="font-weight-normal">
-                                                    {{ $item->product->name }}
-                                                    <span class="text-secondary">
-                                                        {{ ' | ' . $item->product->variant }}
-                                                    </span>
-                                                </h6>
-                                                <div class="row gx-5">
-                                                    <div class="col">
-                                                        <div class="">
-                                                            <h6 class="text-primary">
-                                                                PHP {{ $item->price . '.00' }}
-                                                            </h6>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="">
-                                                            <h6 class="text-primary">
-                                                                {{ $item->quantity }} PCS
-                                                            </h6>
-                                                        </div>
-                                                    </div>
+                                    @foreach ($order->items as $item)
+                                        @if ($itemProduct = \App\Models\Product::find($item['product_id']))
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-3">
+                                                    <img src="{{ asset($itemProduct->img) }}" class="img-fluid"
+                                                        alt="Item picture">
                                                 </div>
-                                                <div class="border-top mb-2"></div>
-                                                <h4 class="font-weight-bold text-primary">
-                                                    TOTAL : PHP {{ $item->price * $item->quantity . '.00' }}
-                                                </h4>
+                                                <div class="col-9">
+                                                    <h6 class="font-weight-normal">
+                                                        {{ $itemProduct->name }}
+                                                        <span class="text-secondary">
+                                                            {{ ' | ' . $itemProduct->variant->name }}
+                                                        </span>
+                                                    </h6>
+                                                    <div class="row gx-5">
+                                                        <div class="col">
+                                                            <div class="">
+                                                                <h6 class="text-primary">
+                                                                    ₱{{ $item['price'] . '.00' }}
+                                                                </h6>
+                                                            </div>
+                                                        </div>
+                                                        @if ($order->customer_type == 'retailer')
+                                                            <div class="col">
+                                                                <div class="">
+                                                                    <h6 class="text-primary">
+                                                                        ₱{{ $item['discount'] . '.00' }}
+                                                                    </h6>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                        <div class="col">
+                                                            <div class="">
+                                                                <h6 class="text-primary">
+                                                                    {{ $item['quantity'] }} PCS
+                                                                </h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="border-top mb-2"></div>
+                                                    <h4 class="font-weight-bold text-primary">
+                                                        TOTAL : ₱{{ $item['total'] . '.00' }}
+                                                    </h4>
 
+                                                </div>
                                             </div>
-                                        </div>
+                                        @else
+                                            <br>
+                                            Product not found
+                                        @endif
                                     @endforeach
                                 </div>
                             </div>
@@ -102,10 +116,20 @@
                                     Customer Details <i class="fa-solid fa-circle-user text-primary"></i>
                                 </h5>
                                 <br>
-                                <h6>Name: {{ $user->first_name . ' ' . $user->last_name }}</h6>
-                                <h6>Contact: +63{{ $user->mobile_number }}</h6>
-                                <h6>Email : {{ $user->email ? $user->email : 'None' }}</h6>
-                                <h6>Address : {{ $order->user_address }}</h6>
+                                @if ($order->customer_type == 'online_shopper')
+                                    <h6>Name:
+                                        {{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}
+                                    </h6>
+                                    <h6>Contact: +63{{ $order->customer->user->mobile_number }}</h6>
+                                    <h6>Email: {{ $order->customer->user->email ? $order->customer->user->email : 'none' }}
+                                    </h6>
+                                @elseif ($order->customer_type == 'retailer')
+                                    <h6>Name: {{ $order->customer->first_name . ' ' . $order->customer->last_name }}</h6>
+                                    <h6>Contact: +63{{ $order->customer->mobile_number }}</h6>
+                                    <h6>Store: {{ $order->customer->store_name }}</h6>
+                                @endif
+                                </h6>
+                                <h6>Address : {{ $order->address }}</h6>
                                 <br>
                                 <br>
                                 <h5>
@@ -129,29 +153,31 @@
                                     </div>
                                     <div class="col">
                                         <h6 class="text-center">Method: <span
-                                                class="badge badge-light">{{ $order->delivery_option }}</span>
+                                                class="badge badge-light">{{ $order->shipping_option }}</span>
                                         </h6>
                                     </div>
                                 </div>
-                                <br>
-                                <button type="button" class="btn btn-sm btn-info order-edit-btn"
-                                    data-order-id="{{ $order->id }}">Edit</button>
-                                <br>
-                                <div class="d-grid gap-2 col-6 mx-auto">
-                                    <button type="button" class="mx-auto text-center btn btn-sm btn-primary"
-                                        data-bs-toggle="collapse" data-bs-target="#PaymentReciept" aria-expanded="false"
-                                        aria-controls="PaymentReciept">View Payment Reciept</button>
-                                </div>
-                                <div class="collapse mt-3" id="PaymentReciept">
-                                    <div class="card card-body">
-                                        <a href="{{ asset('storage/' . $order->payment_reciept) }}"
-                                            data-fancybox="gallery" data-caption="Payment Reciept">
-                                            <img src="{{ asset('storage/' . $order->payment_reciept) }}"
-                                                class="img-fluid" alt="Image">
-                                        </a>
+                                @if ($order->customer_type == 'online_shopper')
+                                    <br>
+                                    <button type="button" class="btn btn-sm btn-info order-edit-btn"
+                                        data-order-id="{{ $order->id }}">Edit</button>
+                                    <br>
+                                    <div class="d-grid gap-2 col-6 mx-auto">
+                                        <button type="button" class="mx-auto text-center btn btn-sm btn-primary"
+                                            data-bs-toggle="collapse" data-bs-target="#PaymentReciept"
+                                            aria-expanded="false" aria-controls="PaymentReciept">View Payment
+                                            Reciept</button>
                                     </div>
-                                </div>
-
+                                    <div class="collapse mt-3" id="PaymentReciept">
+                                        <div class="card card-body">
+                                            <a href="{{ asset('storage/' . $order->payment_reciept) }}"
+                                                data-fancybox="gallery" data-caption="Payment Reciept">
+                                                <img src="{{ asset('storage/' . $order->payment_reciept) }}"
+                                                    class="img-fluid" alt="Image">
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

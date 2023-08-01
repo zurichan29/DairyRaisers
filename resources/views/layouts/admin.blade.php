@@ -123,6 +123,13 @@
             <div class="sidebar-heading">
                 Interface
             </div>
+            {{-- ACCOUNT --}}
+            <li class="nav-item {{ Request::routeIs('admin.staff.index') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.staff.index') }}">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Staff Management</span>
+                </a>
+            </li>
             {{-- BUFFALOS --}}
             <li class="nav-item {{ Request::routeIs('admin.buffalos.index') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.buffalos.index') }}">
@@ -381,7 +388,7 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{ route('admin.profile.index') }}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>

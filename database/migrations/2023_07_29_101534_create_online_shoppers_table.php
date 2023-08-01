@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cart', function (Blueprint $table) {
+        Schema::create('online_shoppers', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->default(null)->nullable();
-            $table->integer('product_id');
-            $table->integer('price');
-            $table->integer('quantity');
-            $table->integer('total');
-            $table->string('order_number')->default(null)->nullable();
+            $table->unsignedBigInteger('user_id')->unique(); // Assuming the users table already exists for registered accounts.
             $table->timestamps();
         });
     }
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cart');
+        Schema::dropIfExists('online_shoppers');
     }
 };

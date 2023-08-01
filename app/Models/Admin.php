@@ -9,11 +9,9 @@ class Admin extends Authenticatable
     // ...
 
     protected $table = 'admin';
+    protected $primaryKey = 'id'; // Set the primary key if different from 'id'
+    
     protected $fillable = [
-        'first_name',
-        'email',
-        'password',
-        'last_activity',
-        'unreadNotifications',
+        'name', 'email', 'access', 'is_verified', 'verification_token', 'is_admin', 'status',
     ];
 }

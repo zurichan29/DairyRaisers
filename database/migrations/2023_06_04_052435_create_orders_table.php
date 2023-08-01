@@ -11,19 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id'); // Cart checkout column is true
+            // $table->integer('user_id')->nullable();
             $table->string('order_number');
+            $table->string('name')->nullable();
+            $table->string('store_name')->nullable();
             $table->integer('grand_total');
-            $table->string('user_address');
+            $table->string('address')->nullable();
             $table->string('remarks')->nullable();
             $table->string('comments')->nullable();
-            $table->string('delivery_option');
+            $table->string('shipping_option');
             $table->string('payment_method');
             $table->string('reference_number')->nullable();
-            $table->string('payment_reciept')->nullable();
+            $table->string('payment_receipt')->nullable();
             $table->string('status')->default('Pending');
+            // Add columns for order items
+            $table->json('items')->nullable();
+
+            // Polymorphic relationship columns
+            $table->unsignedBigInteger('customer_id');
+            $table->string('customer_type');
+
             $table->timestamps();
         });
     }
@@ -33,6 +42,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order');
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('items');
     }
 };

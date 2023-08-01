@@ -34,7 +34,7 @@ class AuthController extends Controller
         }
         return view('client.auth.admin');
     }
-    // protected $redirectTo = 'admin/dashboard';
+
     public function admin_auth(Request $request)
     {
         // if (auth()->guard('admin')->check()) {
@@ -52,11 +52,9 @@ class AuthController extends Controller
 
             // Update the last_activity field to the current time
             $admin = Auth::guard('admin')->user();
-            $admin->last_activity = Carbon::now();
-            $admin->save();
 
             return redirect()->route('admin.dashboard'); // Redirect to the admin dashboard
-        } else {
+        } else { 
             // Failed to log in admin
             return back()->withErrors(['email' => 'Invalid credentials']); // Redirect back to the login page with an error message
         }

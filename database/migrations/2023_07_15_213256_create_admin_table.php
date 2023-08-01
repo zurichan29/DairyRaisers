@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('admin', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
+            $table->string('name');
             $table->string('email')->unique();
-            $table->string('password');
-            $table->timestamp('last_activity')->nullable();
+            $table->string('password')->nullable();
+            $table->json('access')->nullable();
+            $table->boolean('is_verified')->default(false);
+            $table->string('verification_token')->nullable();
+            $table->boolean('is_admin')->default(false); // Flag to identify the administrator
             $table->timestamps();
         });
     }
@@ -27,5 +30,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('admin');
+        Schema::dropIfExists('authorize');
     }
 };

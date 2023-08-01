@@ -14,8 +14,10 @@ $.getJSON('/js/philippine_address_2019v2.json')
             });
 
         var regionCode = $('#regionSelect').val();
+        var regionCode = $('#edit-regionSelect').val();
         if (regionCode === "" || regionCode === null) {
             populateSelectOptions('#regionSelect', regions, 'Select your region');
+            populateSelectOptions('#edit-regionSelect', regions, 'Select your region');
         }
     })
     .fail(function () {
@@ -32,7 +34,6 @@ function populateSelectOptions(selectId, options, placeholder) {
 }
 
 $('#regionSelect').on('change', function () {
-    console.log('asd');
     var regionCode = $(this).val();
     if (regionCode) {
         $.getJSON('/js/philippine_address_2019v2.json')
@@ -110,3 +111,81 @@ $('#municipalitySelect').on('change', function () {
     }
 });
 
+
+$('#edit-regionSelect').on('change', function () {
+    var regionCode = $(this).val();
+    if (regionCode) {
+        $.getJSON('/js/philippine_address_2019v2.json')
+            .done(function (data) {
+                var provinceList = data[regionCode].province_list;
+                var provinces = Object.keys(provinceList).map(function (provinceName) {
+                    return {
+                        code: provinceName,
+                        name: provinceName
+                    };
+                });
+
+                populateSelectOptions('#edit-provinceSelect', provinces, 'Select your province');
+                $('#edit-municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+                $('#edit-barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+            })
+            .fail(function () {
+                console.error('Failed to load address data.');
+            });
+    } else {
+        $('#edit-provinceSelect').empty().append($('<option disabled selected value="">Select your province</option>').text('Select your province'));
+        $('#edit-municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+        $('#edit-barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+    }
+});
+
+$('#edit-provinceSelect').on('change', function () {
+    var regionCode = $('#edit-regionSelect').val();
+    var provinceName = $(this).val();
+    if (provinceName && regionCode) {
+        $.getJSON('/js/philippine_address_2019v2.json')
+            .done(function (data) {
+                var municipalityList = data[regionCode].province_list[provinceName].municipality_list;
+                var municipalities = Object.keys(municipalityList).map(function (municipalityName) {
+                    return {
+                        code: municipalityName,
+                        name: municipalityName
+                    };
+                });
+
+                populateSelectOptions('#edit-municipalitySelect', municipalities, 'Select your municipality');
+                $('#edit-barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+            })
+            .fail(function () {
+                console.error('Failed to load address data.');
+            });
+    } else {
+        $('#edit-municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+        $('#edit-barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+    }
+});
+
+$('#edit-municipalitySelect').on('change', function () {
+    var regionCode = $('#edit-regionSelect').val();
+    var provinceName = $('#edit-provinceSelect').val();
+    var municipalityName = $(this).val();
+    if (municipalityName && provinceName && regionCode) {
+        $.getJSON('/js/philippine_address_2019v2.json')
+            .done(function (data) {
+                var barangayList = data[regionCode].province_list[provinceName].municipality_list[municipalityName].barangay_list;
+                var barangays = barangayList.map(function (barangayName) {
+                    return {
+                        code: barangayName,
+                        name: barangayName
+                    };
+                });
+
+                populateSelectOptions('#edit-barangaySelect', barangays, 'Select your barangay');
+            })
+            .fail(function () {
+                console.error('Failed to load address data.');
+            });
+    } else {
+        $('#edit-barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+    }
+});

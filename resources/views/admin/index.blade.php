@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('content')
 
-    <h1>Hello {{ auth()->guard('admin')->user()->first_name }}</h1>
+    <h1>Hello {{ auth()->guard('admin')->user()->name }}</h1>
 
 
 

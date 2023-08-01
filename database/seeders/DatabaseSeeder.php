@@ -8,6 +8,8 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
+use App\Models\OnlineShopper;
+use App\Models\Retailer;
 use App\Models\Buffalo;
 use App\Models\Product;
 use App\Models\Variants;
@@ -27,18 +29,8 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        // VARIANTS:
-        // 1. Milk
-        // 2. Yogurt
-        // 3. Jelly
-        // 4. Frozen Dessert
-        // 5. Pastillas
-        // 6. Cheese
-
-       
-
         User::Create([
-            'first_name' => 'christian',
+            'first_name' => 'Christian Jay',
             'last_name' => 'Jacalne',
             'email' => 'krischang29@gmail.com',
             'password' =>  Hash::make('2329Cjay'),
@@ -46,11 +38,16 @@ class DatabaseSeeder extends Seeder
             'mobile_verified_at' => Carbon::now()
         ]);
 
-        Admin::Create([
-            'first_name' => 'administrator',
-            'email' => 'christian@dairyraisers.com',
-            'password' => hash::make('test123'),
+        User::Create([
+            'first_name' => 'Laarni',
+            'last_name' => 'Lalic',
+            'email' => 'laarnimarielalic@gmail.com',
+            'password' =>  Hash::make('2329Marie'),
+            'mobile_number' => '9972654850',
+            'mobile_verified_at' => Carbon::now()
         ]);
+
+        $this->seedStaffs();
 
         PaymentMethod::Create([
             'type' => 'Gcash',
@@ -72,49 +69,108 @@ class DatabaseSeeder extends Seeder
             'remarks' => 'This is my remark'
         ]);
 
-        // Order::Create([
+        User_Address::Create([
+            'user_id' => 2,
+            'region' => 'REGION IV-A',
+            'province' => 'CAVITE',
+            'municipality' => 'BACOOR CITY',
+            'barangay' => 'ALIMA',
+            'street' => 'street 22221',
+            'label' => 'home',
+            'zip_code' => '4109',
+            'default' => '1',
+            'remarks' => 'This is my remark'
+        ]);
+
+        // Seed online shoppers and retailers
+        $this->seedOnlineShoppers();
+        $this->seedRetailers();
+
+        // Seed orders with their respective items
+        $this->seedOrders();
+
+
+        // Cart::Create([
+        //     'product_id' => 1,
         //     'user_id' => 1,
-        //     'order_number' => 'DR-0623-1',
-        //     'grand_total' => '650',
-        //     'user_address' => 'Sta. Cecilia 2 julugan 8, Tanza, Cavite, 4108 Philippines',
-        //     'remarks' => 'this is my remarks',
-        //     'payment_method' => 'COD'
+        //     'quantity' => 3,
+        //     'order_number' => 'DR-0723-1',
+        //     'price' => 100,
+        //     'total' => 300
         // ]);
 
-        Cart::Create([
-            'product_id' => 1,
-            'user_id' => 1,
-            'quantity' => 3,
-            'order_number' => 'DR-0623-1',
-            'price' => 100,
-            'total' => 300
+        // Cart::Create([
+        //     'product_id' => 5,
+        //     'user_id' => 1,
+        //     'quantity' => 7,
+        //     'order_number' => 'DR-0623-1',
+        //     'price' => 50,
+        //     'total' => 350
+        // ]);
+
+        // Cart::Create([
+        //     'product_id' => 2,
+        //     'user_id' => 1,
+        //     'quantity' => 3,
+        //     'price' => 100,
+        //     'total' => 300
+        // ]);
+
+        // Cart::Create([
+        //     'product_id' => 17,
+        //     'user_id' => 1,
+        //     'quantity' => 10,
+        //     'price' => 5,
+        //     'total' => 50
+        // ]);
+
+        $this->seedProducts();
+
+        Buffalo::create([
+            'gender' => '',
+            'age' => '',
+            'quantity_sold' => '2',
+            'date_sold' => Carbon::now()->toDateString(),
+            'buyers_name' => 'Shania',
+            'buyers_address' =>  'Santiago, General Trias',
         ]);
 
-        Cart::Create([
-            'product_id' => 5,
-            'user_id' => 1,
-            'quantity' => 7,
-            'order_number' => 'DR-0623-1',
-            'price' => 50,
-            'total' => 350
+        MilkStock::create([
+            'date_created' => Carbon::now()->toDateString(),
+            'quantity' => '20',
+        ]);
+    }
+
+    private function seedStaffs()
+    {
+        Admin::create([
+            'name' => 'Administrator',
+            'email' => 'admin@example.com',
+            'access' => json_encode(['inventory_management', 'order_management', 'account_management']), // Convert to JSON
+            'is_verified' => true,
+            'is_admin' => true,
+            'password' => Hash::make('test123'),
         ]);
 
-        Cart::Create([
-            'product_id' => 2,
-            'user_id' => 1,
-            'quantity' => 3,
-            'price' => 100,
-            'total' => 300
+        Admin::create([
+            'name' => 'Employee 1',
+            'email' => 'employee1@example.com',
+            'access' => json_encode(['order']), // Convert to JSON
+            'is_verified' => true,
+            'password' => Hash::make('employee1'),
         ]);
 
-        Cart::Create([
-            'product_id' => 17,
-            'user_id' => 1,
-            'quantity' => 10,
-            'price' => 5,
-            'total' => 50
+        Admin::create([
+            'name' => 'Employee 2',
+            'email' => 'employee2@example.com',
+            'access' => json_encode(['inventory', 'activity_logs']), // Convert to JSON
+            'is_verified' => true,
+            'password' => Hash::make('employee2'),
         ]);
+    }
 
+    private function seedProducts()
+    {
         Variants::Create([
             'name' => 'Yogurt'
         ]);
@@ -293,40 +349,155 @@ class DatabaseSeeder extends Seeder
             'variants_id' => 6,
             'price' => 250
         ]);
+    }
 
-        ProductStock::create([
-            'product_id' => 1,
-            'stock' => 50,
-            'date_created' => Carbon::now()->toDateString(),
-            'expiration_date' => Carbon::now()->addDays(7)->toDateString(), 
+    private function seedOnlineShoppers()
+    {
+        // Online Shopper 1
+        $onlineShopper1 = OnlineShopper::create([
+            'user_id' => 1, // Replace with the actual user ID of the first online shopper
+            // Add other online shopper-specific details
         ]);
 
-        ProductStock::create([
-            'product_id' => 2,
-            'stock' => 75,
-            'date_created' => Carbon::now()->toDateString(),
-            'expiration_date' => Carbon::now()->addDays(7)->toDateString(), 
+        // Online Shopper 2
+        $onlineShopper2 = OnlineShopper::create([
+            'user_id' => 2, // Replace with the actual user ID of the second online shopper
+            // Add other online shopper-specific details
+        ]);
+    }
+
+    private function seedRetailers()
+    {
+        // Retailer 1
+        $retailer1 = Retailer::create([
+            'first_name' => 'Retailer 1 First Name',
+            'last_name' => 'Retailer 1 Last Name',
+            'store_name' => 'Retailer 1 Store',
+            'mobile_number' => '1111111111',
+            'region' => 'REGION I',
+            'province' => 'ILOCOS NORTE',
+            'municipality' => 'BACARRA',
+            'barangay' => 'CABULALAAN',
+            'street' => 'street 1111',
+            'zip_code' => '4001',
+            'complete_address' => 'street 1111 BRGY. CABULALAAN, BACARRA, ILOCOS NORTE, REGION I 4001, PHILIPPINES',
+            'remarks' => 'remarks 11111'
+            // Add other retailer-specific details
         ]);
 
-        ProductStock::create([
-            'product_id' => 3,
-            'stock' => 22,
-            'date_created' => Carbon::now()->toDateString(),
-            'expiration_date' => Carbon::now()->addDays(7)->toDateString(), 
+        // Retailer 2
+        $retailer2 = Retailer::create([
+            'first_name' => 'Retailer 2 First Name',
+            'last_name' => 'Retailer 2 Last Name',
+            'store_name' => 'Retailer 2 Store',
+            'mobile_number' => '2222222222',
+            'region' => 'REGION II',
+            'province' => 'BATANES',
+            'municipality' => 'BASCO',
+            'barangay' => 'SAN ANTONIO',
+            'street' => 'street 2222',
+            'zip_code' => '4002',
+            'complete_address' => 'street 2222 BRGY. SAN ANTONIO, BASCO, BATANES, REGION II 4002, PHILIPPINES',
+            'remarks' => 'remarks 22222'
+            // Add other retailer-specific details
+        ]);
+    }
+
+    private function seedOrders()
+    {
+        // Orders for Online Shopper 1
+        $order1 = Order::create([
+            'order_number' => 'ORD1001',
+            'customer_id' => 1, // Replace with the actual online shopper ID (e.g., $onlineShopper1->id)
+            'customer_type' => 'online_shopper',
+            'items' => [
+                [
+                    'product_id' => 1,
+                    'price' => 100,
+                    'discount' => 0,
+                    'quantity' => 2,
+                    'total' => 200,
+                ],
+                [
+                    'product_id' => 4,
+                    'price' => 50,
+                    'discount' => 0,
+                    'quantity' => 3,
+                    'total' => 150,
+                ],
+                // Add more items as needed
+            ],
+            'grand_total' => 350,
+            'address' => 'Sta. Cecilia 2 BRGY. JULUGAN VIII, TANZA, CAVITE, REGION IV-A 4108, PHILIPPINES',
+            'shipping_option' => 'Delivery',
+            'payment_method' => 'Gcash',
+            'reference_number' => '123456789B',
         ]);
 
-        Buffalo::create([
-            'gender' => '',
-            'age' => '',
-            'quantity_sold' => '2',
-            'date_sold' => Carbon::now()->toDateString(),
-            'buyers_name' => 'Shania',
-            'buyers_address' =>  'Santiago, General Trias',
+        // Orders for Online Shopper 2
+        $order2 = Order::create([
+            'order_number' => 'ORD1002',
+            'customer_id' => 2, // Replace with the actual online shopper ID (e.g., $onlineShopper2->id)
+            'customer_type' => 'online_shopper',
+            'items' => [
+                [
+                    'product_id' => 2,
+                    'price' => 100,
+                    'discount' => 0,
+                    'quantity' => 3,
+                    'total' => 300,
+                ],
+                // Add more items as needed
+            ],
+            'grand_total' => 300,
+            'address' => 'street 22221 BRGY. ALIMA, BACOOR CITY, CAVITE, REGION IV-A 4109, PHILIPPINES',
+            'shipping_option' => 'Delivery',
+            'payment_method' => 'Gcash',
+            'reference_number' => '987654321A',
         ]);
 
-        MilkStock::create([
-            'date_created' => Carbon::now()->toDateString(),
-            'quantity' => '20',
+        // Orders for Retailer 1
+        $order3 = Order::create([
+            'order_number' => 'ORD1003',
+            'customer_id' => 1, // Replace with the actual retailer ID (e.g., $retailer1->id)
+            'customer_type' => 'retailer',
+            'items' => [
+                [
+                    'product_id' => 3,
+                    'price' => 100,
+                    'discount' => 10,
+                    'quantity' => 5,
+                    'total' => 450,
+                ],
+                // Add more items as needed
+            ],
+            'grand_total' => 450,
+            'address' => 'street 1111 BRGY. CABULALAAN, BACARRA, ILOCOS NORTE, REGION I 4001, PHILIPPINES',
+            'shipping_option' => 'Delivery',
+            'payment_method' => 'Gcash',
+            'reference_number' => '987654321F',
+        ]);
+
+        // Orders for Retailer 2
+        $order4 = Order::create([
+            'order_number' => 'ORD1004',
+            'customer_id' => 2, // Replace with the actual retailer ID (e.g., $retailer2->id)
+            'customer_type' => 'retailer',
+            'items' => [
+                [
+                    'product_id' => 4,
+                    'price' => 50,
+                    'discount' => 2,
+                    'quantity' => 10,
+                    'total' => 480,
+                ],
+                // Add more items as needed
+            ],
+            'grand_total' => 480,
+            'address' => 'street 2222 BRGY. SAN ANTONIO, BASCO, BATANES, REGION II 4002, PHILIPPINES',
+            'shipping_option' => 'Delivery',
+            'payment_method' => 'Gcash',
+            'reference_number' => '123456789G',
         ]);
     }
 }

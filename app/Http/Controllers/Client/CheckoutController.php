@@ -214,23 +214,23 @@ class CheckoutController extends Controller
     {
         function generateOrderId()
         {
-            $currentDate = Carbon::now();
+            $currentDate = now();
             $monthYear = $currentDate->format('my');
-            $lastOrder = DB::table('order')->orderByDesc('id')->first();
-
+            $lastOrder = DB::table('orders')->orderByDesc('id')->first();
+        
             if ($lastOrder) {
                 $lastOrderDate = Carbon::parse($lastOrder->created_at);
                 $lastOrderMonthYear = $lastOrderDate->format('my');
-
+        
                 if ($lastOrderMonthYear === $monthYear) {
                     $lastOrderId = $lastOrder->order_number;
-                    $lastNumber = explode('-', $lastOrderId)[2];
-                    $nextNumber = intval($lastNumber) + 1;
-                    return 'DR-' . $monthYear . '-' . $nextNumber;
+                    $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
+                    $nextNumber = $lastNumber + 1;
+                    return 'DR' . $monthYear . $nextNumber;
                 }
             }
             // If no last order or the month/year has changed, reset the number to 1
-            return 'DR-' . $monthYear . '-1';
+            return 'DR' . $monthYear . '1';
         }
 
         $orderID = generateOrderId();

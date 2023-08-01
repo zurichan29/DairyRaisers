@@ -8,6 +8,14 @@
     <!-- Page Heading -->
     <div class="mb-4 d-flex align-items-center justify-content-between">
         <h1 class="h3 text-gray-800">Orders</h1>
+        <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fa-solid fa-circle-plus"></i>
+            </span>
+            <span class="text">
+                New Order
+            </span>
+        </a>
     </div>
 
     <div class="card shadow mb-4">
@@ -28,9 +36,11 @@
                     <thead>
                         <tr>
                             <th>ORDER NO.</th>
-                            <th>REFERENCE NO.</th>
-                            <th>METHOD</th>
+                            <th>TYPE</th>
                             <th>CUSTOMER</th>
+                            <th>MOBILE NO.</th>
+                            <th>METHOD</th>
+                            <th>GRAND TOTAL</th>
                             <th>STATUS</th>
                             <th></th>
                         </tr>
@@ -38,9 +48,11 @@
                     <tfoot>
                         <tr>
                             <th>ORDER NO.</th>
-                            <th>REFERENCE NO.</th>
-                            <th>METHOD</th>
+                            <th>TYPE</th>
                             <th>CUSTOMER</th>
+                            <th>MOBILE NO.</th>
+                            <th>METHOD</th>
+                            <th>GRAND TOTAL</th>
                             <th>STATUS</th>
                             <th></th>
                         </tr>
@@ -81,9 +93,25 @@
                             @endphp
                             <tr>
                                 <td>{{ $order->order_number }}</td>
-                                <td>{{ $order->reference_number }}</td>
-                                <td>{{ $order->delivery_option }}</td>
-                                <td>{{ $order->user->first_name . ' ' . $order->user->last_name }}</td>
+                                <!-- Display customer details based on their type -->
+                                @if ($order->customer instanceof \App\Models\OnlineShopper)
+                                    @if ($order->customer->user)
+                                    <td>Online Shopper</td>
+                                        <td>{{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}
+                                        </td>
+                                        <td>{{ $order->customer->user->mobile_number }}</td>
+                                    @endif
+                                    <!-- Display other online shopper-specific details -->
+                                @elseif ($order->customer instanceof \App\Models\Retailer)
+                                <td>Retailer</td>
+                                    <td>{{ $order->customer->first_name . ' | ' . $order->customer->store_name }}</td>
+                                    <td>{{ $order->customer->mobile_number }}</td>
+                                    <!-- Display other retailer-specific details -->
+                                @endif
+
+                                {{-- <td>{{ $order->reference_number }}</td> --}}
+                                <td>{{ $order->shipping_option }}</td>
+                                <td>{{ $order->grand_total }}</td>
                                 <td class=" text-center">
                                     <p class="badge {{ $statusBadge }} text-center text-wrap py-2" style="width: 8rem;">
                                         <i class="{{ $icon }}"></i>
@@ -215,4 +243,6 @@
 
         });
     </script>
+    <script src="{{ asset('js/load_address.js') }}"></script>
+    <script src="{{ asset('js/validate_address.js') }}"></script>
 @endsection
