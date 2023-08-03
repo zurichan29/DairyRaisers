@@ -185,6 +185,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
     Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
     Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
+    Route::post('/admin/milk/delete', [MilkStockController::class, 'delete'])->name('admin.milk_stock.delete');
     Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
     Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
     Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');

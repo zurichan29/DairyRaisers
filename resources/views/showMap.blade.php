@@ -49,7 +49,7 @@ var myChart = new Chart(ctx, {
                 max: 200,
                 min: 0,
                 ticks: {
-                    stepSize: 50
+                    stepSize: 20
                 }
             }
         },
