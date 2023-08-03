@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('admin', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('img')->nullable();
+            $table->string('unique_id', 10)->unique()->nullable();
             $table->string('email')->unique();
             $table->string('password')->nullable();
             $table->json('access')->nullable();
@@ -30,6 +32,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('admin');
+        Schema::dropIfExists('unique_id');
         Schema::dropIfExists('authorize');
     }
 };

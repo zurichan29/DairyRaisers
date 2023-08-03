@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\RejectedMailNotif;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AdminHelper;
 
 class OrderController extends Controller
 {
@@ -103,7 +104,7 @@ class OrderController extends Controller
             $customer->remarks = ($request->remarks) ? $request->remarks : null;
             $customer->save();
 
-            $this->logActivity('Administrator has created a retailer customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has created a retailer customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
 
             return response()->json($customer);
         } else {
@@ -317,7 +318,7 @@ class OrderController extends Controller
 
                 session()->forget('selected_products');
 
-                $this->logActivity('Administrator has added a new order: ' . $order->order_number, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' has added a new order: ' . $order->order_number, $request);
 
                 return redirect()->route('admin.orders.index');
 
@@ -412,7 +413,7 @@ class OrderController extends Controller
             if ($order->status == 'Pending') {
                 $order->status = 'Approved';
                 $order->save();
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
@@ -429,7 +430,7 @@ class OrderController extends Controller
             if ($order->status == 'Approved') {
                 $order->status = 'On The Way';
                 $order->save();
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
@@ -446,7 +447,7 @@ class OrderController extends Controller
             if ($order->status == 'Approved') {
                 $order->status = 'Ready To Pick Up';
                 $order->save();
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
@@ -468,7 +469,7 @@ class OrderController extends Controller
             } elseif ($order->status == 'Ready To Pick Up') {
                 $order->status = 'Recieved';
                 $order->save();
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
@@ -490,9 +491,6 @@ class OrderController extends Controller
                 $order->status = 'Rejected';
                 $order->comments = $request->input('remarks');
                 $order->save();
-                // $payment_reciept = PaymentReciept::where('order_id', $id)->first();
-                // $payment_reciept->status = 'Rejected';
-                // $payment_reciept->save();
 
                 $orderData = [
                     'order_number' => $order->order_number,
@@ -502,7 +500,7 @@ class OrderController extends Controller
                     'first_name' => $user->first_name,
                 ];
                 Mail::to($user->email)->send(new RejectedMailNotif($orderData));
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
+                $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id]);
             } else {
                 return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');

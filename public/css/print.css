@@ -1,0 +1,8 @@
+/* Hide unwanted elements when printing */
+body * {
+    visibility: hidden;
+}
+
+table {
+    visibility: visible;
+}

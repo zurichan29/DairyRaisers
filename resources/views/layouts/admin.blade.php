@@ -9,10 +9,10 @@
     {{-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script> --}}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
+    <script src="{{ asset('js/chart.js') }}"></script>
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
     <!-- Add this script tag to include moment.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> --}}
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -26,10 +26,19 @@
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('js/toastr.min.js') }}"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/fancybox.min.css') }}" />
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" /> --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script> --}}
 
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/daterangepicker.css') }}" />
+    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> --}}
 
+    <script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/daterangerpicker.min.js') }}"></script>
+    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> --}}
+    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script> --}}
+    
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
         function orderNotification(order) {
@@ -79,10 +88,6 @@
         });
     </script>
 
-    <style>
-
-    </style>
-
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
     <title>Admin | Dairy Raisers</title>
 </head>
@@ -124,62 +129,53 @@
                 Interface
             </div>
             {{-- ACCOUNT --}}
-            <li class="nav-item {{ Request::routeIs('admin.staff.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.staff.*') ? 'active' : '' }}" data-base-route="admin.staff">
                 <a class="nav-link" href="{{ route('admin.staff.index') }}">
                     <i class="fa-solid fa-user-tie"></i>
                     <span>Staff Management</span>
                 </a>
             </li>
             {{-- BUFFALOS --}}
-            <li class="nav-item {{ Request::routeIs('admin.buffalos.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.buffalos.*') ? 'active' : '' }}"
+                data-base-route="admin.buffalos">
                 <a class="nav-link" href="{{ route('admin.buffalos.index') }}">
                     <i class="fa-solid fa-cow"></i>
                     <span>Buffalos & Milks</span>
                 </a>
             </li>
             {{-- PRODUCTS --}}
-            <li class="nav-item {{ Request::routeIs('admin.products.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.products.*') ? 'active' : '' }}"
+                data-base-route="admin.products">
                 <a class="nav-link" href="{{ route('admin.products.index') }}">
                     <i class="fa-solid fa-bag-shopping"></i>
-                    <span>Product Management</span></a>
-            </li>
-            {{-- <li
-                class="nav-item {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? 'active' : null }}">
-                <a class="nav-link {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? null : 'collapsed' }}"
-                    href="#" data-toggle="collapse" data-target="#collapseProducts" aria-expanded="true"
-                    aria-controls="collapseProducts">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span>Products</span>
+                    <span>Product Management</span>
                 </a>
-                <div id="collapseProducts"
-                    class="collapse {{ Request::routeIs('admin.products.index') || Request::routeIs('admin.products.variants') ? 'show' : null }}"
-                    aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item {{ Request::routeIs('admin.products.index') ? ' active' : null }}"
-                            href="{{ route('admin.products.index') }}">Inventory</a>
-                        <a class="collapse-item {{ Request::routeIs('admin.products.variants') ? ' active' : null }}"
-                            href="{{ route('admin.products.variants') }}">Variants</a>
-                    </div>
-                </div>
-            </li> --}}
+            </li>
             {{-- ORDERS --}}
-            <li class="nav-item {{ Request::routeIs('admin.orders.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.orders.*') ? 'active' : '' }}"
+                data-base-route="admin.orders">
                 <a class="nav-link" href="{{ route('admin.orders.index') }}">
                     <i class="fa-solid fa-truck-moving"></i>
-                    <span>Order Management</span></a>
+                    <span>Order Management</span>
+                </a>
             </li>
             {{-- PAYMENT METHODS --}}
-            <li class="nav-item {{ Request::routeIs('admin.payment_method.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.payment_method.*') ? 'active' : '' }}"
+                data-base-route="admin.payment_method">
                 <a class="nav-link" href="{{ route('admin.payment_method.index') }}">
                     <i class="fa-solid fa-credit-card"></i>
-                    <span>Payment Methods</span></a>
+                    <span>Payment Methods</span>
+                </a>
             </li>
             {{-- ACTIVITY LOGS --}}
-            <li class="nav-item {{ Request::routeIs('admin.activity_logs') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.activity_logs') ? 'active' : '' }}"
+                data-base-route="admin.activity_logs">
                 <a class="nav-link" href="{{ route('admin.activity_logs') }}">
                     <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span>Activity Logs</span></a>
+                    <span>Activity Logs</span>
+                </a>
             </li>
+
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -189,12 +185,15 @@
                 Analytics
             </div>
 
-            {{-- ACTIVITY LOGS --}}
-            <li class="nav-item {{ Request::routeIs('admin.sales_report.index') ? 'active' : '' }}">
+            {{-- SALES REPORT --}}
+            <li class="nav-item {{ Request::routeIs('admin.sales_report.index') ? 'active' : '' }}"
+                data-base-route="admin.sales_report">
                 <a class="nav-link" href="{{ route('admin.sales_report.index') }}">
                     <i class="fa-solid fa-diagram-project"></i>
                     <span>Sales Report</span></a>
             </li>
+
+
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -237,153 +236,15 @@
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        {{-- <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to
-                                            download!</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All
-                                    Alerts</a>
-                            </div>
-                        </li> --}}
-
-                        <!-- Nav Item - Messages -->
-                        {{-- <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-                                <!-- Counter - Messages -->
-                                <span class="badge badge-danger badge-counter">7</span>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">
-                                    Message Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                                            problem I've been having.</div>
-                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">I have the photos that you ordered last month, how
-                                            would you like them sent to you?</div>
-                                        <div class="small text-gray-500">Jae Chun · 1d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <div class="status-indicator bg-warning"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">Last month's report looks great, I am very happy
-                                            with
-                                            the progress so far, keep up the good work!</div>
-                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle"
-                                            src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                                            told me that people say this to all dogs, even if they aren't good...</div>
-                                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More
-                                    Messages</a>
-                            </div>
-                        </li> --}}
-
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Administrator</span>
-                                <img class="img-profile rounded-circle" src="{{ asset('images/avatar-man.png') }}">
+                                <span
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->guard('admin')->user()->name }}</span>
+                                <img class="img-profile rounded-circle" src="{{ asset('images/avatar-woman.png') }}">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -391,14 +252,6 @@
                                 <a class="dropdown-item" href="{{ route('admin.profile.index') }}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
-                                </a>
-                                {{-- <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a> --}}
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{{ URL::secure(route('logout.admin')) }}"
@@ -418,6 +271,8 @@
                 <div class="container-fluid">
 
                     @yield('content')
+
+
 
                 </div>
                 <!-- /.container-fluid -->
@@ -471,7 +326,56 @@
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <!-- DataTables JS -->
+
+
+    <!-- DataTables Buttons JS -->
+    
+    {{-- <script src="{{ asset('js/sb-admin-2/chart-bar-demo.js') }}"></script> --}}
+
+    <script>
+        $(document).ready(function() {
+            // Get the current route name
+            var currentRoute = '{{ Route::currentRouteName() }}';
+
+            // Loop through each sidebar menu item
+            $('.nav-item').each(function() {
+                var baseRoute = $(this).data('base-route');
+
+                // Check if the current route starts with the base route name
+                if (currentRoute.startsWith(baseRoute)) {
+                    $(this).addClass('active');
+                }
+            });
+
+            let logoutTimer;
+
+            function resetLogoutTimer() {
+                clearTimeout(logoutTimer);
+
+                // Set the timeout to 30 minutes (1800000 milliseconds)
+                logoutTimer = setTimeout(function() {
+                    // Call the logout function or redirect to logout URL
+                    // For example, assuming you have a logout route in Laravel:
+                    window.location.href = '{{ route('logout.admin') }}';
+                }, 1800000); // 30 minutes
+            };
+
+            function initLogoutTimer() {
+                // Add event listeners to detect user activity
+                $(document).on('mousemove keydown', resetLogoutTimer);
+
+                // Start the timer immediately on page load
+                resetLogoutTimer();
+            };
+
+            // Call the initLogoutTimer function when the page is loaded
+            $(document).ready(initLogoutTimer);
+        });
+    </script>
+
 </body>
 
 </html>

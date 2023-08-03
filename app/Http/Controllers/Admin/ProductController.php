@@ -190,7 +190,7 @@ class ProductController extends Controller
                 'stock' => $product->stock,
             ];
 
-            $this->logActivity('Administrator has updated a product: ' . $product->name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated a product: ' . $product->name, $request);
 
             return response()->json($data);
         } 

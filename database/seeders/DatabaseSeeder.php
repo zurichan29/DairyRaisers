@@ -17,8 +17,10 @@ use App\Models\MilkStock;
 use App\Models\ProductStock;
 use App\Models\User_Address;
 use App\Models\PaymentMethod;
+use App\Models\Sales;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -88,7 +90,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed orders with their respective items
         $this->seedOrders();
-
+        $this->seedSalesData();
 
         // Cart::Create([
         //     'product_id' => 1,
@@ -161,7 +163,7 @@ class DatabaseSeeder extends Seeder
         Admin::create([
             'name' => 'Administrator',
             'email' => 'admin@example.com',
-            'access' => json_encode(['inventory_management', 'order_management', 'account_management']), // Convert to JSON
+            'access' => json_encode(['inventory', 'orders', 'staff_management', 'payment_methods', 'activity_logs', 'buffalos_and_milk']), // Convert to JSON
             'is_verified' => true,
             'is_admin' => true,
             'password' => Hash::make('test123'),
@@ -170,9 +172,9 @@ class DatabaseSeeder extends Seeder
         Admin::create([
             'name' => 'Employee 1',
             'email' => 'employee1@example.com',
-            'access' => json_encode(['order']), // Convert to JSON
+            'access' => json_encode(['orders']), // Convert to JSON
             'is_verified' => true,
-            'password' => Hash::make('employee1'),
+            'password' => Hash::make('mypassword1'),
         ]);
 
         Admin::create([
@@ -180,7 +182,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'employee2@example.com',
             'access' => json_encode(['inventory', 'activity_logs']), // Convert to JSON
             'is_verified' => true,
-            'password' => Hash::make('employee2'),
+            'password' => Hash::make('mypassword2'),
         ]);
     }
 
@@ -214,147 +216,189 @@ class DatabaseSeeder extends Seeder
             'name' => 'Choco Milk',
             'img' => 'images/Baka.png',
             'variants_id' => 3,
-            'price' => 100
+            'price' => 100,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Fresh Milk',
             'img' => 'images/Baka.png',
             'variants_id' => 3,
-            'price' => 100
+            'price' => 100,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Strawberry Milk',
             'img' => 'images/Baka.png',
             'variants_id' => 3,
-            'price' => 100
+            'price' => 100,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Plain Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Strawberry Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Mango Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Blueberry Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Patchberry Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Pineapple Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Mango Yogurt',
             'img' => 'images/Baka.png',
             'variants_id' => 1,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Milk-o-Jel',
             'img' => 'images/Baka.png',
             'variants_id' => 4,
-            'price' => 50
+            'price' => 50,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Plain Pastillas',
             'img' => 'images/Baka.png',
             'variants_id' => 2,
-            'price' => 25
+            'price' => 25,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Cheese Pastillas',
             'img' => 'images/Baka.png',
             'variants_id' => 2,
-            'price' => 25
+            'price' => 25,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Ube Pastillas',
             'img' => 'images/Baka.png',
             'variants_id' => 2,
-            'price' => 25
+            'price' => 25,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Buko Pandan Pastillas',
             'img' => 'images/Baka.png',
             'variants_id' => 2,
-            'price' => 25
+            'price' => 25,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Langka Pastillas',
             'img' => 'images/Baka.png',
             'variants_id' => 2,
-            'price' => 25
+            'price' => 25,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Ice Candy',
             'img' => 'images/Baka.png',
             'variants_id' => 5,
-            'price' => 5
+            'price' => 5,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Cheese & Corn Ice Cream',
             'img' => 'images/Baka.png',
             'variants_id' => 5,
-            'price' => 30
+            'price' => 30,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Cookies & Cream Ice Cream',
             'img' => 'images/Baka.png',
             'variants_id' => 5,
-            'price' => 30
+            'price' => 30,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Choco Ice Candy',
             'img' => 'images/Baka.png',
             'variants_id' => 5,
-            'price' => 10
+            'price' => 10,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Mais Ice Candy',
             'img' => 'images/Baka.png',
             'variants_id' => 5,
-            'price' => 10
+            'price' => 10,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
 
 
@@ -362,7 +406,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Mozarella Cheese',
             'img' => 'images/Baka.png',
             'variants_id' => 6,
-            'price' => 250
+            'price' => 250,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
         ]);
     }
 
@@ -417,12 +463,11 @@ class DatabaseSeeder extends Seeder
             // Add other retailer-specific details
         ]);
     }
-
     private function seedOrders()
     {
         // Orders for Online Shopper 1
         $order1 = Order::create([
-            'order_number' => 'ORD1001',
+            'order_number' => 'DR08231',
             'customer_id' => 1, // Replace with the actual online shopper ID (e.g., $onlineShopper1->id)
             'customer_type' => 'online_shopper',
             'items' => [
@@ -451,7 +496,7 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Online Shopper 2
         $order2 = Order::create([
-            'order_number' => 'ORD1002',
+            'order_number' => 'DR08232',
             'customer_id' => 2, // Replace with the actual online shopper ID (e.g., $onlineShopper2->id)
             'customer_type' => 'online_shopper',
             'items' => [
@@ -473,7 +518,7 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Retailer 1
         $order3 = Order::create([
-            'order_number' => 'ORD1003',
+            'order_number' => 'DR08233',
             'customer_id' => 1, // Replace with the actual retailer ID (e.g., $retailer1->id)
             'customer_type' => 'retailer',
             'items' => [
@@ -495,7 +540,7 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Retailer 2
         $order4 = Order::create([
-            'order_number' => 'ORD1004',
+            'order_number' => 'DR08234',
             'customer_id' => 2, // Replace with the actual retailer ID (e.g., $retailer2->id)
             'customer_type' => 'retailer',
             'items' => [
@@ -513,6 +558,68 @@ class DatabaseSeeder extends Seeder
             'shipping_option' => 'Delivery',
             'payment_method' => 'Gcash',
             'reference_number' => '123456789G',
+        ]);
+    }
+
+    private function seedSalesData(): void
+    {
+        $currentDate = Carbon::now();
+        $lastMonthDate = $currentDate->copy()->subMonth();
+
+        // Create sales data for the current month
+        Sales::create([
+            'category' => 'Products',
+            'name' => 'Choco Milk', // Product name
+            'price' => 100, // Product price
+            'quantity' => 50, // Product quantity sold
+            'amount' => 1500.00,
+            'created_at' => $currentDate,
+        ]);
+
+        Sales::create([
+            'category' => 'Buffalo',
+            'name' => 'Buffalo', // Product name
+            'price' => 2300.50, // Product price
+            'quantity' => 2, // Number of buffaloes sold
+            'amount' => 4601.00, // Total sales for buffaloes
+            'created_at' => $currentDate,
+        ]);
+
+        Sales::create([
+            'category' => 'Milk',
+            'name' => 'Milk', // Product name
+            'price' => 1800.75, // Product price per liter
+            'quantity' => 3, // Number of liters of milk sold
+            'amount' => 5420.25, // Total sales for milk
+            'created_at' => $currentDate,
+        ]);
+
+        // Create sales data for the last month
+        Sales::create([
+            'category' => 'Products',
+            'name' => 'Choco Milk', // Product name
+            'price' => 100, // Product price
+            'quantity' => 25, // Product quantity sold
+            'amount' => 2500.00,
+            'created_at' => $lastMonthDate,
+        ]);
+
+        Sales::create([
+            'category' => 'Buffalo',
+            'name' => 'Buffalo', // Product name
+            'price' => 1800.25, // Product price
+            'quantity' => 1, // Number of buffaloes sold
+            'amount' => 1800.25, // Total sales for buffaloes
+            'created_at' => $lastMonthDate,
+        ]);
+
+        Sales::create([
+            'category' => 'Milk',
+            'name' => 'Milk', // Product name
+            'price' => 2100.50, // Product price per liter
+            'quantity' => 2, // Number of liters of milk sold
+            'amount' => 4201.00, // Total sales for milk
+            'created_at' => $lastMonthDate,
         ]);
     }
 }

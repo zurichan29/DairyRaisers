@@ -35,6 +35,7 @@ class ShopController extends Controller
             if ($request->ajax()) {
                 return view('client.shop.filteredProducts', compact('products'));
             }
+
             return view('client.shop.show', compact('products'));
         }
         throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));

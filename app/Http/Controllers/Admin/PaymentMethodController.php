@@ -17,7 +17,8 @@ class PaymentMethodController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             $payment_methods = PaymentMethod::all();
-
+            // Get the accessible links for the sidebar
+           
             return view('admin.payment_methods.index', compact('payment_methods'));
         } else {
             return redirect()->route('login.administrator');
@@ -49,7 +50,7 @@ class PaymentMethodController extends Controller
             // Save the PaymentMethod to the database
             $paymentMethod->save();
 
-            $this->logActivity('Administrator has added a payment method: ' . $paymentMethod->type, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has added a payment method: ' . $paymentMethod->type, $request);
 
             // Return a response or redirect as needed
             return response()->json([
@@ -68,7 +69,7 @@ class PaymentMethodController extends Controller
         if (auth()->guard('admin')->check()) {
             $id = $request->input('id');
             $paymentMethod = PaymentMethod::where('id', $id)->first();
-            $this->logActivity('Administrator has deleted a payment method: ' . $paymentMethod->type, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has deleted a payment method: ' . $paymentMethod->type, $request);
             $paymentMethod->delete();
             return response(['message' => 'success', 'id' => $id, 'type' => $paymentMethod->type]);
         }
@@ -82,7 +83,7 @@ class PaymentMethodController extends Controller
             ($paymentMethod->status == 'ACTIVATED') ? $status = 'DEACTIVATED' : $status = 'ACTIVATED';
             $paymentMethod->status = $status;
             $paymentMethod->save();
-            $this->logActivity('Administrator has updated the status of ' . $paymentMethod->type . ' to ' . $paymentMethod->status, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $paymentMethod->type . ' to ' . $paymentMethod->status, $request);
 
             return response(['message' => 'success', 'id' => $id, 'status' => $status, 'type' => $paymentMethod->type]);
         }
@@ -109,7 +110,7 @@ class PaymentMethodController extends Controller
             $paymentMethod->account_number = $request->input('account_number');
             $paymentMethod->save();
 
-            $this->logActivity('Administrator has updated a payment method: ' . $paymentMethod->type, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated a payment method: ' . $paymentMethod->type, $request);
 
             return response([
                 'message' => 'success',

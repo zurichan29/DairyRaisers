@@ -125,13 +125,19 @@ Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'
 Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 // ADMIN
-Route::group(['middleware' => 'admin'], function () {
-    Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
-    // DASHBOARD
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    // ACTIVITY LOGS
+// Route::group(['middleware' => 'admin'], function () {
+Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
+
+// DASHBOARD
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+// ACTIVITY LOGS
+Route::group(['middleware' => 'check.access:activity_logs'], function () {
     Route::get('/admin/activity_logs', [ActivityLogsController::class, 'index'])->name('admin.activity_logs');
-    //PRODUCTS (INVENTORY AND VARIANT)
+});
+
+//PRODUCTS (INVENTORY AND VARIANT)
+Route::group(['middleware' => 'check.access:inventory'], function () {
     Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
     Route::get('/admin/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');
     Route::post('/admin/products/data', [ProductController::class, 'getProductsData'])->name('admin.products.data');
@@ -142,36 +148,31 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('/admin/variants/data', [VariantController::class, 'getVariantsData'])->name('admin.variants.data');
     Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
     Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
+});
 
-    // Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
-    // Route::get('/admin/variants', [VariantController::class, 'index'])->name('admin.products.variants');
-    // Route::get('/admin/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
-    // Route::get('/admin/products/stock/{id}', [ProductStockController::class, 'index'])->name('admin.products.stock');
-    // Route::post('/admin/products/stock/{product}/store', [ProductStockController::class, 'store'])->name('admin.products.stock.store');
-    // Route::post('/admin/products/stock/add', [ProductController::class, 'addStock'])->name('admin.product.addStock');
-    // Route::get('/admin/products/stock/{productId}', [ProductDashboardController::class, 'getStockData'])->name('admin.products.stock.data');
-    // Route::resource('products', ProductsController::class);
-
-    // PAYMENT METHODS
+// PAYMENT METHODS
+Route::group(['middleware' => 'check.access:payment_methods'], function () {
     Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
     Route::post('/admin/payment_method/data', [PaymentMethodController::class, 'getPaymentMethodData'])->name('admin.payment_method.data');
     Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
     Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
     Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
     Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
+});
 
-    // ORDERS
+// ORDERS
+Route::group(['middleware' => 'check.access:orders'], function () {
     Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
-    Route::get('/admin/orders/create', [OrderManagement::class, 'create'])->name('admin.orders.create');    
-    Route::post('/admin/orders/create/customer', [OrderManagement::class, 'store_customer'])->name('admin.orders.create_customer_details');  
-    Route::post('/admin/orders/create/store_selected_products', [OrderManagement::class, 'selected_products'])->name('admin.orders.selected_products');    
+    Route::get('/admin/orders/create', [OrderManagement::class, 'create'])->name('admin.orders.create');
+    Route::post('/admin/orders/create/customer', [OrderManagement::class, 'store_customer'])->name('admin.orders.create_customer_details');
+    Route::post('/admin/orders/create/store_selected_products', [OrderManagement::class, 'selected_products'])->name('admin.orders.selected_products');
     // Route::post('/admin/orders/create/data', [OrderManagement::class, 'data'])->name('admin.orders.data');    
-    Route::post('/admin/orders/create/populate_address', [OrderManagement::class, 'populate_address'])->name('admin.orders.populate_address');    
-    Route::post('/admin/orders/edit/customer', [OrderManagement::class, 'edit_customer'])->name('admin.orders.edit_customer_details');    
-    Route::post('/admin/orders/fetch/customer', [OrderManagement::class, 'fetch_customer'])->name('admin.orders.fetch_customer_details');    
-    Route::post('/admin/orders/get/customer', [OrderManagement::class, 'get_customer'])->name('admin.orders.get_customer_details');    
-    Route::post('/admin/orders/create/store', [OrderManagement::class, 'store_order'])->name('admin.orders.store_order');    
-    Route::post('/admin/orders/store', [OrderManagement::class, 'store'])->name('admin.orders.store');    
+    Route::post('/admin/orders/create/populate_address', [OrderManagement::class, 'populate_address'])->name('admin.orders.populate_address');
+    Route::post('/admin/orders/edit/customer', [OrderManagement::class, 'edit_customer'])->name('admin.orders.edit_customer_details');
+    Route::post('/admin/orders/fetch/customer', [OrderManagement::class, 'fetch_customer'])->name('admin.orders.fetch_customer_details');
+    Route::post('/admin/orders/get/customer', [OrderManagement::class, 'get_customer'])->name('admin.orders.get_customer_details');
+    Route::post('/admin/orders/create/store', [OrderManagement::class, 'store_order'])->name('admin.orders.store_order');
+    Route::post('/admin/orders/store', [OrderManagement::class, 'store'])->name('admin.orders.store');
     Route::get('/admin/orders/{id}', [OrderManagement::class, 'show'])->name('admin.orders.show');
     Route::post('/admin/orders/edit/ref', [OrderManagement::class, 'ref'])->name('admin.orders.ref');
     Route::post('/admin/orders/fetch', [OrderManagement::class, 'fetch'])->name('admin.orders.fetch');
@@ -180,26 +181,37 @@ Route::group(['middleware' => 'admin'], function () {
     Route::put('/admin/orders/{id}/pickup', [OrderManagement::class, 'pickUp'])->name('admin.orders.pick_up');
     Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
     Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
-
-    // BUFFALOS
-    Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
-    Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
-    Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
-    Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
-    Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
-    Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
-    Route::get('/show-map', [BarGraphController::class, 'showMap']);
-
-    // STAFF
-    Route::get('/admin/staff',[StaffController::class, 'index'])->name('admin.staff.index');
-    Route::post('/admin/staff/store',[StaffController::class, 'store'])->name('admin.staff.store');
-    Route::get('/staff/password-setup/{token}',[StaffController::class, 'showPasswordSetupForm'])->name('admin.staff.setup');
-    Route::post('/staff/password-setup/{token}',[StaffController::class, 'setupPassword'])->name('admin.staff.verify');
-
-    // PROFILE
-    Route::get('/admin/profile',[ProfileController::class, 'index'])->name('admin.profile.index');
-    Route::post('/admin/profile/update',[ProfileController::class, 'update'])->name('admin.profile.update');
-
-    // SALES REPORT
-    Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
 });
+
+// BUFFALOS
+Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
+Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
+Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
+Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
+Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
+Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
+Route::get('/show-map', [BarGraphController::class, 'showMap']);
+
+// STAFF
+Route::group(['middleware' => 'check.access:staff_management'], function () {
+    Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
+    Route::post('/admin/staff/store', [StaffController::class, 'store'])->name('admin.staff.store');
+    Route::post('/admin/staff/init', [StaffController::class, 'init'])->name('admin.staff.init');
+    Route::post('/admin/staff/fetch', [StaffController::class, 'fetch'])->name('admin.staff.fetch');
+    Route::post('/admin/staff/update', [StaffController::class, 'update'])->name('admin.staff.update');
+    Route::get('/staff/password-setup/{token}', [StaffController::class, 'showPasswordSetupForm'])->name('admin.staff.setup');
+    Route::post('/staff/password-setup/{token}', [StaffController::class, 'setupPassword'])->name('admin.staff.verify');
+});
+
+// PROFILE
+Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
+Route::post('/admin/profile/update-password', [ProfileController::class, 'update_password'])->name('admin.profile.update-password');
+Route::post('/admin/profile/update-avatar', [ProfileController::class, 'update_avatar'])->name('admin.profile.update-avatar');
+
+// SALES REPORT
+Route::group(['middleware' => 'check.access:sales_report'], function () {
+    Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
+    Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
+    Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
+});
+// });
