@@ -14,6 +14,7 @@
                 <i class="fa-solid fa-cow"></i> Buffalos</button>
         </li>
     </ul>
+
     {{-- CONTENT OF NAV PILLS --}}
     <div class="tab-content p-2" id="pills-tabContent">
         {{-- CONTENT 1 --}}
@@ -33,9 +34,9 @@
                             Update Milk Stocks
                         </span>
                     </button>
-                    <!-- Add/Update Milk Stock Modal -->
-                    <div class="modal fade" id="incrementMilkStock" tabindex="-1" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true">
+                    
+                    <!-- MODAL Add/Update Milk Stock -->
+                    <div class="modal fade" id="incrementMilkStock" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -60,6 +61,14 @@
                                             <label for="quantity">Quantity (Liter)</label>
                                         </div>
 
+                                        <button type="button" id="deleteBuffalosBtn" class="btn btn-primary mb-3">
+                                            <span class="loading-spinner" style="display: none;">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true"></span>
+                                                Loading...
+                                            </span>
+                                            <span class="delete-btn">Delete</span>
+                                        </button>
                                         <button type="submit" id="incrementMilkStockBtn" class="btn btn-primary mb-3">
                                             <span class="loading-spinner" style="display: none;">
                                                 <span class="spinner-border spinner-border-sm" role="status"
@@ -85,7 +94,8 @@
                         </span>
                     </button>
                 </div>
-                <!-- Sell Milk Stock Modal -->
+                
+                <!-- MODAL Sell Milk Stock -->
                 <div class="modal fade" id="sellMilkStock" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -174,7 +184,7 @@
                             Update Buffalos
                         </span>
                     </button>
-                    <!-- Add/Update Buffalo Modal -->
+                    <!-- Add/Update Buffalo MODAL -->
                     <div class="modal fade" id="updateBuffalos" tabindex="-1" aria-labelledby="exampleModalLabel"
                         aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -198,9 +208,9 @@
                                             <label for="age">Age of Buffalo</label>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" name="quantity_sold"
-                                                id="quantity_sold" placeholder="quantity_sold">
-                                            <label for="quantity_sold">Quantity</label>
+                                            <input type="text" class="form-control" name="quantity"
+                                                id="quantity" placeholder="quantity">
+                                            <label for="quantity">Quantity</label>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <div>
@@ -244,7 +254,7 @@
                         </span>
                     </button>
                 </div>
-                <!-- Sell Buffalo Modal -->
+                <!-- MODAL Sell Buffalo -->
                 <div class="modal fade" id="sellBuffalos" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -268,9 +278,9 @@
                                         <label for="age">Age of Buffalo</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" name="quantity_sold"
-                                            id="quantity_sold" placeholder="quantity_sold">
-                                        <label for="quantity_sold">Quantity</label>
+                                        <input type="text" class="form-control" name="quantity"
+                                            id="quantity" placeholder="quantity">
+                                        <label for="quantity">Quantity</label>
                                     </div>
                                     <div class="form-floating mb-3">
                                         <div>
@@ -326,30 +336,47 @@
                 </div>
             </div>
         </div>
-        <!-- Activity Logs TAble -->
+        <!-- Activity Logs Table -->
+        <style>
+            #dataTable {
+                font-size: 14px;
+            }
+        </style>
+        <!-- Page Heading -->
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <h1 class="h3" style="font-size: 20px;">Milks and Buffalos Activity Logs</h1>
+        </div>
+    
         <div class="card shadow mb-4">
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th>#</th>
                                 <th>ADMIN ID</th>
                                 <th>ACTIVITY</th>
-                                <th>DESCRIPTION</th>
                                 <th>DATE</th>
                                 <th>IP ADDRESS</th>
                             </tr>
                         </thead>
+                        <tfoot>
+                            <tr>
+                                <th>ADMIN ID</th>
+                                <th>ACTIVITY</th>
+                                <th>DATE</th>
+                                <th>IP ADDRESS</th>
+                            </tr>
+                        </tfoot>
                         <tbody>
-                            @foreach ($activity_logs as $activity)
+                            @foreach ($activity_logs as $logs)
+                                @php
+                                    
+                                @endphp
                                 <tr>
-                                    <td class="id-column">{{ $activity->id }}</td>
-                                    <td class="admin-id-column">{{ $activity->admin_id }}</td>
-                                    <td class="activity-type-column">{{ $activity->activity_type }}</td>
-                                    <td class="description-column">{{ $activity->description }}</td>
-                                    <td class="date-column">{{ $activity->updated_at }}</td>
-                                    <td class="ip-address-column">{{ $activity->ip_address }}</td>
+                                    <td>{{ $logs->admin_id }}</td>
+                                    <td>{{ $logs->description }}</td>
+                                    <td>{{ $logs->created_at }}</td>
+                                    <td>{{ $logs->ip_address }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -359,10 +386,10 @@
         </div>
     </div>
 
-
+    {{--
     <h5>Milks & Buffalos Chart:</h5>
     @include('.showMap')
-
+    --}}
 
 
 
@@ -409,14 +436,57 @@
                         showNotification('info', 'Milk stocks updated',
                             'Milk Stock updated to ' + response.quantity);
 
+                        // Clear input fields
+                        form.reset();
+
                         submitBtn.prop('disabled', false);
                         buttonText.show();
                         loadingSpinner.hide();
+
+                        refreshDataTable();
+
+                        // Close the modal
+                        var modal = $('#incrementMilkStock');
+                        modal.modal('hide');
+
                     },
                     error: function(xhr) {
                         console.error(xhr.responseJSON); // Log the error response
                         alert('Error submitting milk data. Please try again.');
                     }
+                });
+            });
+
+            /// Delete button click event
+            $(document).on('click', '.delete-btn', function() {
+                var deleteButton = $(this);
+                var milkStockId = deleteButton.data('id');
+                var confirmationMessage = "Are you sure? You won't be able to revert this!";
+
+                showConfirmationModal(confirmationMessage, function() {
+                    // Proceed with deleting the payment method
+                    $.ajax({
+                        url: '{{ route('admin.milk_stock.delete') }}', // Replace with the actual URL for deleting the payment method
+                        type: 'POST',
+                        data: {
+                            id: milkStockId,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            // Remove the row from the table
+                            // var row = deleteButton.closest('tr');
+                            // dataTable.row(row).remove().draw();
+                            // Show notification
+                            showNotification('error', 'Milk deleted', response
+                                .type + ' deleted.');
+
+                            refreshDataTable();
+
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
                 });
             });
 
@@ -455,6 +525,20 @@
                         // Optionally, show a success message or redirect to another page
                         // alert('Milk data submitted successfully!');
                         showNotification('info', response.quantity + ' milk/s sold');
+
+                        // Clear input fields
+                        form.reset();
+
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
+
+                        refreshDataTable();
+
+                        // Close the modal
+                        var modal = $('#sellMilkStock');
+                        modal.modal('hide');
+
                     },
                     error: function(xhr) {
                         console.error(xhr.responseJSON); // Log the error response
@@ -499,7 +583,20 @@
                         // Optionally, show a success message or redirect to another page
                         // alert('Milk data submitted successfully!');
                         showNotification('info', 'Buffalo updated', 'Buffalos updated to ' +
-                            response.quantity_sold);
+                            response.quantity);
+                        
+                        // Clear input fields
+                        form.reset();
+
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
+
+                        refreshDataTable();
+
+                        // Close the modal
+                        var modal = $('#updateBuffalos');
+                        modal.modal('hide');
                     },
                     error: function(xhr) {
                         console.error(xhr.responseJSON); // Log the error response
@@ -542,7 +639,20 @@
                     success: function(response) {
                         // Optionally, show a success message or redirect to another page
                         // alert('Milk data submitted successfully!');
-                        showNotification('info', response.quantity_sold + ' buffalo/s sold');
+                        showNotification('info', response.quantity + ' buffalo/s sold');
+                        
+                        // Clear input fields
+                        form.reset();
+
+                        submitBtn.prop('disabled', false);
+                        buttonText.show();
+                        loadingSpinner.hide();
+
+                        refreshDataTable();
+
+                        // Close the modal
+                        var modal = $('#sellBuffalos');
+                        modal.modal('hide');
                     },
                     error: function(xhr) {
                         console.error(xhr.responseJSON); // Log the error response
@@ -570,59 +680,4 @@
         });
     </script>
 
-    <script>
-        // Data
-        const dataChartDataLabelsExample = {
-            type: 'pie',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May'],
-                datasets: [{
-                    label: 'Traffic',
-                    data: [30, 45, 62, 65, 61],
-                    backgroundColor: [
-                        'rgba(63, 81, 181, 0.5)',
-                        'rgba(77, 182, 172, 0.5)',
-                        'rgba(66, 133, 244, 0.5)',
-                        'rgba(156, 39, 176, 0.5)',
-                        'rgba(233, 30, 99, 0.5)',
-                    ],
-                }, ],
-            },
-        };
-
-        // Options
-        const optionsChartDataLabelsExample = {
-            dataLabelsPlugin: true,
-            options: {
-                plugins: {
-                    datalabels: {
-                        formatter: (value, ctx) => {
-                            let sum = 0;
-                            // Assign the data to the variable and format it according to your needs
-                            let dataArr = dataChartDataLabelsExample.data.datasets[0].data;
-                            dataArr.map((data) => {
-                                sum += data;
-                            });
-                            let percentage = ((value * 100) / sum).toFixed(2) + '%';
-                            return percentage;
-                        },
-                        color: 'white',
-                        labels: {
-                            title: {
-                                font: {
-                                    size: '14',
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        };
-
-        new mdb.Chart(
-            document.getElementById('chart-data-mdb-labels-example'),
-            dataChartDataLabelsExample,
-            optionsChartDataLabelsExample
-        );
-    </script>
 @endsection

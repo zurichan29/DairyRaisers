@@ -29,7 +29,6 @@ class AuthController extends Controller
     {
         // auth()->guard('admin')->logout();
         if (auth()->guard('admin')->check()) {
-                auth()->guard('admin')->logout();
             throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
         return view('client.auth.admin');

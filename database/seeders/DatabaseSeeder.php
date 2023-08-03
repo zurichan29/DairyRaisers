@@ -129,28 +129,19 @@ class DatabaseSeeder extends Seeder
         $this->seedProducts();
         // $table->string('gender');
         // $table->integer('age');
-        // $table->integer('quantity_sold');
+        // $table->integer('quantity');
         // $table->timestamps('date_sold');
         // $table->string('buyers_name');
         // $table->string('buyers_address');
         Buffalo::create([
             'gender' => 'Female',
             'age' => null,
-            'quantity_sold' => 2,
+            'quantity' => 2,
             'date_sold' => Carbon::now()->toDateString(),
             'buyers_name' => 'Shania',
             'buyers_address' =>  'Santiago, General Trias',
         ]);
 
-
-        Buffalo::create([
-            'gender' => 'Female',
-            'age' => null,
-            'quantity_sold' => 2,
-            'date_sold' => Carbon::now()->toDateString(),
-            'buyers_name' => 'Shania',
-            'buyers_address' =>  'Santiago, General Trias',
-        ]);
 
         MilkStock::create([
             'date_created' => Carbon::now()->toDateString(),

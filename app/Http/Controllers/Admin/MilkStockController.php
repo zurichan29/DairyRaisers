@@ -46,6 +46,17 @@ class MilkStockController extends Controller
         }
     }
 
+    public function delete(Request $request)
+    {
+        if (auth()->guard('admin')->check()) {
+            $id = $request->input('id');
+            $milkStock = MilkStock::where('id', $id)->first();
+            $this->logActivity('Administrator has deleted milks', $request);
+            $milkStock->delete();
+            return response(['message' => 'success', 'id' => $id]);
+        }
+    }
+
     public function sell(Request $request)
     {
         if (auth()->guard('admin')->check()) {

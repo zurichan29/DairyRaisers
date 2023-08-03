@@ -125,7 +125,7 @@ Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'
 Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 // ADMIN
-// Route::group(['middleware' => 'admin'], function () {
+
 Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
 
 // DASHBOARD
@@ -184,13 +184,16 @@ Route::group(['middleware' => 'check.access:orders'], function () {
 });
 
 // BUFFALOS
-Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
-Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
-Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
-Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
-Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
-Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
-Route::get('/show-map', [BarGraphController::class, 'showMap']);
+Route::group(['middleware' => 'check.access:buffalos_and_milk'], function () {
+    Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
+    Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
+    Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
+    Route::post('/admin/milk/delete', [MilkStockController::class, 'delete'])->name('admin.milk_stock.delete');
+    Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
+    Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
+    Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
+    Route::get('/show-map', [BarGraphController::class, 'showMap']);
+});
 
 // STAFF
 Route::group(['middleware' => 'check.access:staff_management'], function () {
@@ -214,4 +217,3 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
 });
-// });

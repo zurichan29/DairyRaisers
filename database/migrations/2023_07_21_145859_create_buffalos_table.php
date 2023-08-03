@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('gender');
             $table->integer('age')->nullable();
-            $table->integer('quantity_sold');
+            $table->integer('quantity');
             $table->timestamp('date_sold')->nullable();
             $table->string('buyers_name');
             $table->string('buyers_address');

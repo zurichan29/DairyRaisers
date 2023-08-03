@@ -36,6 +36,9 @@
             <div>
                 <a href="{{ url()->previous() }}">Go Back</a>
             </div>
+            <div class="">
+                <a href="{{ route('logout') }}">LOGOUT</a>
+            </div>
         </div>
     </div>
 @endsection

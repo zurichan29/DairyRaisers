@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('milk_stock', function (Blueprint $table) {
             $table->id();
-            $table->date('date_created');
+            $table->timestamp('date_created')->nullable();
             $table->integer('quantity');
             $table->timestamps();
         });

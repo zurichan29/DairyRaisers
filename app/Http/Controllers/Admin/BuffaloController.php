@@ -12,12 +12,26 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class BuffaloController extends Controller
 {
+    public function index()
+    {
+        // Your logic here
+        if (auth()->guard('admin')->check()) {
+            $activity_logs = ActivityLog::where('activity_type', 'Buffalo')->get();
+            $buffalo = Buffalo::where('quantity')->count();
+            $total = Buffalo::all()->sum('quantity');
+            
+            return view('admin.buffalos.index', compact('activity_logs','buffalo', 'total'));
+        } else {
+            return redirect()->back();
+        }
+    }
+
     public function submitBuffalo(Request $request) {
         if (auth()->guard('admin')->check()) {
             $validatedData = $request->validate([
                 'gender' => 'required|string',
                 'age' => 'required|integer',
-                'quantity_sold' => 'required|integer',
+                'quantity' => 'required|integer',
                 'date_sold' => 'required|date',
                 'buyers_name' => 'required|string',
                 'buyers_address' => 'required|string',
@@ -27,13 +41,13 @@ class BuffaloController extends Controller
             $buffalo = new Buffalo();
             $buffalo->gender = $request->gender;
             $buffalo->age = $request->age;
-            $buffalo->quantity_sold = $request->quantity_sold;
+            $buffalo->quantity = $request->quantity;
             $buffalo->date_sold = $request->date_sold;
             $buffalo->buyers_name = $request->buyers_name;
             $buffalo->buyers_address = $request->buyers_address;
             $buffalo->save();
 
-            $this->logActivity($buffalo->quantity_sold . ' of ' . $buffalo->gender . ' Buffalo/s in age/s ' . $buffalo->age . ' added', $request);
+            $this->logActivity('Added ' . $buffalo->quantity . ' ' . $buffalo->gender . ' Buffalo/s in the age/s of ' . $buffalo->age , $request);
 
             // Optionally, you can add a success message or redirect to another page
             return response()->json($buffalo);
@@ -45,7 +59,7 @@ class BuffaloController extends Controller
             $validatedData = $request->validate([
                 'gender' => 'required|string',
                 'age' => 'required|integer',
-                'quantity_sold' => 'required|integer',
+                'quantity' => 'required|integer',
                 'date_sold' => 'required|date',
                 'buyers_name' => 'required|string',
                 'buyers_address' => 'required|string',
@@ -55,13 +69,13 @@ class BuffaloController extends Controller
             $buffalo = new Buffalo();
             $buffalo->gender = $request->gender;
             $buffalo->age = $request->age;
-            $buffalo->quantity_sold = $request->quantity_sold;
+            $buffalo->quantity = $request->quantity;
             $buffalo->date_sold = $request->date_sold;
             $buffalo->buyers_name = $request->buyers_name;
             $buffalo->buyers_address = $request->buyers_address;
             $buffalo->save();
 
-            $this->logActivity($buffalo->quantity_sold . ' of Buffalo/s sold', $request);
+            $this->logActivity($buffalo->quantity . ' of Buffalo/s sold', $request);
 
             // Optionally, you can add a success message or redirect to another page
             return response()->json($buffalo);
