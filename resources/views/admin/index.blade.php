@@ -11,7 +11,7 @@
                             <div class="col">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total
                                     Staff</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" >
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     {{ $staffs->count() }}</div>
                             </div>
                             <div class="col-auto">
@@ -28,7 +28,7 @@
                             <div class="col">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total
                                     Buffalos</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" >
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     {{ $buffalos->sum('quantity') }}</div>
                             </div>
                             <div class="col-auto">
@@ -45,7 +45,7 @@
                             <div class="col">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total
                                     Products</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" >
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     {{ $products->count() }}</div>
                             </div>
                             <div class="col-auto">
@@ -62,7 +62,7 @@
                             <div class="col">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total
                                     Orders</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" >
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     {{ $orders->count() }}</div>
                             </div>
                             <div class="col-auto">
@@ -74,7 +74,43 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col">
+                <!-- Pie Chart -->
+                <div class="col-xl-4 col-lg-5 w-100">
+                    <div class="card shadow h-100 d-flex flex-pill">
+                        <!-- Card Header - Dropdown -->
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-start">
+                            <h6 class="m-0 font-weight-bold text-primary">BUFFALOS BY CATEGORY</h6>
+
+                        </div>
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <div class="chart-pie pt-4 pb-2">
+                                <canvas id="buffaloChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Area Chart -->
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card shadow h-100 flex flex-pill">
+                        <!-- Card Header - Dropdown -->
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-start">
+                            <h6 class="m-0 font-weight-bold text-primary">PRODUCT STOCKS BY VARIANTS</h6>
+                           
+                        </div>
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <div class="chart-area">
+                                <canvas id="productStocksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+          
+
+            {{-- <div class="col">
                 <div class="card shadow h-100 d-flex flex-fill">
                     <div class="card-header py-3">
                         <div class="row">
@@ -101,11 +137,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <div class="row mb-3">
             <div class="col">
-                <div class="card shadow mb-3">
+                <div class="card shadow ">
                     <div class="card-header py-3">
                         <div class="row">
                             <div class="col-md-8 d-flex justify-content-start align-items-center">
@@ -142,7 +178,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-md-8">
-                <div class="card shadow mb-3 h-100 d-flex flex-fill">
+                <div class="card shadow h-100 d-flex flex-fill">
                     <div class="card-header bg-primary text-white py-3">
                         <div class="row d-flex justify-content-between">
                             <div class="col d-flex justify-content-start align-items-center">
@@ -222,7 +258,7 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card shadow mb-3 h-100 d-flex flex-fill">
+                <div class="card shadow h-100 d-flex flex-fill">
                     <div class="card-header text-white py-3">
                         <div class="row d-flex justify-content-between">
                             <div class="col d-flex justify-content-start align-items-center">
