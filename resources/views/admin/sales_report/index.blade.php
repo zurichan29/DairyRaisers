@@ -60,16 +60,16 @@
                         </div>
                     </div> <!-- COPY, PRINT, CSV AND EXCEL BUTTON -->
                     <div class="col-md-4 d-flex justify-content-end align-items-center">
-                        <button type="button" id="" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="copy" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-copy"></i> Copy
                         </button>
-                        <button type="button" id="" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="csv" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-file-csv"></i> CSV
                         </button>
-                        <button type="button" id="" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="excel" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-regular fa-file-excel"></i> Excel
                         </button>
-                        <button type="button" id="" class="btn btn-sm btn-outline-primary">
+                        <button type="button" id="print" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-print"></i> Print
                         </button>
                     </div>
@@ -394,6 +394,20 @@
                 var earningData = @json($earningData);
                 initializeChart(labels, earningData);
             });
+            
+            document.getElementById("print").addEventListener("click", function () {
+            var table = document.getElementById("dataTable");
+            if (table) {
+                var newWin = window.open('', '_blank');
+                newWin.document.open();
+                newWin.document.write('<html><body>');
+                newWin.document.write('<table border="1">' + table.innerHTML + '</table>');
+                newWin.document.write('</body></html>');
+                newWin.document.close();
+                newWin.print();
+            }
+        });
+
         </script>
     @endif
 @endsection

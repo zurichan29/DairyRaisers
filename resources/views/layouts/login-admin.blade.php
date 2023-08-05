@@ -14,6 +14,9 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">       
     <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <title>Login at Dairy Raisers</title>
 </head>
@@ -28,6 +31,13 @@
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+    
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/load_address.js') }}"></script>
@@ -42,5 +52,6 @@
             mainContent.style.marginTop = navbarHeight + 'px';
         });
     </script>
+
 </body>
 </html>
