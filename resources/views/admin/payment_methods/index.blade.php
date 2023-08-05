@@ -11,64 +11,63 @@
                 font-size: 14px;
             }
         </style>
-        <!-- Page Heading -->
-        <div class="mb-4 d-flex align-items-center justify-content-between">
-            <h1 class="h3 text-gray-800">Payment Methods</h1>
-            <button type="button" data-bs-toggle="modal" data-bs-target="#createPaymentMethod"
-                class="btn btn-primary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fa-solid fa-circle-plus"></i>
-                </span>
-                <span class="text">
-                    Create Payment Method
-                </span>
-            </button>
-            <!-- Modal -->
-            <div class="modal fade" id="createPaymentMethod" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title text-primary" id="exampleModalLabel">Create new payment method</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="createPaymentForm">
-                                @csrf
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="type" id="type"
-                                        placeholder="Type">
-                                    <label for="type">Type</label>
-                                    <div id="add-type-error" class="add-method-error"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="account_name" id="account_name"
-                                        placeholder="Account Name">
-                                    <label for="account_name">Account Name</label>
-                                    <div id="add-account_name-error" class="add-method-error"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="account_number" id="account_number"
-                                        placeholder="Account Number">
-                                    <label for="account_number">Account Number</label>
-                                    <div id="add-account_number-error" class="add-method-error"></div>
-                                </div>
-                                <button type="submit" id="addMethodBtn" class="btn btn-primary mb-3">
-                                    <span class="loading-spinner" style="display: none;">
-                                        <span class="spinner-border spinner-border-sm" role="status"
-                                            aria-hidden="true"></span>
-                                        Loading...
-                                    </span>
-                                    <span class="btn-text">Submit</span>
-                                </button>
-                            </form>
-                        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="createPaymentMethod" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-primary" id="exampleModalLabel">Create new payment method</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createPaymentForm">
+                            @csrf
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="type" id="type" placeholder="Type">
+                                <label for="type">Type</label>
+                                <div id="add-type-error" class="add-method-error"></div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="account_name" id="account_name"
+                                    placeholder="Account Name">
+                                <label for="account_name">Account Name</label>
+                                <div id="add-account_name-error" class="add-method-error"></div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="account_number" id="account_number"
+                                    placeholder="Account Number">
+                                <label for="account_number">Account Number</label>
+                                <div id="add-account_number-error" class="add-method-error"></div>
+                            </div>
+                            <button type="submit" id="addMethodBtn" class="btn btn-primary mb-3">
+                                <span class="loading-spinner" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </span>
+                                <span class="btn-text">Submit</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
+
+
         <div class="card shadow mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h1 class="h3 text-primary">Payment Methods</h1>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#createPaymentMethod"
+                    class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </span>
+                    <span class="text">
+                        Create Payment Method
+                    </span>
+                </button>
+
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">

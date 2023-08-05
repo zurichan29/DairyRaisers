@@ -13,12 +13,11 @@
                 /* Adjust the font size as per your preference */
             }
         </style>
-        <!-- Page Heading -->
-        <div class="mb-4 d-flex align-items-center justify-content-between">
-            <h1 class="h3">Activity Logs</h1>
-        </div>
 
         <div class="card shadow mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h1 class="h3 text-primary">Activity Logs</h1>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">

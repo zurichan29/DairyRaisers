@@ -23,9 +23,7 @@
                             <h1 class="text-center" style="color: #666;">{{ $product->name }}</h1>
                         </div>
                         <input type="number" name="quantity" value="1"
-                            class="justify-center text-center mb-4" style="width: 100%; border: none; outline: none; background: none;
-                            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">
+                            class="form-control text-center">
                         <button class="btn btn-primary mt-4" type="submit" style="width: 100%; height: 40px;
                         border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
                             Add to Cart</button>

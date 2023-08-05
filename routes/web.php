@@ -155,6 +155,7 @@ Route::group(['middleware' => 'check.access:buffalos_management'], function () {
 //PRODUCTS (INVENTORY AND VARIANT)
 Route::group(['middleware' => 'check.access:inventory'], function () {
     Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+    Route::get('/admin/products/print', [ProductController::class, 'print'])->name('admin.products.print');
     Route::get('/admin/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');
     Route::post('/admin/products/data', [ProductController::class, 'getProductsData'])->name('admin.products.data');
     Route::post('/admin/products/update-status', [ProductController::class, 'updateStatus'])->name('admin.products.updateStatus');
@@ -164,6 +165,7 @@ Route::group(['middleware' => 'check.access:inventory'], function () {
     Route::post('/admin/variants/data', [VariantController::class, 'getVariantsData'])->name('admin.variants.data');
     Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
     Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
+    
 });
 
 // ORDERS
@@ -209,6 +211,7 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
+    Route::get('/admin/sales_reports/daily_sales/print/',[SalesReportController::class, 'printDailySales'])->name('admin.sales_report.print');
 });
 
 // PROFILE

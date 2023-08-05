@@ -23,7 +23,8 @@
                         <form action="" method="POST" id="addStaffForm">
                             @csrf
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control disable-on-submit" name="name" id="name" placeholder="Name">
+                                <input type="text" class="form-control disable-on-submit" name="name" id="name"
+                                    placeholder="Name">
                                 <label for="name">Name</label>
                                 <div id="add-staff-name-error" class="error-container"></div>
                             </div>
@@ -41,8 +42,9 @@
                                             @foreach ($firstHalf as $access)
                                                 <li>
                                                     <div class="form-check">
-                                                        <input type="checkbox" class="form-check-input disable-on-submit" name="access[]"
-                                                            value="{{ $access }}" id="access-{{ $access }}">
+                                                        <input type="checkbox" class="form-check-input disable-on-submit"
+                                                            name="access[]" value="{{ $access }}"
+                                                            id="access-{{ $access }}">
                                                         <label class="form-check-label"
                                                             for="access-{{ $access }}">{{ $access }}</label>
                                                     </div>
@@ -94,7 +96,8 @@
                             <input type="hidden" name="staff_id" id="editStaffId">
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control disable-on-submit" name="name" id="editName" placeholder="Name" >
+                                <input type="text" class="form-control disable-on-submit" name="name" id="editName"
+                                    placeholder="Name">
                                 <label for="editName">Name *</label>
                                 <div id="edit-staff-name-error" class="error-container"></div>
                             </div>
@@ -125,83 +128,80 @@
                 </div>
             </div>
         </div>
-        <!-- Page Heading -->
-        <div class="mb-4 d-flex align-items-center justify-content-between">
-            <h1 class="h3">Staff Management</h1>
-            <button type="button" data-bs-toggle="modal" data-bs-target="#addStaffModal"
-                class="btn btn-primary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fa-solid fa-circle-plus"></i>
-                </span>
-                <span class="text">
-                    Add Staff
-                </span>
-            </button>
-        </div>
         {{-- Table --}}
-        <div class="container">
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="dataTable" style="font-size: 14px">
-                            <thead>
-                                <tr>
-                                    <th>NAME</th>
-                                    <th>EMAIL</th>
-                                    <th>ACCESS</th>
-                                    <th>STATUS</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($staffs as $staff)
-                                    @if (!$staff->is_admin)
-                                        @php
-                                            $access = is_array($staff->access) ? $staff->access : json_decode($staff->access, true);
-                                            if ($staff->is_verified) {
-                                                $badge = 'success';
-                                                $text = 'VERIFIED';
-                                            } else {
-                                                $badge = 'danger';
-                                                $text = 'NOT VERIFIED';
-                                            }
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $staff->name }}</td>
-                                            <td>{{ $staff->email }} <span
-                                                    class="badge bg-{{ $badge }}">{{ $text }}</span></td>
-                                            <td>
-                                                @if (is_array($access))
-                                                    <ul>
-                                                        @foreach ($access as $permission)
-                                                            <li>{{ $permission }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                @endif
-                                            </td>
-                                            <td>{{ $staff->status }}</td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn rounded-3 btn-light" type="button"
-                                                        id="actionsDropdown" data-bs-toggle="dropdown"
-                                                        aria-haspopup="true" aria-expanded="false">
-                                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="h3 text-primary">Staff Management</h1>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#addStaffModal"
+                    class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </span>
+                    <span class="text">
+                        Add Staff
+                    </span>
+                </button>
+            </div>
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table table-striped" id="dataTable" style="font-size: 14px">
+                        <thead>
+                            <tr>
+                                <th>NAME</th>
+                                <th>EMAIL</th>
+                                <th>ACCESS</th>
+                                <th>STATUS</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($staffs as $staff)
+                                @if (!$staff->is_admin)
+                                    @php
+                                        $access = is_array($staff->access) ? $staff->access : json_decode($staff->access, true);
+                                        if ($staff->is_verified) {
+                                            $badge = 'success';
+                                            $text = 'VERIFIED';
+                                        } else {
+                                            $badge = 'danger';
+                                            $text = 'NOT VERIFIED';
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $staff->name }}</td>
+                                        <td>{{ $staff->email }} </td>
+                                        <td>
+                                            @if (is_array($access))
+                                                <ul>
+                                                    @foreach ($access as $permission)
+                                                        <li>{{ $permission }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </td>
+                                        <td><span class="badge bg-{{ $badge }}">{{ $text }}</span></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn rounded-3 btn-light" type="button"
+                                                    id="actionsDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end"
+                                                    aria-labelledby="actionsDropdown">
+                                                    <button type="button" class="dropdown-item edit-btn"
+                                                        data-staff-id="{{ $staff->id }}">
+                                                        Edit
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-end"
-                                                        aria-labelledby="actionsDropdown">
-                                                        <button type="button" class="dropdown-item edit-btn"
-                                                            data-staff-id="{{ $staff->id }}">
-                                                            Edit
-                                                        </button>
-                                                    </div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

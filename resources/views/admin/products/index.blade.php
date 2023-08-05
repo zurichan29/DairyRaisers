@@ -31,72 +31,58 @@
         <div class="tab-content p-2" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-inventory" role="tabpanel"
                 aria-labelledby="pills-inventory-tab" tabindex="0">
-                <!-- Page Heading -->
-                <div class="mb-4 d-flex align-items-center justify-content-between">
-                    <h1 class="h3">Inventory</h1>
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#addProductModal"
-                        class="btn btn-primary btn-icon-split">
-                        <span class="icon text-white-50">
-                            <i class="fa-solid fa-circle-plus"></i>
-                        </span>
-                        <span class="text">
-                            Add Product
-                        </span>
-                    </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title text-primary" id="addProductModalLabel">Create New Product</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="addProductForm" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" name="name" id="addName"
-                                                placeholder="Name">
-                                            <label for="addName">Name</label>
-                                            <div id="add-product-name-error" class="error-container"></div>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="file" class="form-control" name="img" id="addImg"
-                                                placeholder="Product Image">
-                                            <label for="addImg">Product Image</label>
-                                            <div id="add-product-img-error" class="error-container"></div>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <select class="form-select" name="variant" id="addVariant">
-                                                @foreach ($variants as $variant)
-                                                    <option value="{{ $variant->name }}">{{ $variant->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="addVariant">Variants:</label>
-                                            <div id="add-product-variant-error" class="error-container"></div>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" name="price" id="addPrice"
-                                                placeholder="Price">
-                                            <label for="addPrice">Price</label>
-                                            <div id="add-product-price-error" class="error-container"></div>
-                                        </div>
-                                        <button type="submit" id="addProductBtn" class="btn btn-primary mb-3">
-                                            <span class="loading-spinner" style="display: none;">
-                                                <span class="spinner-border spinner-border-sm" role="status"
-                                                    aria-hidden="true"></span>
-                                                Loading...
-                                            </span>
-                                            <span class="btn-text">Submit</span>
-                                        </button>
-                                    </form>
-                                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-primary" id="addProductModalLabel">Create New Product</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addProductForm" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="name" id="addName"
+                                            placeholder="Name">
+                                        <label for="addName">Name</label>
+                                        <div id="add-product-name-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="file" class="form-control" name="img" id="addImg"
+                                            placeholder="Product Image">
+                                        <label for="addImg">Product Image</label>
+                                        <div id="add-product-img-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" name="variant" id="addVariant">
+                                            @foreach ($variants as $variant)
+                                                <option value="{{ $variant->name }}">{{ $variant->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="addVariant">Variants:</label>
+                                        <div id="add-product-variant-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="price" id="addPrice"
+                                            placeholder="Price">
+                                        <label for="addPrice">Price</label>
+                                        <div id="add-product-price-error" class="error-container"></div>
+                                    </div>
+                                    <button type="submit" id="addProductBtn" class="btn btn-primary mb-3">
+                                        <span class="loading-spinner" style="display: none;">
+                                            <span class="spinner-border spinner-border-sm" role="status"
+                                                aria-hidden="true"></span>
+                                            Loading...
+                                        </span>
+                                        <span class="btn-text">Submit</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <!-- Edit Modal -->
                 <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
@@ -208,12 +194,23 @@
                     </div>
                 </div>
 
-                <div class="card shadow mb-4">
+                <div class="card shadow mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addProductModal"
+                            class="btn btn-primary btn-icon-split">
+                            <span class="icon text-white-50">
+                                <i class="fa-solid fa-circle-plus"></i>
+                            </span>
+                            <span class="text">
+                                Add Product
+                            </span>
+                        </button>
+                        <a href="{{ route('admin.products.print') }}" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-print"></i> Print
+                        </a>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <button type="button" id="excel" class="mr-2 btn btn-sm btn-outline-primary" style="margin-left:54.8rem; margin-bottom:1rem;">
-                                <i class="fa-regular fa-file-excel"></i> Download Excel
-                            </button>
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
@@ -309,53 +306,39 @@
             </div>
             <div class="tab-pane fade" id="pills-variants" role="tabpanel" aria-labelledby="pills-variants-tab"
                 tabindex="0">
-                <!-- Page Heading -->
-                <div class="mb-4 d-flex align-items-center justify-content-between">
-                    <h1 class="h3">Variants</h1>
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#addVariantModal"
-                        class="btn btn-primary btn-icon-split">
-                        <span class="icon text-white-50">
-                            <i class="fa-solid fa-circle-plus"></i>
-                        </span>
-                        <span class="text">
-                            Add Variants
-                        </span>
-                    </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="addVariantModal" tabindex="-1" aria-labelledby="addVariantModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title text-primary" id="addVariantModalLabel">Create New Variant</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="addVariantForm">
-                                        @csrf
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" name="name" id="addName"
-                                                placeholder="Name">
-                                            <label for="addName">Name</label>
-                                            <div id="add-variant-name-error" class="error-container"></div>
-                                        </div>
-                                        <button type="submit" id="addVariantBtn" class="btn btn-primary mb-3">
-                                            <span class="loading-spinner" style="display: none;">
-                                                <span class="spinner-border spinner-border-sm" role="status"
-                                                    aria-hidden="true"></span>
-                                                Loading...
-                                            </span>
-                                            <span class="btn-text">Submit</span>
-                                        </button>
-                                    </form>
-                                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="addVariantModal" tabindex="-1" aria-labelledby="addVariantModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-primary" id="addVariantModalLabel">Create New Variant</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addVariantForm">
+                                    @csrf
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="name" id="addName"
+                                            placeholder="Name">
+                                        <label for="addName">Name</label>
+                                        <div id="add-variant-name-error" class="error-container"></div>
+                                    </div>
+                                    <button type="submit" id="addVariantBtn" class="btn btn-primary mb-3">
+                                        <span class="loading-spinner" style="display: none;">
+                                            <span class="spinner-border spinner-border-sm" role="status"
+                                                aria-hidden="true"></span>
+                                            Loading...
+                                        </span>
+                                        <span class="btn-text">Submit</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
                 <!-- Edit Modal -->
                 <div class="modal fade" id="editVariantModal" tabindex="-1" aria-labelledby="editVariantModalLabel"
                     aria-hidden="true">
@@ -392,6 +375,17 @@
                 </div>
 
                 <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addVariantModal"
+                            class="btn btn-primary btn-icon-split">
+                            <span class="icon text-white-50">
+                                <i class="fa-solid fa-circle-plus"></i>
+                            </span>
+                            <span class="text">
+                                Add Variants
+                            </span>
+                        </button>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="variantTable" width="100%" cellspacing="0">

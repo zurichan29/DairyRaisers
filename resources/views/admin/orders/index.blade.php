@@ -10,29 +10,19 @@
                 font-size: 14px
             }
         </style>
-        <!-- Page Heading -->
-        <div class="mb-4 d-flex align-items-center justify-content-between">
-            <h1 class="h3 text-gray-800">Orders</h1>
-            <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fa-solid fa-circle-plus"></i>
-                </span>
-                <span class="text">
-                    New Order
-                </span>
-            </a>
-        </div>
+       
 
         <div class="card shadow mb-4">
-            <div class="m-3">
-                <label class="visually-hidden" for="statusFilter">Preference</label>
-                <select class="form-select" id="statusFilter">
-                    <option value="">All Status</option>
-                    <option value="Pending">Pending Status</option>
-                    <option value="Delivery">Delivery Status</option>
-                    <option value="Pick-up">Pick-up Status</option>
-                    <option value="Rejected">Rejected Status</option>
-                </select>
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h1 class="h3 text-primary">Orders</h1>
+                <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </span>
+                    <span class="text">
+                        New Order
+                    </span>
+                </a>
             </div>
 
             <div class="card-body">
@@ -179,16 +169,7 @@
             $(document).ready(function() {
 
                 var dataTable = $('#dataTable').DataTable({
-                    columns: [
-                        null,
-                        {
-                            className: 'order-ref-column',
-                        },
-                        null,
-                        null,
-                        null,
-                        null,
-                    ]
+                   
                 });
 
                 $('#statusFilter').on('change', function() {

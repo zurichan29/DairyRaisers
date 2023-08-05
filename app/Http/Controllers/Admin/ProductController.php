@@ -26,6 +26,13 @@ class ProductController extends Controller
         }
     }
 
+    public function print()
+    {
+        $products = Product::with('variant')->get();
+        $variants = Variants::all();
+        return view('admin.products.print', compact('products', 'variants'));
+    }
+
     public function show($id)
     {
         if (auth()->guard('admin')->check()) {
@@ -49,25 +56,25 @@ class ProductController extends Controller
 
     public function updateStatus(Request $request)
     {
-        if(auth()->guard('admin')->check()) {
-        $productId = $request->input('productId');
-        $currentStatus = $request->input('currentStatus');
+        if (auth()->guard('admin')->check()) {
+            $productId = $request->input('productId');
+            $currentStatus = $request->input('currentStatus');
 
-        $product = Product::find($productId);
+            $product = Product::find($productId);
 
-        if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
-        }
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
 
-        // Determine the new status based on the current status
-        $newStatus = ($product->status == 'AVAILABLE') ? 'NOT AVAILABLE' : 'AVAILABLE';
+            // Determine the new status based on the current status
+            $newStatus = ($product->status == 'AVAILABLE') ? 'NOT AVAILABLE' : 'AVAILABLE';
 
-        $product->status = $newStatus;
-        $product->save();
+            $product->status = $newStatus;
+            $product->save();
 
-        $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $product->name . ' to ' . $product->status, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $product->name . ' to ' . $product->status, $request);
 
-        return response()->json($product);
+            return response()->json($product);
         }
     }
 
@@ -192,8 +199,10 @@ class ProductController extends Controller
             $this->logActivity(auth()->guard('admin')->user()->name . ' has updated a product: ' . $product->name, $request);
 
             return response()->json($data);
-        } 
+        }
     }
+
+    
 
     // Method to log the activity
     private function logActivity($activityDescription, $request)

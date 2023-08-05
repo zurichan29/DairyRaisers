@@ -6,12 +6,29 @@
             {{ session('no_access') }}
         </div>
     @else
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}">All Orders</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Create Order</li>
+            </ol>
+        </nav>
         <form action="{{ route('admin.orders.store_order') }}" method="POST">
             @csrf
 
-            <div class="card">
-                <div class="card-body">
+            <div class="card shadow mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title">Select Customer</h5>
+                    <div class="">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#addCustomerDetailsModal"
+                            class="btn btn-primary">Add
+                            Customer
+                            Details</button>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal"
+                            id="edit-customer-details-btn" class="btn btn-primary">Edit
+                            Selected Customer</button>
+                    </div>
+                </div>
+                <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-striped" id="customerTable" style="font-size: 14px">
                             <thead>
@@ -42,13 +59,7 @@
                 </div>
             </div>
 
-            <button type="button" data-bs-toggle="modal" data-bs-target="#addCustomerDetailsModal"
-                class="btn btn-primary">Add
-                Customer
-                Details</button>
-            <button type="button" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal"
-                id="edit-customer-details-btn" class="btn btn-primary">Edit
-                Selected Customer</button>
+
 
             {{-- SELECTING A PRODUCT --}}
 
