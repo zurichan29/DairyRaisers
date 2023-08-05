@@ -1,38 +1,60 @@
 @extends('layouts.client')
 @section('content')
 
-    <div class=" flex justify-center items-center py-28">
-
-        <div class=" box-container text-center">
-
+    <div class="container mt-5" style="margin-bottom: 100px;">
+        <div class="card" style="display:flex; max-width: 750px; min-height: 400px; margin:auto; margin-bottom:30px; padding:30px;
+        background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
             <form action="{{ route('product.add', ['productId' => $product->id]) }}" method="POST"
-                class=" relative p-4 w-[20rem] bg-[#deb88757] justify-center text-center rounded-2xl shadow-[5px_5px_20px_rgba(0,0,0,0.2)]">
+                class="row g-0">
                 <a href="{{ route('shop') }}"></a>
 
                 @csrf
-                <img src="{{ asset('images/Baka.png') }}" class="w-25 ml-16" alt="">
-                <h1 class="text-[#d2691e] text-2xl font-semibold pb-5">{{ $product->name }}</h1>
-                <input type="number" name="quantity" value="1"
-                    class="justify-center text-center font-semibold text-[#199696] px-4 py-2 rounded-xl">
-                <button type="submit"
-                    class="mt-10 mb-3 text-lg bg-[#199696] w-fit relative py-4 px-8 text-white font-bold uppercase text-xs rounded hover:shadow-[1px_1px_15px_rgb(0,0,0,.6)] transition delay-80 hover:-translate-y-1 hover:scale-90 duration-300">
-                    Add to Cart</button>
+                <div class="col-md-6 border-end">	
+                    <div class="d-flex flex-column justify-content-center">	
+                        <div class="main_image">
+                            <img src="{{ asset('images/Baka.png') }}" width="350" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6" style="margin-top: 20px;">	
+                    <div class="p-3 right-side">	
+                        <div class="mb-4">
+                            <h1 class="text-center" style="color: #666;">{{ $product->name }}</h1>
+                        </div>
+                        <input type="number" name="quantity" value="1"
+                            class="justify-center text-center mb-4" style="width: 100%; border: none; outline: none; background: none;
+                            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
+                            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">
+                        <button class="btn btn-primary mt-4" type="submit" style="width: 100%; height: 40px;
+                        border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
+                            Add to Cart</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 
-    <div class="p-8 pb-20 bg-[#fff8dc]">
-        <div class="pb-16 flex justify-center items-center font-semibold text-[#199696] text-2xl">You May Also Like
-        </div>
-        <section class=" grid grid-cols-5 gap-8 justify-center text-center items-center w-full">
+    <div class="text-center" style="margin-top: 7rem; margin-bottom:3rem;">
+        <h1 style="color:#007bff; margin-bottom:3rem; text-transform:uppercase;">
+            <strong>You May Also Like</strong>
+        </h1>
+        <section class="justify-center text-center items-center" style="display:flex;">
 
             @foreach ($randomProducts as $product)
-                <div
-                    class="p-4 h-[20rem] bg-[#deb88757] rounded-2xl shadow-[5px_5px_20px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_15px_rgb(0,0,0,.3)] cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-[#deb88757] duration-300">
+                <div style="display:flex; max-width: 220px; max-height: 300px; margin:auto; margin-bottom:30px; padding:30px;
+                    background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
                     <a href="">
-                        <img src="{{ asset('images/Baka.png') }}" class="w-[10rem] ml-6" alt="">
-                        <h1 class="text-[#d2691e] text-xl font-semibold pb-5">{{ $product->name }}</h1>
-                        <p class="pt-2 pr-0 text-[#199696] text-xl">₱ {{ $product->price }}</p>
+                        <div>
+                            <img src="{{ asset('images/Baka.png') }}" class="" alt="" style="width: 100%; border-radius: 4px 4px 0 0;
+                            -webkit-border-radius: 4px 4px 0 0;">
+                        </div>
+                        <div class="panel-body text-center" style="margin-bottom: 50px">
+                            <h1 class="" style="font-size: 20px;"><strong>{{ $product->name }}</strong></h1>
+                            <p class="pt-2" style=" border: none; outline: none; background: none; font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px; box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">
+                                ₱ {{ $product->price }}
+                            </p>
+                        </div>
                         {{-- <a href="{{ route() }}"></a> --}}
                     </a>
                 </div>

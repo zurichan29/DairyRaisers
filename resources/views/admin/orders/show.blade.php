@@ -124,25 +124,31 @@
                                     <br>
                                     @if ($order->customer_type == 'online_shopper')
                                         <h6>Name:
-                                            {{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}
+                                            <strong>{{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}</strong>
                                         </h6>
-                                        <h6>Contact: +63{{ $order->customer->user->mobile_number }}</h6>
+                                        <h6>Contact: <strong>+63{{ $order->customer->user->mobile_number }}</strong></h6>
                                         <h6>Email:
-                                            {{ $order->customer->user->email ? $order->customer->user->email : 'none' }}
+                                            <strong>{{ $order->customer->user->email ? $order->customer->user->email : 'none' }}</strong>
                                         </h6>
                                     @elseif ($order->customer_type == 'retailer')
-                                        <h6>Name: {{ $order->customer->first_name . ' ' . $order->customer->last_name }}
+                                        <h6>Name: <strong>{{ $order->customer->first_name . ' ' . $order->customer->last_name }}</strong>
                                         </h6>
-                                        <h6>Contact: +63{{ $order->customer->mobile_number }}</h6>
-                                        <h6>Store: {{ $order->customer->store_name }}</h6>
+                                        <h6>Contact: <strong>+63{{ $order->customer->mobile_number }}</strong></h6>
+                                        <h6>Store: <strong>{{ $order->customer->store_name }}</strong></h6>
                                     @endif
                                     </h6>
-                                    <h6>Address : {{ $order->address }}</h6>
+                                    <h6 style="line-height: 1.5rem;">Address : <strong>{{ $order->address }}</strong></h6>
                                     <br>
+                                    <hr>
                                     <br>
-                                    <h5>
-                                        Invoice <i class="fa-solid fa-credit-card text-primary"></i>
-                                    </h5>
+                                    <div style="display: flex; column-gap:8rem;">
+                                        <h5>
+                                            Invoice <i class="fa-solid fa-credit-card text-primary"></i>
+                                        </h5>
+                                        <button type="button" id="print" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa-solid fa-print"></i> Print Invoice
+                                        </button>
+                                    </div>
                                     <br>
                                     <h4 class="font-weight-bold">Grand Total (₱): {{ $order->grand_total . '.00' }}</h4>
                                     <h6>Order No. {{ $order->order_number }}</h6>

@@ -17,14 +17,14 @@
                             <!-- Nested Row within Card Body -->
                             <div class="row">
                                 <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                    <h2 class="header-admin">Dairy Raisers</h2>
+                                    <h2 class="header-admin" style="width: 17rem;">Dairy Raisers</h2>
                                     <img src="/images/bg-login.png">
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="p-5">
                                         <div class="text-center">
                                             <img src="{{ asset('images/company-logo.png') }}" class="img-fluid"
-                                                style="width: 40px" alt="company logo">
+                                                style="width: 70px;" alt="company logo">
                                             <h1 class="h4">Welcome Back!</h1>
                                         </div>
                                         @if ($errors->any())

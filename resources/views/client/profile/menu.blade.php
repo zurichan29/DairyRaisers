@@ -36,9 +36,10 @@
             <div>
                 <a href="{{ url()->previous() }}">Go Back</a>
             </div>
-            <div class="">
-                <a href="{{ route('logout') }}">LOGOUT</a>
-            </div>
+        </div>
+        <div class="text-center mt-5" style="padding-top:8px; align-items: center; width: 100%; height: 40px;
+        border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
+            <a href="{{ route('logout') }}">LOGOUT</a>
         </div>
     </div>
 @endsection

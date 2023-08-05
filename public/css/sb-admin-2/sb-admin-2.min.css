@@ -666,7 +666,6 @@ pre code {
 .col-lg-3,
 .col-lg-4,
 .col-lg-5,
-.col-lg-6,
 .col-lg-7,
 .col-lg-8,
 .col-lg-9,
@@ -715,8 +714,14 @@ pre code {
 .col-xl-auto {
     position: relative;
     width: 100%;
-    padding-right: .75rem;
-    padding-left: .75rem
+    padding-right: 2rem;
+    padding-left: 2rem;
+    margin-bottom: 2rem;
+}
+.col-lg {
+    position: relative;
+    width: 100%;
+    padding-left: 1rem;
 }
 
 .col {
@@ -5032,12 +5037,12 @@ input[type=submit].btn-block {
 
 .card-body {
     flex: 1 1 auto;
-    min-height: 1px;
-    padding: 1.25rem
+    height: auto;
+    padding: 1rem;
 }
 
 .card-title {
-    margin-bottom: .75rem
+    margin-bottom: 2rem;
 }
 
 .card-subtitle {
@@ -12117,8 +12122,8 @@ a:focus {
 
 .bg-login-image img {
     width: 26rem;
-    height: 31rem;
-    background-position: center;
+    height: 33rem;
+    background-position: left;
     background-size: cover
 }
 

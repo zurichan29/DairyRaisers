@@ -211,6 +211,9 @@
                 <div class="card shadow mb-4">
                     <div class="card-body">
                         <div class="table-responsive">
+                            <button type="button" id="excel" class="mr-2 btn btn-sm btn-outline-primary" style="margin-left:54.8rem; margin-bottom:1rem;">
+                                <i class="fa-regular fa-file-excel"></i> Download Excel
+                            </button>
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
