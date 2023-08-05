@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buffalo', function (Blueprint $table) {
+        Schema::create('milk_sales', function (Blueprint $table) {
             $table->id();
-            $table->enum('gender', ['male', 'female']);
-            $table->enum('age', ['baby', 'adult']);
-            $table->integer('quantity')->nullable()->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buffalo');
+        Schema::dropIfExists('milk_sales');
     }
 };

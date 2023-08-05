@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-
 use App\Models\Variants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -66,7 +65,7 @@ class ProductController extends Controller
         $product->status = $newStatus;
         $product->save();
 
-        $this->logActivity('Administrator has updated the status of ' . $product->name . ' to ' . $product->status, $request);
+        $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $product->name . ' to ' . $product->status, $request);
 
         return response()->json($product);
         }
@@ -137,7 +136,7 @@ class ProductController extends Controller
                 'price' => $product->price,
                 'variant' => $product->variant->name,
             ];
-            $this->logActivity('Administrator added a new product: ' . $product->name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' added a new product: ' . $product->name, $request);
 
             return response()->json($data);
         }

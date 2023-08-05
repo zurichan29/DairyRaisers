@@ -242,7 +242,6 @@
                     refreshDataTable(startDate, endDate, category);
                 });
 
-
                 // Function to initialize the chart
                 function initializeChart(labels, earningData) {
                     // Check if the previous chart instance exists and destroy it
@@ -269,17 +268,9 @@
                                     hoverBackgroundColor: "#17a673",
                                     data: earningData.map(data => data[1]),
                                 },
-                                {
-                                    label: 'Milk',
-                                    backgroundColor: "#36b9cc",
-                                    hoverBackgroundColor: "#2c9faf",
-                                    data: earningData.map(data => data[2]),
-                                },
                             ],
                         },
                         options: {
-                            // ... (other options)
-
                             maintainAspectRatio: false,
                             layout: {
                                 padding: {
@@ -363,7 +354,6 @@
                     });
                 }
 
-
                 // Handle form submission using Ajax
                 $('#filterForm').submit(function(e) {
                     e.preventDefault();
@@ -392,6 +382,7 @@
                 // Initialize the chart on page load
                 var labels = @json($labels);
                 var earningData = @json($earningData);
+                console.log(earningData);
                 initializeChart(labels, earningData);
             });
         </script>

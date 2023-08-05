@@ -15,12 +15,10 @@ class SalesReportController extends Controller
     public function index()
     {
         $currentYear = Carbon::now()->year;
-        $years = range($currentYear, $currentYear - 9); // Generate a list of 10 years starting from the current year
+        $years = range($currentYear, $currentYear - 9);
 
-        // Get the months collection
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
 
-        // Fetch sales data from the database and calculate total earnings for each month and category
         $salesData = Sales::select(
             DB::raw('MONTH(created_at) as month'),
             'category',
@@ -30,7 +28,6 @@ class SalesReportController extends Controller
             ->orderBy('month')
             ->get();
 
-        // Prepare the labels and earnings data for the chart
         $labels = $months->toArray();
         $earningData = [];
 
@@ -41,9 +38,8 @@ class SalesReportController extends Controller
 
             $productsEarnings = $monthData->where('category', 'Products')->sum('total_earnings');
             $buffaloEarnings = $monthData->where('category', 'Buffalo')->sum('total_earnings');
-            $milkEarnings = $monthData->where('category', 'Milk')->sum('total_earnings');
 
-            $earningData[] = [$productsEarnings, $buffaloEarnings, $milkEarnings];
+            $earningData[] = [$productsEarnings, $buffaloEarnings];
         }
 
         return view('admin.sales_report.index', compact('years', 'currentYear', 'labels', 'earningData'));
@@ -83,9 +79,8 @@ class SalesReportController extends Controller
 
             $productsEarnings = $monthData->where('category', 'Products')->sum('total_earnings');
             $buffaloEarnings = $monthData->where('category', 'Buffalo')->sum('total_earnings');
-            $milkEarnings = $monthData->where('category', 'Milk')->sum('total_earnings');
 
-            $earningData[] = [$productsEarnings, $buffaloEarnings, $milkEarnings];
+            $earningData[] = [$productsEarnings, $buffaloEarnings];
         }
 
         return response()->json([

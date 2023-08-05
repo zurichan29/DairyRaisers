@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buffalo', function (Blueprint $table) {
+        Schema::create('buffalo_sales', function (Blueprint $table) {
             $table->id();
-            $table->enum('gender', ['male', 'female']);
-            $table->enum('age', ['baby', 'adult']);
-            $table->integer('quantity')->nullable()->default(0);
+            $table->string('buyer_name');
+            $table->string('buyer_address');
+            $table->json('details')->nullable();
+            $table->integer('total_quantity');
+            $table->decimal('grand_total', 8, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buffalo');
+        Schema::dropIfExists('buffalo_sales');
     }
 };

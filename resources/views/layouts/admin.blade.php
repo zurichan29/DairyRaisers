@@ -38,7 +38,7 @@
     <script type="text/javascript" src="{{ asset('js/daterangerpicker.min.js') }}"></script>
     {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> --}}
     {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script> --}}
-    
+
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
         function orderNotification(order) {
@@ -136,18 +136,17 @@
                 </a>
             </li>
             {{-- BUFFALOS --}}
-            <li class="nav-item {{ Request::routeIs('admin.buffalos.*') ? 'active' : '' }}"
-                data-base-route="admin.buffalos">
-                <a class="nav-link" href="{{ route('admin.buffalos.index') }}">
+            <li class="nav-item {{ Request::routeIs('admin.dairy.*') ? 'active' : '' }}" data-base-route="admin.dairy">
+                <a class="nav-link" href="{{ route('admin.dairy.index') }}">
                     <i class="fa-solid fa-cow"></i>
-                    <span>Buffalos & Milks</span>
+                    <span>Buffalo Management</span>
                 </a>
             </li>
             {{-- PRODUCTS --}}
             <li class="nav-item {{ Request::routeIs('admin.products.*') ? 'active' : '' }}"
                 data-base-route="admin.products">
                 <a class="nav-link" href="{{ route('admin.products.index') }}">
-                    <i class="fa-solid fa-bag-shopping"></i>
+                    <i class="fa-solid fa-bottle-water"></i>
                     <span>Product Management</span>
                 </a>
             </li>
@@ -329,11 +328,6 @@
 
     <script src="{{ asset('js/app.js') }}" defer></script>
     <!-- DataTables JS -->
-
-
-    <!-- DataTables Buttons JS -->
-    
-    {{-- <script src="{{ asset('js/sb-admin-2/chart-bar-demo.js') }}"></script> --}}
 
     <script>
         $(document).ready(function() {

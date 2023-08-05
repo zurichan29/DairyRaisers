@@ -73,7 +73,7 @@ class OrderController extends Controller
             }
         }
 
-        return view('client.order.index', ['orders' => $orders, 'user' => $user]);
+        return view('client.order.index', ['orders' => $orders]);
     }
 
     public function show($id)

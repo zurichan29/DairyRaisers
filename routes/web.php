@@ -6,7 +6,7 @@ use App\Events\OrderNotification;
 // ADMIN
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarGraphController;
-use App\Http\Controllers\Admin\BuffaloController;
+use App\Http\Controllers\Admin\DairyController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\VariantController;
 use App\Http\Controllers\Admin\OrderController as OrderManagement;
@@ -126,14 +126,30 @@ Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEma
 
 // ADMIN
 
-Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
+// Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
 
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-// ACTIVITY LOGS
-Route::group(['middleware' => 'check.access:activity_logs'], function () {
-    Route::get('/admin/activity_logs', [ActivityLogsController::class, 'index'])->name('admin.activity_logs');
+// STAFF
+Route::group(['middleware' => 'check.access:staff_management'], function () {
+    Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
+    Route::post('/admin/staff/store', [StaffController::class, 'store'])->name('admin.staff.store');
+    Route::post('/admin/staff/init', [StaffController::class, 'init'])->name('admin.staff.init');
+    Route::post('/admin/staff/fetch', [StaffController::class, 'fetch'])->name('admin.staff.fetch');
+    Route::post('/admin/staff/update', [StaffController::class, 'update'])->name('admin.staff.update');
+    Route::get('/staff/password-setup/{token}', [StaffController::class, 'showPasswordSetupForm'])->name('admin.staff.setup');
+    Route::post('/staff/password-setup/{token}', [StaffController::class, 'setupPassword'])->name('admin.staff.verify');
+});
+
+// BUFFALOS
+Route::group(['middleware' => 'check.access:buffalos_management'], function () {
+    Route::get('/admin/dairy', [DairyController::class, 'index'])->name('admin.dairy.index');
+    Route::post('/admin/dairy/buffalo-update', [DairyController::class, 'buffalo_update'])->name('admin.dairy.buffalo-update');
+    Route::post('/admin/dairy/buffalo-sell', [DairyController::class, 'buffalo_sell'])->name('admin.dairy.buffalo-sell');
+    Route::post('/admin/dairy/buffalo-sales-fetch', [DairyController::class, 'buffalo_sales_fetch'])->name('admin.dairy.buffalo-sales-fetch');
+    Route::post('/admin/dairy/buffalo-fetch', [DairyController::class, 'buffalo_fetch'])->name('admin.dairy.buffalo-fetch');
+    Route::get('/admin/dairy/buffalo-invoice/{id}', [DairyController::class, 'buffalo_show'])->name('admin.dairy.buffalo-show');
 });
 
 //PRODUCTS (INVENTORY AND VARIANT)
@@ -148,16 +164,6 @@ Route::group(['middleware' => 'check.access:inventory'], function () {
     Route::post('/admin/variants/data', [VariantController::class, 'getVariantsData'])->name('admin.variants.data');
     Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
     Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
-});
-
-// PAYMENT METHODS
-Route::group(['middleware' => 'check.access:payment_methods'], function () {
-    Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
-    Route::post('/admin/payment_method/data', [PaymentMethodController::class, 'getPaymentMethodData'])->name('admin.payment_method.data');
-    Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
-    Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
-    Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
-    Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
 });
 
 // ORDERS
@@ -183,33 +189,20 @@ Route::group(['middleware' => 'check.access:orders'], function () {
     Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
 });
 
-// BUFFALOS
-Route::group(['middleware' => 'check.access:buffalos_and_milk'], function () {
-    Route::get('/admin/buffalos', [MilkStockController::class, 'index'])->name('admin.buffalos.index');
-    Route::get('/admin/milk/total', [MilkStockController::class, 'totalQuantity'])->name('admin.milk_stock.total');
-    Route::post('/admin/milk/update', [MilkStockController::class, 'submitMilkStock'])->name('admin.milk_stock.update');
-    Route::post('/admin/milk/delete', [MilkStockController::class, 'delete'])->name('admin.milk_stock.delete');
-    Route::post('/admin/milk/sell', [MilkStockController::class, 'sell'])->name('admin.milk_stock.sell');
-    Route::post('/admin/buffalos/update', [BuffaloController::class, 'submitBuffalo'])->name('admin.buffalos.submit');
-    Route::post('/admin/buffalos/sell', [BuffaloController::class, 'sell'])->name('admin.buffalos.sell');
-    Route::get('/show-map', [BarGraphController::class, 'showMap']);
+// PAYMENT METHODS
+Route::group(['middleware' => 'check.access:payment_methods'], function () {
+    Route::get('/admin/payment_method', [PaymentMethodController::class, 'index'])->name('admin.payment_method.index');
+    Route::post('/admin/payment_method/data', [PaymentMethodController::class, 'getPaymentMethodData'])->name('admin.payment_method.data');
+    Route::post('/admin/payment_method/store', [PaymentMethodController::class, 'store'])->name('admin.payment_method.store');
+    Route::post('/admin/payment_method/delete', [PaymentMethodController::class, 'delete'])->name('admin.payment_method.delete');
+    Route::post('/admin/payment_method/status', [PaymentMethodController::class, 'status'])->name('admin.payment_method.status');
+    Route::post('/admin/payment_method/update', [PaymentMethodController::class, 'update'])->name('admin.payment_method.update');
 });
 
-// STAFF
-Route::group(['middleware' => 'check.access:staff_management'], function () {
-    Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
-    Route::post('/admin/staff/store', [StaffController::class, 'store'])->name('admin.staff.store');
-    Route::post('/admin/staff/init', [StaffController::class, 'init'])->name('admin.staff.init');
-    Route::post('/admin/staff/fetch', [StaffController::class, 'fetch'])->name('admin.staff.fetch');
-    Route::post('/admin/staff/update', [StaffController::class, 'update'])->name('admin.staff.update');
-    Route::get('/staff/password-setup/{token}', [StaffController::class, 'showPasswordSetupForm'])->name('admin.staff.setup');
-    Route::post('/staff/password-setup/{token}', [StaffController::class, 'setupPassword'])->name('admin.staff.verify');
+// ACTIVITY LOGS
+Route::group(['middleware' => 'check.access:activity_logs'], function () {
+    Route::get('/admin/activity_logs', [ActivityLogsController::class, 'index'])->name('admin.activity_logs');
 });
-
-// PROFILE
-Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
-Route::post('/admin/profile/update-password', [ProfileController::class, 'update_password'])->name('admin.profile.update-password');
-Route::post('/admin/profile/update-avatar', [ProfileController::class, 'update_avatar'])->name('admin.profile.update-avatar');
 
 // SALES REPORT
 Route::group(['middleware' => 'check.access:sales_report'], function () {
@@ -217,3 +210,9 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
 });
+
+// PROFILE
+Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
+Route::post('/admin/profile/update-password', [ProfileController::class, 'update_password'])->name('admin.profile.update-password');
+Route::post('/admin/profile/update-avatar', [ProfileController::class, 'update_avatar'])->name('admin.profile.update-avatar');
+

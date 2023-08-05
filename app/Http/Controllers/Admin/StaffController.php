@@ -23,13 +23,13 @@ class StaffController extends Controller
         if (auth()->guard('admin')->check()) {
             $staffs = Admin::all();
             $accessList = [
+                'staff_management',
+                'buffalo_management',
                 'inventory',
-                'buffalos_and_milk',
                 'orders',
                 'payment_methods',
-                'staff_management',
                 'activity_logs',
-                'sales_report'
+                'sales_report',
             ];
 
             return view('admin.staffs.index', compact('staffs', 'accessList'));

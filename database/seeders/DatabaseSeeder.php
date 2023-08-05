@@ -30,24 +30,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // \App\Models\User::factory(10)->create();
+        $this->seedUserandAddress();
 
-        User::Create([
-            'first_name' => 'Christian Jay',
-            'last_name' => 'Jacalne',
-            'email' => 'krischang29@gmail.com',
-            'password' =>  Hash::make('2329Cjay'),
-            'mobile_number' => '9262189072',
-            'mobile_verified_at' => Carbon::now()
-        ]);
-
-        User::Create([
-            'first_name' => 'Laarni',
-            'last_name' => 'Lalic',
-            'email' => 'laarnimarielalic@gmail.com',
-            'password' =>  Hash::make('2329Marie'),
-            'mobile_number' => '9972654850',
-            'mobile_verified_at' => Carbon::now()
-        ]);
 
         $this->seedStaffs();
 
@@ -58,40 +42,21 @@ class DatabaseSeeder extends Seeder
             'status' => 'ACTIVATED'
         ]);
 
-        User_Address::Create([
-            'user_id' => 1,
-            'region' => 'REGION IV-A',
-            'province' => 'CAVITE',
-            'municipality' => 'TANZA',
-            'barangay' => 'JULUGAN VIII',
-            'street' => 'Sta. Cecilia 2',
-            'label' => 'home',
-            'zip_code' => '4108',
-            'default' => '1',
-            'remarks' => 'This is my remark'
-        ]);
 
-        User_Address::Create([
-            'user_id' => 2,
-            'region' => 'REGION IV-A',
-            'province' => 'CAVITE',
-            'municipality' => 'BACOOR CITY',
-            'barangay' => 'ALIMA',
-            'street' => 'street 22221',
-            'label' => 'home',
-            'zip_code' => '4109',
-            'default' => '1',
-            'remarks' => 'This is my remark'
-        ]);
-
-        // Seed online shoppers and retailers
         $this->seedOnlineShoppers();
         $this->seedRetailers();
-
-        // Seed orders with their respective items
+        
         $this->seedOrders();
         $this->seedSalesData();
+        $this->seedProducts();
+        $this->seedBuffalo();
 
+       
+    }
+
+    
+    private function seedCart()
+    {
         // Cart::Create([
         //     'product_id' => 1,
         //     'user_id' => 1,
@@ -125,27 +90,51 @@ class DatabaseSeeder extends Seeder
         //     'price' => 5,
         //     'total' => 50
         // ]);
+    }
 
-        $this->seedProducts();
-        // $table->string('gender');
-        // $table->integer('age');
-        // $table->integer('quantity');
-        // $table->timestamps('date_sold');
-        // $table->string('buyers_name');
-        // $table->string('buyers_address');
-        Buffalo::create([
-            'gender' => 'Female',
-            'age' => null,
-            'quantity' => 2,
-            'date_sold' => Carbon::now()->toDateString(),
-            'buyers_name' => 'Shania',
-            'buyers_address' =>  'Santiago, General Trias',
+    private function seedUserandAddress()
+    {
+        User::Create([
+            'first_name' => 'Christian Jay',
+            'last_name' => 'Jacalne',
+            'email' => 'krischang29@gmail.com',
+            'password' =>  Hash::make('2329Cjay'),
+            'mobile_number' => '9262189072',
+            'mobile_verified_at' => Carbon::now()
         ]);
 
+        User::Create([
+            'first_name' => 'Laarni',
+            'last_name' => 'Lalic',
+            'email' => 'laarnimarielalic@gmail.com',
+            'password' =>  Hash::make('2329Marie'),
+            'mobile_number' => '9972654850',
+            'mobile_verified_at' => Carbon::now()
+        ]);
+        User_Address::Create([
+            'user_id' => 1,
+            'region' => 'REGION IV-A',
+            'province' => 'CAVITE',
+            'municipality' => 'TANZA',
+            'barangay' => 'JULUGAN VIII',
+            'street' => 'Sta. Cecilia 2',
+            'label' => 'home',
+            'zip_code' => '4108',
+            'default' => '1',
+            'remarks' => 'This is my remark'
+        ]);
 
-        MilkStock::create([
-            'date_created' => Carbon::now()->toDateString(),
-            'quantity' => '20',
+        User_Address::Create([
+            'user_id' => 2,
+            'region' => 'REGION IV-A',
+            'province' => 'CAVITE',
+            'municipality' => 'BACOOR CITY',
+            'barangay' => 'ALIMA',
+            'street' => 'street 22221',
+            'label' => 'home',
+            'zip_code' => '4109',
+            'default' => '1',
+            'remarks' => 'This is my remark'
         ]);
     }
 
@@ -154,7 +143,7 @@ class DatabaseSeeder extends Seeder
         Admin::create([
             'name' => 'Administrator',
             'email' => 'admin@example.com',
-            'access' => json_encode(['inventory', 'orders', 'staff_management', 'payment_methods', 'activity_logs', 'buffalos_and_milk']), // Convert to JSON
+            'access' => json_encode(['inventory', 'orders', 'staff_management', 'payment_methods', 'activity_logs', 'buffalo_management']), // Convert to JSON
             'is_verified' => true,
             'is_admin' => true,
             'password' => Hash::make('test123'),
@@ -163,7 +152,7 @@ class DatabaseSeeder extends Seeder
         Admin::create([
             'name' => 'Employee 1',
             'email' => 'employee1@example.com',
-            'access' => json_encode(['orders']), // Convert to JSON
+            'access' => json_encode(['orders', 'buffalo_management']), // Convert to JSON
             'is_verified' => true,
             'password' => Hash::make('mypassword1'),
         ]);
@@ -576,15 +565,6 @@ class DatabaseSeeder extends Seeder
             'created_at' => $currentDate,
         ]);
 
-        Sales::create([
-            'category' => 'Milk',
-            'name' => 'Milk', // Product name
-            'price' => 1800.75, // Product price per liter
-            'quantity' => 3, // Number of liters of milk sold
-            'amount' => 5420.25, // Total sales for milk
-            'created_at' => $currentDate,
-        ]);
-
         // Create sales data for the last month
         Sales::create([
             'category' => 'Products',
@@ -603,14 +583,31 @@ class DatabaseSeeder extends Seeder
             'amount' => 1800.25, // Total sales for buffaloes
             'created_at' => $lastMonthDate,
         ]);
+    }
 
-        Sales::create([
-            'category' => 'Milk',
-            'name' => 'Milk', // Product name
-            'price' => 2100.50, // Product price per liter
-            'quantity' => 2, // Number of liters of milk sold
-            'amount' => 4201.00, // Total sales for milk
-            'created_at' => $lastMonthDate,
-        ]);
+    private function seedBuffalo()
+    {
+        
+            Buffalo::create([
+                'gender' => 'male',
+                'age' => 'baby',
+                'quantity' => 100,
+            ]);
+            Buffalo::create([
+                'gender' => 'male',
+                'age' => 'adult',
+                'quantity' => 100,
+            ]);
+            Buffalo::create([
+                'gender' => 'female',
+                'age' => 'baby',
+                'quantity' => 100,
+            ]);
+            Buffalo::create([
+                'gender' => 'female',
+                'age' => 'adult',
+                'quantity' => 100,
+            ]);
+        
     }
 }

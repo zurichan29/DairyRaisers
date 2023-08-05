@@ -1,0 +1,82 @@
+{
+    "errors": {
+        "categories.0.gender": [
+            "The categories.0.gender field is required."
+        ],
+        "categories.1.gender": [
+            "The categories.1.gender field is required."
+        ],
+        "categories.2.gender": [
+            "The categories.2.gender field is required."
+        ],
+        "categories.3.gender": [
+            "The categories.3.gender field is required."
+        ],
+        "categories.4.gender": [
+            "The categories.4.gender field is required."
+        ],
+        "categories.5.gender": [
+            "The categories.5.gender field is required."
+        ],
+        "categories.6.gender": [
+            "The categories.6.gender field is required."
+        ],
+        "categories.7.gender": [
+            "The categories.7.gender field is required."
+        ],
+        "categories.0.age": [
+            "The categories.0.age field is required."
+        ],
+        "categories.1.age": [
+            "The categories.1.age field is required."
+        ],
+        "categories.2.age": [
+            "The categories.2.age field is required."
+        ],
+        "categories.3.age": [
+            "The categories.3.age field is required."
+        ],
+        "categories.4.age": [
+            "The categories.4.age field is required."
+        ],
+        "categories.5.age": [
+            "The categories.5.age field is required."
+        ],
+        "categories.6.age": [
+            "The categories.6.age field is required."
+        ],
+        "categories.7.age": [
+            "The categories.7.age field is required."
+        ],
+        "categories.1.quantity": [
+            "The categories.1.quantity field is required."
+        ],
+        "categories.3.quantity": [
+            "The categories.3.quantity field is required."
+        ],
+        "categories.5.quantity": [
+            "The categories.5.quantity field is required."
+        ],
+        "categories.7.quantity": [
+            "The categories.7.quantity field is required."
+        ],
+        "categories.0.price": [
+            "The categories.0.price field is required."
+        ],
+        "categories.2.price": [
+            "The categories.2.price field is required."
+        ],
+        "categories.3.price": [
+            "The categories.3.price field is required."
+        ],
+        "categories.4.price": [
+            "The categories.4.price field is required."
+        ],
+        "categories.6.price": [
+            "The categories.6.price field is required."
+        ],
+        "categories.7.price": [
+            "The categories.7.price field is required."
+        ]
+    }
+}
