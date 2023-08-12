@@ -36,7 +36,7 @@
                                     break;
                             }
                             
-                            switch ($order->delivery_option) {
+                            switch ($order->shipping_option) {
                                 case 'Delivery':
                                     $opt_icon = 'fa-solid fa-truck';
                                     break;
@@ -58,16 +58,17 @@
                                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
                                         <a class="dropdown-item"
                                             href="{{ route('orders.show', ['id' => $order->id]) }}">view</a>
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.re-order', ['id' => $order->id]) }}">order again</a>
+                                        @auth
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.re-order', ['id' => $order->id]) }}">order again</a>
+                                        @endauth
                                     </div>
                                 </div>
                                 <div class="card-body py-2">
                                     <div class="row align-items-center">
                                         <div class="col-4">
                                             <img style="width: 80px" class="img-fluid d-block mx-auto rounded"
-                                                src="{{ asset($user->cart->where('order_number', $order->order_number)->first()->product->img) }}"
-                                                alt="product image">
+                                                src="{{ asset($firstData['img']) }}" alt="product image">
                                         </div>
                                         <div class="col-8">
                                             <h4 class="class="text-primary font-weight-bold">

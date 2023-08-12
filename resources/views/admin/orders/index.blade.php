@@ -10,7 +10,7 @@
                 font-size: 14px
             }
         </style>
-       
+
 
         <div class="card shadow mb-4">
             <div class="card-header d-flex align-items-center justify-content-between">
@@ -96,17 +96,19 @@
                                             </td>
                                             <td>{{ $order->customer->user->mobile_number }}</td>
                                         @endif
-                                        <!-- Display other online shopper-specific details -->
                                     @elseif ($order->customer instanceof \App\Models\Retailer)
                                         <td>Retailer</td>
                                         <td>{{ $order->customer->first_name . ' | ' . $order->customer->store_name }}</td>
                                         <td>{{ $order->customer->mobile_number }}</td>
-                                        <!-- Display other retailer-specific details -->
+                                    @elseif ($order->customer_type == 'guest')
+                                        <td>Guest</td>
+                                        <td>{{ $order->name }}</td>
+                                        <td>+63{{ $order->mobile_number }}</td>
                                     @endif
 
                                     {{-- <td>{{ $order->reference_number }}</td> --}}
                                     <td>{{ $order->shipping_option }}</td>
-                                    <td>{{ $order->grand_total }}</td>
+                                    <td>₱{{ $order->grand_total }}.00</td>
                                     <td class=" text-center">
                                         <p class="badge {{ $statusBadge }} text-center text-wrap py-2"
                                             style="width: 8rem;">
@@ -169,7 +171,7 @@
             $(document).ready(function() {
 
                 var dataTable = $('#dataTable').DataTable({
-                   
+
                 });
 
                 $('#statusFilter').on('change', function() {

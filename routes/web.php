@@ -42,56 +42,82 @@ use App\Http\Controllers\Client\ShopController;
 
 
 Route::get('/', [PageController::class, 'index'])->name('index');
-
 Route::get('/about', [PageController::class, 'about'])->name('about');
-
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
-
 Route::get('/faqs', [PageController::class, 'faqs'])->name('faqs');
-
 Route::get('/payment', [PageController::class, 'payment']);
-
 Route::get('/detail', [PageController::class, 'detail'])->name('orders');
 
 /** CART MANAGEMENT */
 Route::get('/cart', [CartController::class, 'cart'])->name('cart');
-Route::patch('/cart/{id}/update', [CartController::class, 'updateQuantity']);
-Route::delete('/cart/{id}/remove', [CartController::class, 'removeCartItem']);
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'removeCart'])->name('cart.remove');
 Route::get('/cart/count', [CartController::class, 'getCartCount']);
 
 /** SHOP */
 Route::get('/shop/products', [ShopController::class, 'show'])->name('shop');
-Route::get('/shop/product/{id}', [ShopController::class, 'addToCartForm'])->name('product.view');
-Route::post('/shop/product/add/{productId}', [ShopController::class, 'addToCart'])->name('product.add');
+Route::get('/location', [ShopController::class, 'location'])->name('location');
+Route::get('/update-location', [ShopController::class, 'update_location_form'])->name('location.update-show');
+Route::post('/confirm-location/{backRoute}', [ShopController::class, 'confirm_location'])->name('location.confirm');
+Route::post('/update-location', [ShopController::class, 'update_location'])->name('location.update');
+Route::post('/update-cart', [ShopController::class, 'updateCart'])->name('product.update-cart');
+Route::post('/fetch-cart', [ShopController::class, 'fetchCart'])->name('product.fetch-cart');
 
-/** AUTHENTICATION */
-Route::get('/login', [AuthController::class, 'show'])->name('login');
-Route::post('/login/authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name('login.administrator');
-Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
-Route::get('/reset-password', [AuthController::class, 'resetPasswordForm'])->name('reset_password');
-Route::post('/check-reset-password-form', [AuthController::class, 'checkRPForm'])->name('reset_password.check');
-Route::post('/verify-reset-password-form', [AuthController::class, 'verifyRPForm'])->name('reset_password.verify');
-Route::get('/reset-password/{number}', [AuthController::class, 'newPasswordForm'])->name('reset_password.newpassword');
-Route::post('/reset-password/{number}/verify', [AuthController::class, 'verifyNewPass'])->name('reset_password.verify_newpassword');
+
+Route::group(['middleware' => 'check.client:' . false], function () {
+    /** AUTHENTICATION */
+    Route::get('/login', [AuthController::class, 'show'])->name('login');
+    Route::post('/login/authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
+    Route::get('/reset-password', [AuthController::class, 'reset_password'])->name('reset_password');
+    Route::post('/check-reset-password-form', [AuthController::class, 'verify_rp'])->name('reset_password.validate');
+    Route::get('/reset-password/{token}/{email}', [AuthController::class, 'new_password'])->name('reset_password.new-password');
+    Route::post('/reset-password/{token}/{email}/validate', [AuthController::class, 'verify_np'])->name('reset_password.verify-new-password');
+
+    /**REGISTER */
+    Route::get('/register', [RegisterController::class, 'show'])->name('register');
+    Route::post('/register/validate', [RegisterController::class, 'validation'])->name('register.validate');
+    Route::get('/register/resend-token', [RegisterController::class, 'resend_token'])->name('register.resend-token');
+    Route::post('/register/resend-token/send', [RegisterController::class, 'send_token'])->name('register.resend-token.send');
+    Route::get('/user/validate-email/{token}/{email}', [RegisterController::class, 'email_validate'])->name('register.email.validate');
+});
+
+Route::group(['middleware' => 'check.client:' . true], function () {
+    /** USER PROFILE OR SETTINGS */
+    Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
+    Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
+    Route::get('/profile/change_password', [ClientController::class, 'showChangePassForm'])->name('profile.change_password');
+    Route::post('/profile/change_password/validate', [ClientController::class, 'validatePass'])->name('profile.change_password.validate');
+    // ADDRESS
+    Route::get('/profile/address', [ClientController::class, 'address'])->name('profile.address');
+    Route::get('/profile/address/create', [ClientController::class, 'address_create'])->name('address.create');
+    Route::post('/profile/address/store', [ClientController::class, 'address_store'])->name('address.store');
+    Route::post('/profile/address/delete', [ClientController::class, 'address_delete'])->name('address.delete');
+    Route::get('/profile/address/edit/{id}', [ClientController::class, 'address_edit'])->name('address.edit');
+    Route::put('/profile/address/update/{id}', [ClientController::class, 'address_update'])->name('address.update');
+    Route::post('/profile/address/make_default', [ClientController::class, 'address_default'])->name('address.default');
+    // EMAIL
+    Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
+    Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
+    Route::get('/profile/email/verify', [ClientController::class, 'EmailVerifyShow'])->name('email.show');
+    Route::post('/profile/change-email/verify', [ClientController::class, 'ChangeEmail'])->name('email.change');
+    Route::post('/profile/create/email', [ClientController::class, 'createEmail'])->name('email.create');
+    Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'])->name('email.resend');
+    Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
+    // RE-ORDERS
+    Route::get('/orders/re-order/{id}', [ClientOrder::class, 're_order'])->name('orders.re-order');
+    Route::post('/orders/re-order/{id}/place', [ClientOrder::class, 'place'])->name('orders.re-order.place');
+});
+
+
 // LOGOUT
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout/admin', [AuthController::class, 'logout_admin'])->name('logout.admin');
 
-/**REGISTER */
-Route::get('/register', [RegisterController::class, 'show'])->name('register');
-Route::post('/check-mobile-number', [RegisterController::class, 'checkMobileNum'])->name('register.validate');
-Route::post('/input-mobile-number', [RegisterController::class, 'InputMobileNum']);
-Route::get('/register-details/number/{mobile_number}', [RegisterController::class, 'showDetailsForm'])->name('register.details.page');
-Route::post('register/details/validate', [RegisterController::class, 'checkDetails'])->name('register.details.validate');
-
 /** ORDER HISTORY */
 Route::get('/orders', [ClientOrder::class, 'index'])->name('order_history');
 Route::get('/orders/{id}', [ClientOrder::class, 'show'])->name('orders.show');
-Route::get('/orders/re-order/{id}', [ClientOrder::class, 're_order'])->name('orders.re-order');
-Route::post('/orders/re-order/{id}/place', [ClientOrder::class, 'place'])->name('orders.re-order.place');
+
 
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
@@ -102,32 +128,13 @@ Route::get('/checkout/address/edit', [CheckoutController::class, 'showEditAddres
 Route::post('/checkout/address/edit/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit.address.validate');
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 
-/** USER PROFILE OR SETTINGS */
-Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
-Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
-Route::get('/profile/change_password', [ClientController::class, 'showChangePassForm'])->name('profile.change_password');
-Route::post('/profile/change_password/validate', [ClientController::class, 'validatePass'])->name('profile.change_password.validate');
-// ADDRESS
-Route::get('/profile/address', [ClientController::class, 'address'])->name('profile.address');
-Route::post('/profile/create_address', [ClientController::class, 'createAddress'])->name('create.address');
-Route::delete('/profile/address/delete/{id}', [ClientController::class, 'deleteAddress'])->name('delete.address');
-Route::get('/profile/address/edit/{id}', [ClientController::class, 'editAddress'])->name('edit.address');
-Route::put('/profile/address/update/{id}', [ClientController::class, 'updateAddress'])->name('update.address');
-Route::post('/profile/address/make_default', [ClientController::class, 'defaultAddress'])->name('default.address');
 
-// EMAIL
-Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
-Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
-Route::get('/profile/email/verify', [ClientController::class, 'EmailVerifyShow'])->name('email.show');
-Route::post('/profile/change-email/verify', [ClientController::class, 'ChangeEmail'])->name('email.change');
-Route::post('/profile/create/email', [ClientController::class, 'createEmail'])->name('email.create');
-Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'])->name('email.resend');
-Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
 
 // ADMIN
 
 // Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
-
+Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name('login.administrator');
+Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -165,7 +172,6 @@ Route::group(['middleware' => 'check.access:inventory'], function () {
     Route::post('/admin/variants/data', [VariantController::class, 'getVariantsData'])->name('admin.variants.data');
     Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
     Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
-    
 });
 
 // ORDERS
@@ -211,11 +217,10 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
-    Route::get('/admin/sales_reports/daily_sales/print/',[SalesReportController::class, 'printDailySales'])->name('admin.sales_report.print');
+    Route::get('/admin/sales_reports/daily_sales/print/', [SalesReportController::class, 'printDailySales'])->name('admin.sales_report.print');
 });
 
 // PROFILE
 Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
 Route::post('/admin/profile/update-password', [ProfileController::class, 'update_password'])->name('admin.profile.update-password');
 Route::post('/admin/profile/update-avatar', [ProfileController::class, 'update_avatar'])->name('admin.profile.update-avatar');
-

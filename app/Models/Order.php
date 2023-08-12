@@ -27,6 +27,7 @@ class Order extends Model
   protected static $customerTypeMap = [
     'online_shopper' => OnlineShopper::class,
     'retailer' => Retailer::class,
+    'guest' => GuestUser::class,
   ];
 
   // Add a mapping for customer types using a custom morph map
@@ -38,6 +39,7 @@ class Order extends Model
     Relation::morphMap([
       'online_shopper' => OnlineShopper::class,
       'retailer' => Retailer::class,
+      'guest' => GuestUser::class,
     ]);
   }
 
@@ -46,11 +48,6 @@ class Order extends Model
   {
     return $this->morphTo();
   }
-  // Define the relationship with User model for online shoppers
-  // public function user()
-  // {
-  //   return $this->belongsTo(User::class);
-  // }
 
   public function product()
   {

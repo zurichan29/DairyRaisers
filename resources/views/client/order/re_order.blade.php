@@ -263,40 +263,8 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             @foreach ($items as $item)
-                                                <div class="row align-items-center mb-4">
-                                                    <div class="col-3">
-                                                        <img src="{{ asset($item->product->img) }}" class="img-fluid"
-                                                            alt="Item picture">
-                                                    </div>
-                                                    <div class="col-9">
-                                                        <h6 class="font-weight-normal">
-                                                            {{ $item->product->name }}
-                                                            <span class="text-secondary">
-                                                                {{ ' | ' . $item->product->variant }}
-                                                            </span>
-                                                        </h6>
-                                                        <div class="row gx-5">
-                                                            <div class="col">
-                                                                <div class="">
-                                                                    <h6 class="text-secondary">
-                                                                        ₱{{ $item->price . '.00' }}
-                                                                    </h6>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="">
-                                                                    <h6 class="text-secondary">
-                                                                        {{ $item->quantity }} PCS
-                                                                    </h6>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="border-top border-secondary mb-2"></div>
-                                                        <h5 class="font-weight-bold">
-                                                            Total: ₱{{ $item->price * $item->quantity . '.00' }}
-                                                        </h5>
-                                                    </div>
-                                                </div>
+                                                <x-order-display :name="$item['name']" :variant="$item['variant']" :price="$item['price']"
+                                                    :quantity="$item['quantity']" :total="$item['total']" :img="$item['img']" />
                                             @endforeach
                                             <div class="border-top mb-3"></div>
                                             <div class="form-floating mb-3">
@@ -390,8 +358,8 @@
             $('#label').prop('readonly', false);
         }
 
-         // Initially call the appropriate function based on the selected radio button
-         if ($('#pickup').prop('checked')) {
+        // Initially call the appropriate function based on the selected radio button
+        if ($('#pickup').prop('checked')) {
             disablePickUpElements();
         } else {
             enablePickUpElements();

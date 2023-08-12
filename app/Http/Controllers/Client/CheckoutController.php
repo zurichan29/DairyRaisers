@@ -31,16 +31,16 @@ use App\Events\OrderNotification;
 
 class CheckoutController extends Controller
 {
-    public function checkout(Request $request)
+    public function checkout()
     {
         if (auth()->check()) {
             $userId = auth()->user()->id;
-            $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
+            $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
             $address = $user->address;
 
             $defaultAddress = $user->address->where('default', true)->first();
 
-            $cartItems = $user->cart->where('order_number', null);
+            $cartItems = $user->cart;
             $cart = [];
             $grandTotal = $cartItems->sum('total');
             $shippingFee = 50;
@@ -48,23 +48,24 @@ class CheckoutController extends Controller
             foreach ($cartItems as $cartItem) {
                 $cart[] = [
                     'cartId' => $cartItem->id,
-                    'productId' => $cartItem->product->id,
+                    'product_id' => $cartItem->product->id,
                     'name' => $cartItem->product->name,
                     'img' => $cartItem->product->img,
-                    'variant' => $cartItem->product->variant,
+                    'variant' => $cartItem->product->variant->name,
                     'price' => $cartItem->product->price,
                     'quantity' => $cartItem->quantity,
                     'total' => $cartItem->total
                 ];
             }
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
-
-            $address = null;
-            $cart = $guest->guest_cart->where('order_number', NULL);
-            $grandTotal = $cart->sum('total');
+            $defaultAddress = null;
+            $address = session('guest_address');
+            $cartItems = session('order_data', []);
+            $grandTotal = 0;
+            foreach ($cartItems as $item) {
+                $grandTotal += $item['total'];
+            }
+            // dd($cartItems);
         }
 
         $paymentMethod = PaymentMethod::all();
@@ -75,7 +76,6 @@ class CheckoutController extends Controller
             'items' => $cartItems,
             'grandTotal' => $grandTotal,
             'payment_methods' => $paymentMethod,
-            'user' => $user
         ]);
     }
 
@@ -217,11 +217,11 @@ class CheckoutController extends Controller
             $currentDate = now();
             $monthYear = $currentDate->format('my');
             $lastOrder = DB::table('orders')->orderByDesc('id')->first();
-        
+
             if ($lastOrder) {
                 $lastOrderDate = Carbon::parse($lastOrder->created_at);
                 $lastOrderMonthYear = $lastOrderDate->format('my');
-        
+
                 if ($lastOrderMonthYear === $monthYear) {
                     $lastOrderId = $lastOrder->order_number;
                     $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
@@ -238,10 +238,8 @@ class CheckoutController extends Controller
         $request->validate([
             'remarks' => ['max:255'],
             'payment_method' => ['required'],
-            'delivery_option' => ['required', 'in:Delivery,Pick Up'],
         ]);
 
-        $deliveryOption = $request->input('delivery_option');
         if ($request->input('payment_method') != 'Cash On Delivery') {
             $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
             $request->validate([
@@ -272,16 +270,15 @@ class CheckoutController extends Controller
             $filePath = NULL;
         }
 
-
         if (auth()->check()) {
             $userId = auth()->user()->id;
-            $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
+            $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
 
             if (!$user->cart) {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+                return redirect()->route('index');
             }
 
-            $cart = $user->cart->first();
+            $cart = $user->cart;
             $address = $user->address->where('default', true)->first();
 
             if ($address) {
@@ -329,86 +326,83 @@ class CheckoutController extends Controller
                 $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
             }
 
-            Cart::where('user_id', $userId)->where('order_number', NULL)->update(['order_number' => $orderID]);
+            $cart_items = Cart::where('user_id', $userId)->get();
+            $items = [];
 
-            // Create a new Order instance and save it
+            foreach ($cart_items as $item) {
+                $product = Product::with('variant')->where('id', $item->product_id)->first();
+                $items[] = [
+                    "product_id" => $item->product_id,
+                    "img" => $item->product->img,
+                    "name" => $item->product->name,
+                    'variant' => $product->variant->name,
+                    "price" => $item->price,
+                    "quantity" => $item->quantity,
+                    "total" => $item->total,
+                ];
+            }
+            Cart::where('user_id', $userId)->delete();
+
+            $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
             $order = new Order;
-            $order->user_id = $userId;
+            $order->name = $name;
+            $order->mobile_number = auth()->user()->mobile_number;
             $order->order_number = $orderID;
-            $order->user_address = $completeAddress;
+            $order->address = $completeAddress;
             $order->remarks = $request->input('remarks');
-            $order->grand_total = $cart->where('order_number', $orderID)->sum('total');
+            $order->grand_total = $cart->sum('total');
             $order->payment_method = $paymentMethod->type;
             $order->reference_number = $referenceNumber;
-            $order->delivery_option = $deliveryOption;
+            $order->shipping_option = 'Delivery';
+            $order->customer_id = $userId;
+            $order->customer_type = 'online_shopper';
+            $order->items = $items;
+            $order->ip_address = $request->ip();
 
             if ($request->input('payment_method') != 'Cash On Delivery') {
-                // Create a new PaymentReceipt instance and save it
-                // $payment_receipt = new PaymentReciept;
-                // $payment_receipt->status = 'read';
-                // $payment_receipt->reciept =  $filePath;
-                // $payment_receipt->user_id = $userId;
-                // $payment_receipt->order_id = $order->id; // Set the order_id here
-                // $payment_receipt->save();
-                $order->payment_reciept = $filePath;
-                // $order->payment_reciept()->associate($payment_receipt);
+                $order->payment_receipt = $filePath;
             }
-            // dd($order);
+
             $order->save();
             event(new OrderNotification($order));
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
-            $cart = $guest->guest_cart->first();
-
-            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
-            $addressData = json_decode($jsonData, true);
-
-            $addresses = $request->validate([
-                'first_name' => ['string', 'required', 'max:255'],
-                'last_name' => ['string', 'required', 'max:255'],
-                'mobile_number' => ['required', 'numeric', 'digits:10', 'regex:/^9[0-9]{9}$/'],
-                'region' => ['string', 'required', 'max:255'],
-                'province' => ['string', 'required', 'max:255'],
-                'barangay' => ['string', 'required', 'max:255'],
-                'municipality' => ['string', 'required', 'max:255'],
-                'street' => ['string', 'required', 'max:255'],
-                'label' => ['required', 'max:255', 'in:home,office'],
-                'zip_code' => ['integer', 'required', 'digits:4']
-            ], [
-                'mobile_number.regex' => 'The :attribute must be a valid phone number with 10 characters and starting with 9.',
+            $request->validate([
+                'name' => 'required|max:255|min:4',
+                'mobile_number' => ['required', 'integer', 'digits:10', 'regex:/^9/'],
             ]);
 
-            if (
-                isset($addressData[$addresses['region']]) &&
-                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
-                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
-                in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
-            ) {
-                $regionName = $addressData[$request->input('region')]['region_name'];
-                // User input is valid
-            } else {
-                // User input is invalid
-                throw ValidationException::withMessages([
-                    'error' => 'Something went wrong on the address value, please try again.',
-                ]);
+            $orderData = session('order_data', []);
+            $guestAddress = session('guest_address');
+            $grandTotal = 0;
+            foreach ($orderData as $item) {
+                $grandTotal += $item['total'];
             }
 
-            $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
-
-            GuestCart::where('guest_user_id', $guest->id)->where('order_number', NULL)->update(['order_number' => $orderID]);
-            $order = new GuestOrder;
-            $order->guest_user_id = $guest->id;
-            $order->first_name = $request->input('first_name');
-            $order->last_name = $request->input('last_name');
-            $order->mobile_number = $request->input('mobile_number');
+            $order = new Order;
+            $order->name = $request->name;
+            $order->mobile_number = $request->mobile_number;
             $order->order_number = $orderID;
-            $order->guest_address = $completeAddress;
+            $order->address = $guestAddress['complete_address'];
             $order->remarks = $request->input('remarks');
-            $order->grand_total = $cart->where('order_number', $orderID)->sum('total');
-            $order->payment_method = 'COD';
+            $order->grand_total = $grandTotal;
+            $order->payment_method = $paymentMethod->type;
+            $order->reference_number = $referenceNumber;
+            $order->shipping_option = 'Delivery';
+            $order->customer_id = null;
+            $order->customer_type = 'guest';
+            $order->items = $orderData;
+            $order->ip_address = $request->ip();
+
+            if ($request->input('payment_method') != 'Cash On Delivery') {
+                $order->payment_receipt = $filePath;
+            }
+
             $order->save();
+
+            session()->forget('guest_address');
+            session()->forget('order_data');
+
+            event(new OrderNotification($order));
         }
         return redirect()->route('order_history')->with('message', 'You have placed your order');
     }

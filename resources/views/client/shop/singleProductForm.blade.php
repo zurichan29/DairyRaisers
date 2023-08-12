@@ -4,7 +4,7 @@
     <div class="container mt-5" style="margin-bottom: 100px;">
         <div class="card" style="display:flex; max-width: 750px; min-height: 400px; margin:auto; margin-bottom:30px; padding:30px;
         background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
-            <form action="{{ route('product.add', ['productId' => $product->id]) }}" method="POST"
+            <form action="{{ route('product.add', ['id' => $product->id]) }}" method="POST"
                 class="row g-0">
                 <a href="{{ route('shop') }}"></a>
 

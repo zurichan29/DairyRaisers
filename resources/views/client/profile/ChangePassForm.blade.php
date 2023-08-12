@@ -7,25 +7,19 @@
         <form method="POST" action="{{ URL::secure(route('profile.change_password.validate')) }}">
             @csrf
             <label for="current_password">Current Password:</label>
-            <input type="password" name="current_password" id="current_password" style="width: 100%; border: none; outline: none; background: none;
-                font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
+            <input type="password" name="current_password" id="current_password" class="form-control" required>
             @error('current_password')
                 <p>{{ $message }}</p>
             @enderror
 
             <label for="password">New Password:</label>
-            <input type="password" name="password" id="password" style="width: 100%; border: none; outline: none; background: none;
-                font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
+            <input type="password" name="password" id="password" class="form-control" required>
             @error('password')
                 <p>{{ $message }}</p>
             @enderror
 
             <label for="password_confirmation">Confirm Password</label>
-            <input type="password" name="password_confirmation" id="password_confirmation" style="width: 100%; border: none; outline: none; background: none;
-                font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
+            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
             @error('password_confirmation')
                 <p>{{ $message }}</p>
             @enderror

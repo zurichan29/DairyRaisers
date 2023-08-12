@@ -1,20 +1,17 @@
 <?php
 
 namespace App\Http\Controllers\Client;
+
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Cart;
-use App\Models\GuestUser;
-use App\Models\GuestCart;
 
 class CartController extends Controller
 {
-    //
-
-    public function cart(Request $request)
+    public function cart()
     {
         $userCart = [];
         $grand_total = 0;
@@ -29,10 +26,10 @@ class CartController extends Controller
                     $total = $cartItem->quantity * $cartItem->product->price;
                     $userCart[] = [
                         'cartId' =>  $cartItem->id,
-                        'productId' => $cartItem->product->id,
+                        'product_id' => $cartItem->product->id,
                         'name' => $cartItem->product->name,
                         'img' => $cartItem->product->img,
-                        'variant' => $cartItem->product->variant,
+                        'variant' => $cartItem->product->variant->name,
                         'price' => $cartItem->product->price,
                         'quantity' => $cartItem->quantity,
                         'total' => $total
@@ -40,93 +37,123 @@ class CartController extends Controller
                     $grand_total += $total;
                 }
             }
-            // For guest users
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
+            $userCart = session('order_data');
 
-            foreach ($guest->guest_cart as $cart) {
-                $total = $cart->quantity * $cart->product->price;
-                $userCart[] = [
-                    'cartId' => $cart['id'],
-                    'productId' => $cart['product_id'],
-                    'name' => $cart->product->name,
-                    'img' => $cart->product->img,
-                    'variant' => $cart['variant'],
-                    'price' => $cart['price'],
-                    'quantity' => $cart['quantity'],
-                    'total' => $total
-                ];
-                $grand_total += $total;
+            if (session()->has('order_data')) {
+                foreach ($userCart as $item) {
+                    $grand_total += $item['total'];
+                }
             }
         }
+
 
         return view('client.shop.cart', ['cart' => $userCart, 'grand_total' => $grand_total]);
     }
 
-    public function updateQuantity(Request $request, $id)
+    public function updateQuantity(Request $request)
     {
         $grandTotal = 0;
-        // For users account
+        $total = 0;
+        if ($request->input('quantity') == 0) {
+            return response()->json(['errors' => 'invalid quantity: must not be less than 0.'], 422);
+        }
         if (auth()->check()) {
-            $cart = Cart::findOrFail($id);
-            $cart->quantity = (int)$request->quantity;
+            $cart = Cart::where('user_id', auth()->user()->id)->where('product_id', $request->input('cartId'))->first();
+            $cart->quantity = $request->quantity;
             $cart->total = $cart->product->price * $cart->quantity;
             $cart->save();
-            $grandTotal = Cart::where('user_id', auth()->user()->id)->where('order_number', NULL)->sum('total');
-
-        // For guest users
+            $total = $cart->total;
+            $grandTotal = Cart::where('user_id', auth()->user()->id)->get()->sum('total');
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
+            $orderData = session('order_data', []);
+            $total = 0;
 
-            $cart = GuestCart::findOrFail($id);
-            $cart->quantity = (int)$request->quantity;
-            $cart->total =  $cart->product->price * $cart->quantity;
-            $cart->save();
-            $grandTotal = GuestCart::where('guest_user_id', $guest->id)->where('order_number', NULL)->sum('total');
+            if (session()->has('order_data')) {
+                $existingProductIndex = null;
+                foreach ($orderData as $index => $item) {
+                    if ($item['product_id'] == $request->input('cartId')) {
+                        $existingProductIndex = $index;
+                        break;
+                    }
+                }
+
+                if ($existingProductIndex !== null) {
+                    $orderData[$existingProductIndex]['quantity'] = $request->input('quantity');
+                    $orderData[$existingProductIndex]['total'] = $orderData[$existingProductIndex]['price'] * $orderData[$existingProductIndex]['quantity'];
+
+                    session(['order_data' => $orderData]);
+
+                    $cartTotal = 0;
+                    foreach (session('order_data') as $item) {
+                        $cartTotal += $item['total'];
+                    }
+
+                    $total = $orderData[$existingProductIndex]['total'];
+                }
+
+                $grandTotal = 0;
+                foreach ($orderData as $item) {
+                    $grandTotal += $item['total'];
+                }
+            }
         }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Quantity updated successfully.',
-            'cart' => $cart,
-            'grandTotal' => $grandTotal
+            'total' => $total,
+            'grandTotal' => $grandTotal,
         ]);
     }
 
-    public function removeCartItem(Request $request, $id)
+    public function removeCart(Request $request)
     {
-
-        $grandTotal = 0;
         if (auth()->check()) {
-            $cart = Cart::findOrFail($id);
-            $userId = auth()->user()->id;
+            $cart = Cart::where('user_id', auth()->user()->id)->where('product_id', $request->input('cartId'))->first();
             $cart->delete();
-            $userCart = Cart::where('user_id', $userId)->where('order_number', NULL)->get();
-
-            $grandTotal = $userCart->sum('total');
-            $cartCount = $userCart->count();
+            // $cart->save();
+            $carts = Cart::where('user_id', auth()->user()->id)->get();
+            $count = $carts->count();
+            $grandTotal = $carts->sum('total');
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->where('id', $thisGuest->id)->first();
+            $cartId = $request->input('cartId');
+            $orderData = session('order_data', []);
 
-            $cart = GuestCart::findOrFail($id);
-            $cart->delete();
-            $guestCart = GuestCart::where('guest_user_id', $guest->id)->where('order_number', NULL)->get();
+            if ($orderData) {
+                $removedProductIndex = null;
+                foreach ($orderData as $index => $item) {
+                    if ($item['product_id'] == $cartId) {
+                        $removedProductIndex = $index;
+                        break;
+                    }
+                }
 
-            $grandTotal = $guestCart->sum('total');
-            $cartCount = $guestCart->count();
+                if ($removedProductIndex !== null) {
+                    $removedTotal = $orderData[$removedProductIndex]['total'];
+                    unset($orderData[$removedProductIndex]); // Remove the product from the array
+                    session(['order_data' => $orderData]);
+
+                    $grandTotal = 0;
+                    foreach ($orderData as $item) {
+                        $grandTotal += $item['total'];
+                    }
+
+                    $count = count(session('order_data'));
+                }
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Item not found in the cart.'
+                ], 404);
+            }
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Cart item removed successfully.',
+            'message' => 'Item removed successfully.',
             'grandTotal' => $grandTotal,
-            'cartCount' => $cartCount
+            'count' => $count,
         ]);
     }
 }

@@ -1,90 +1,160 @@
 @extends('layouts.client')
 @section('content')
-
-    <div style="max-width: 350px; min-height: 400px; margin: 80px auto; padding: 30px 30px 30px 30px;
-        background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
-
-        @if ($addresses)
-            @foreach ($addresses as $address)
-                <h1 style="font-size: 1rem;">Region: {{ $address['region'] }}</h1>
-                <h1 style="font-size: 1rem;">Province: {{ $address['province'] }}</h1>
-                <h1 style="font-size: 1rem;">Municipality: {{ $address['municipality'] }}</h1>
-                <h1 style="font-size: 1rem;">Barangay: {{ $address['barangay'] }}</h1>
-                <h1 style="font-size: 1rem;">Street: {{ $address['street'] }}</h1>
-                <h1 style="font-size: 1rem;">Label: {{ $address['label'] }}</h1>
-                <h1 style="font-size: 1rem;">Zip Code: {{ $address['zip_code'] }}</h1>
-                <h1 style="font-size: 1rem;">Default: {{ $address['default'] }}</h1>
-                <a href="{{ URL::secure(route('edit.address', ['id' => $address['id']])) }}">Edit Address</a>
-                @if ($address['default'] != 1)
-                    <form action="{{ route('default.address', ['id' => $address['id']]) }}" method="post">
-                        @csrf
-                        <button type="submit" class="btn btn-primary mt-2" style="width:100%; height: 40px; border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
-                            Make Default
-                        </button>
-                    </form>
-                @endif
-                <form action="{{ URL::secure(route('delete.address', ['id' => $address['id']])) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-primary mt-4" style="width:100%; height: 40px; background-color:rgb(248, 53, 53); border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
-                        Delete Address
+    <!-- Remove Confirmation Modal -->
+    <div class="modal fade" id="removeConfirmationModal" tabindex="-1" aria-labelledby="removeConfirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                    <button type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
-                </form>
-                
-                {{-- <a href="{{ URL::secure(route('delete.address', ['id' => $address['id']])) }}">Delete Address</a> --}}
-                <br><br>
-            @endforeach
-        @else
-            <h1>NO ADDRESS FOUND</h1>
-        @endif
-        @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to remove the selected address?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" id="removeAddressForm">
+                        @csrf
+                        <input type="hidden" name="address_id" id="remove_address_id">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button type="submit" class="btn btn-danger" id="confirmRemoveButton">Yes</button>
+                    </form>
+
+                </div>
             </div>
-        @endif
-    </div>
-    <div style="max-width: 350px; min-height: 400px; margin: 80px auto; padding: 30px 30px 30px 30px;
-        background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
-        <form action="{{ route('create.address') }}" method="POST" id="addressForm">
-            @csrf
-            <select id="regionSelect" name="region" style="width: 100%; border: none; outline: none; background: none;
-            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-                <option disabled selected value="">Select your region</option>
-            </select>
-            <select id="provinceSelect" name="province" style="width: 100%; border: none; outline: none; background: none;
-            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-                <option disabled selected value="">Select your province</option>
-            </select>
-            <select id="municipalitySelect" name="municipality" style="width: 100%; border: none; outline: none; background: none;
-            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-                <option disabled selected value="">Select your municipality</option>
-            </select>
-            <select id="barangaySelect" name="barangay" style="width: 100%; border: none; outline: none; background: none;
-            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-                <option disabled selected value="">Select your barangay</option>
-            </select>
-            <label for="street">Street Name, Building, House No.</label>
-            <input type="string" name="street" id="street" style="width: 100%; border: none; outline: none; background: none;
-            font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-            box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-            <label for="zip_code">Zip Code:</label>
-            <input type="number" name="zip_code" id="zip_code" style="width: 100%; border: none; outline: none; background: none; font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px; box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;" required>
-            <select name="label" id="label" style=" border: none; outline: none; background: none; font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px; box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">
-                <option value="home">Home</option>
-                <option value="office">Office</option>
-            </select>
-            <button type="submit" class="btn btn-primary" style="width: 100%; height: 40px; border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
-                Create Address
-            </button>
-        </form>
+        </div>
     </div>
 
+    <!--Default Confirmation Modal -->
+    <div class="modal fade" id="defaultConfirmationModal" tabindex="-1" aria-labelledby="defaultConfirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to make this address as default?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" id="defaultAddressForm">
+                        @csrf
+                        <input type="hidden" name="address_id" id="default_address_id">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button type="submit" class="btn btn-danger" id="confirmDefaultButton">Yes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="">
+        <p>ADDRESSES</p>
+    </div>
+
+    <a href="{{ route('address.create') }}" class="btn btn-primary">Create Address</a>
+
+    <button type="button" id="edit-button" class="btn btn-primary">Edit Address</button>
+    <button type="button" id="remove-button" class="btn btn-danger">Remove Address</button>
+    <button type="button" id="default-button" class="btn btn-info">Set to Default</button>
+
+    <div class="container">
+        <div class="row" id="user-address">
+            @foreach ($addresses as $key => $value)
+                <div class="col">
+                    <div class="card shadow">
+                        <div class="card-header text-center">
+                            <input type="radio" class="btn-check" name="select-address" value="{{ $value->id }}"
+                                id="address-{{ $key + 1 }}" autocomplete="off">
+                            <label class="btn btn-outline-success" for="address-{{ $key + 1 }}">select</label>
+                            <p>Address {{ $key + 1 }}</p>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ $value->default }}</p>
+                            <p>{{ $key + 1 }}</p>
+                            <p>{{ $value->region }}</p>
+                            <p>{{ $value->province }}</p>
+                            <p>{{ $value->municipality }}</p>
+                            <p>{{ $value->barangay }}</p>
+                            <p>{{ $value->street }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+
+    <script>
+        $(document).ready(function() {
+
+            $("#edit-button").click(function() {
+                var selectedAddress = $("input[name='select-address']:checked").val();
+                if (selectedAddress) {
+                    var url = "{{ route('address.edit', ['id' => ':id']) }}";
+                    url = url.replace(':id', selectedAddress);
+                    location.href = url;
+                } else {
+                    NotifyUser('error', 'Error', 'No address selected.');
+                }
+            });
+
+            $("#remove-button").click(function() {
+                var selectedAddress = $("input[name='select-address']:checked").val();
+                if (selectedAddress) {
+                    $('#removeConfirmationModal').modal('show');
+                } else {
+                    NotifyUser('error', 'Error', 'No address selected.');
+                }
+            });
+
+            $("#cancelRemoveButton, #removeConfirmationModal .close").click(function() {
+                $('#removeConfirmationModal').modal('hide');
+            });
+
+            // Handle the removal confirmation
+            $("#confirmRemoveButton").click(function() {
+                var selectedAddress = $("input[name='select-address']:checked").val();
+                if (selectedAddress) {
+                    // Update the form action with the selected address ID
+                    var formAction = "{{ route('address.delete', ['id' => 'ADDRESS_ID']) }}";
+                    formAction = formAction.replace('ADDRESS_ID', selectedAddress);
+                    $("#removeAddressForm").attr("action", formAction);
+
+                    $('#removeAddressForm').submit(); // Submit the form
+                }
+            });
+
+            $("#default-button").click(function() {
+                var selectedAddress = $("input[name='select-address']:checked").val();
+                if (selectedAddress) {
+                    $('#defaultConfirmationModal').modal('show');
+                } else {
+                    NotifyUser('error', 'Error', 'No address selected.');
+                }
+            });
+
+            $("#canceldefaultButton, #defaultConfirmationModal .close").click(function() {
+                $('#defaultConfirmationModal').modal('hide');
+            });
+
+            // Handle the removal confirmation
+            $("#confirmDefaultButton").click(function() {
+                var selectedAddress = $("input[name='select-address']:checked").val();
+                if (selectedAddress) {
+                    // Update the form action with the selected address ID
+                    var formAction = "{{ route('address.default', ['id' => 'ADDRESS_ID']) }}";
+                    formAction = formAction.replace('ADDRESS_ID', selectedAddress);
+                    $("#defaultAddressForm").attr("action", formAction);
+
+                    $('#defaultAddressForm').submit();
+                }
+            });
+        });
+    </script>
 @endsection

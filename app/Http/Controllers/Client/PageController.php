@@ -17,9 +17,8 @@ class PageController extends Controller
 {
     //
 
-    public function index(Request $request)
+    public function index()
     {      
-        auth()->guard('admin')->logout();
         return view('client.index');
     }
 

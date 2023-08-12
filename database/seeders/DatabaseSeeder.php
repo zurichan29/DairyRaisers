@@ -97,19 +97,19 @@ class DatabaseSeeder extends Seeder
         User::Create([
             'first_name' => 'Christian Jay',
             'last_name' => 'Jacalne',
-            'email' => 'krischang29@gmail.com',
+            'email' => 'sample@gmail.com',
             'password' =>  Hash::make('2329Cjay'),
-            'mobile_number' => '9262189072',
-            'mobile_verified_at' => Carbon::now()
+            'mobile_number' => '9262189071',
+            'email_verified_at' => Carbon::now(), 
         ]);
 
         User::Create([
             'first_name' => 'Laarni',
             'last_name' => 'Lalic',
-            'email' => 'laarnimarielalic@gmail.com',
+            'email' => 'myasd@gmail.com',
             'password' =>  Hash::make('2329Marie'),
-            'mobile_number' => '9972654850',
-            'mobile_verified_at' => Carbon::now()
+            'mobile_number' => '9972654851',
+            'email_verified_at' => Carbon::now(), 
         ]);
         User_Address::Create([
             'user_id' => 1,

@@ -30,7 +30,7 @@ class VerifyEmail extends Mailable
     public function build()
     {
         return $this->subject('Verify Your Email')
-            ->markdown('client.template.verify_email')
+            ->markdown('client.register.verify_email')
             ->with(['user' => $this->user]);
     }
 

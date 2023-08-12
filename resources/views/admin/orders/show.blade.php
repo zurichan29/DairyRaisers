@@ -131,10 +131,16 @@
                                             <strong>{{ $order->customer->user->email ? $order->customer->user->email : 'none' }}</strong>
                                         </h6>
                                     @elseif ($order->customer_type == 'retailer')
-                                        <h6>Name: <strong>{{ $order->customer->first_name . ' ' . $order->customer->last_name }}</strong>
+                                        <h6>Name:
+                                            <strong>{{ $order->customer->first_name . ' ' . $order->customer->last_name }}</strong>
                                         </h6>
                                         <h6>Contact: <strong>+63{{ $order->customer->mobile_number }}</strong></h6>
                                         <h6>Store: <strong>{{ $order->customer->store_name }}</strong></h6>
+                                    @elseif ($order->customer_type == 'guest')
+                                        <h6>Name:
+                                            <strong>{{ $order->name }}</strong>
+                                        </h6>
+                                        <h6>Contact: <strong>+63{{ $order->mobile_number }}</strong></h6>
                                     @endif
                                     </h6>
                                     <h6 style="line-height: 1.5rem;">Address : <strong>{{ $order->address }}</strong></h6>

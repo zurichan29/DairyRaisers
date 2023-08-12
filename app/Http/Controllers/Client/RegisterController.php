@@ -9,16 +9,134 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
-
+use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmail;
 
 class RegisterController extends Controller
 {
     //
     public function show()
     {
-        return view('client.register.show');
+
+        return view('client.register.email');
+    }
+
+    public function validation(Request $request)
+    {
+        $request->validate([
+            'first_name' => ['required', 'string', 'min:4'],
+            'last_name' => ['required', 'string', 'min:4'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'mobile_number' => ['required', 'integer', 'digits:10', 'regex:/^9/'],
+            'password' => ['required', 'string', 'min:6', 'confirmed', 'regex:/^(?=.*[A-Z])(?=.*\d).+$/'],
+        ], [
+            'password.regex' => 'The password must be at least 6 characters long and contain at least one uppercase letter and one number.',
+        ]);
+
+        $user = new User();
+        $user->mobile_number = $request->mobile_number;
+        $user->email = $request->email;
+        $user->email_verify_token = Str::random(60);
+        $user->mobile_verified_at = Carbon::now();
+        $user->first_name = $request->input('first_name');
+        $user->last_name = $request->input('last_name');
+        $user->password = Hash::make($request->input('password'));
+        $user->save();
+
+        Mail::to($user->email)->send(new VerifyEmail($user));
+
+        return redirect()->route('register')->with('message', [
+            'type' => 'success',
+            'title' => 'Verify Your Email',
+            'body' => 'An email confirmation was sent to your email address. Please check your inbox.',
+            'period' => true,
+        ]);
+    }
+
+    public function email_validate(Request $request, $token, $email)
+    {
+        $user = User::where('email_verify_token', $token)->where('email_verified_at', null)->where('email', $email)->first();
+
+        if ($user) {
+            $user->email_verified_at = Carbon::now();
+            $user->email_verify_token = null;
+            $user->save();
+
+            if(auth()->check()) {
+                auth()->logout();
+            }
+
+            //LOGGED IN THE USER
+            auth()->login($user);
+
+            return redirect()->route('index')->with('message', [
+                'type' => 'success',
+                'title' => 'Verified',
+                'body' => 'Your email has been successfully validated.',
+                'period' => true,
+            ]);
+        } else {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+        }
+    }
+
+    public function resend_token()
+    {
+        return view('client.register.resend-token');
+    }
+
+    public function send_token(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('email', $value)
+                        ->whereNull('email_verified_at')
+                        ->first();
+
+                    if (!$user) {
+                        $fail("The provided email is not valid or is already verified.");
+                    }
+                },
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->email_code_count >= 3 && Carbon::now() >= $user->email_code_cooldown) {
+            $user->email_code_count = 0;
+            $user->email_code_cooldown =  null;
+            $user->save();
+        }
+
+        // Check if the user has exceeded the resend limit
+        if ($user->email_code_count >= 3 && Carbon::now()->lt($user->email_code_cooldown)) {
+            return response()->json(['error' => 'You have used up all of your attempts to resend email verification. Please wait a moment and try again.'], 422);
+        }
+
+        // Update email_code_count and email_code_cooldown
+        $user->email_code_count = $user->email_code_count + 1;
+        if ($user->email_code_count >= 3) {
+            $user->email_code_cooldown = Carbon::now()->addHour();
+        }
+        $user->email_verify_token = Str::random(40);
+        $user->save();
+
+        Mail::to($user->email)->send(new VerifyEmail($user));
+
+        return response()->json(['success' => 'Verification token has been sent to your email. Please check your inbox.']);
     }
 
     public function checkMobileNum(Request $request)

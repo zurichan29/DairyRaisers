@@ -21,9 +21,6 @@
         <label for="mobile_number">Mobile No. *</label>
     </div>
     <div class="border-top my-4"></div> --}}
-    <div class="row mb-3">
-        <h4 class="text-primary">ADDRESS</h4>
-    </div>
   
     <div class="form-floating mb-3">
         <select class="form-select" id="regionSelect" name="region" aria-label="select region">

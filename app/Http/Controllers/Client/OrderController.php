@@ -30,145 +30,83 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if (auth()->check()) {
-            $user = User::with('cart.product')->with('order')->where('id', auth()->user()->id)->first();
-            
-            $orders = $user->order->sortByDesc('created_at');
+            $orders = Order::with('customer')
+                ->where('customer_type', 'online_shopper')
+                ->where('customer_id', auth()->user()->id)
+                ->orderByDesc('created_at')
+                ->get();
+            $firstData = $orders[0]->items[0];
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->with('guest_order')->where('id', $thisGuest->id)->first();
-            $orders = $guest->guest_order->where('delivery_status', '<>', 'delivered');
-
-            if ($orders) {
-                foreach ($orders as $order) {
-                    $cartItems = $guest->guest_cart->where('order_number', $order->order_number);
-                    $user_order[$order->id] = [
-                        'order_id' => $order->id,
-                        'order_number' => $order->order_number,
-                        'full_name' => $order->first_name . ' ' . $order->last_name,
-                        'mobile_number' => $order->mobile_number,
-                        'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $order->created_at)->format('Y-m-d g:i A'),
-                        'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $order->updated_at)->format('Y-m-d g:i A'),
-                        'address' => $order->guest_address,
-                        'remarks' => $order->remarks,
-                        'delivery_status' => $order->delivery_status,
-                        'payment_method' => $order->payment_method,
-                        'grand_total' => $order->grand_total + 50,
-                    ];
-
-                    foreach ($cartItems as $cartItem) {
-                        $total = $cartItem->quantity * $cartItem->product->price;
-                        $user_order[$order->id]['cart_item'][] = [
-                            'cartId' =>  $cartItem->id,
-                            'productId' => $cartItem->product->id,
-                            'name' => $cartItem->product->name,
-                            'img' => $cartItem->product->img,
-                            'variant' => $cartItem->product->variant,
-                            'price' => $cartItem->product->price,
-                            'quantity' => $cartItem->quantity,
-                            'total' => $total
-                        ];
-                    }
-                }
-            }
+            $ip_address = $request->ip();
+            $orders = Order::where('customer_type', 'guest')
+                ->where('ip_address', $ip_address)
+                ->orderByDesc('created_at')
+                ->get();
+            $firstData = $orders[0]->items[0];
         }
-
-        return view('client.order.index', ['orders' => $orders]);
+        return view('client.order.index', compact('orders', 'firstData'));
     }
-
     public function show($id)
     {
         if (auth()->check()) {
             $order = Order::findOrFail($id);
-            $user = User::with('cart.product')->with('order')->with('address')->where('id', $order->user->id)->first();
-            $cart = $user->cart->where('order_number', $order->order_number);
-            $statusBadge = null;
-            switch ($order->status) {
-                case 'Pending':
-                    $statusBadge = 'badge-info';
-                    break;
-                case 'Approved':
-                    $statusBadge = 'badge-primary';
-                    break;
-                case 'On The Way':
-                    $statusBadge = 'badge-warning';
-                    break;
-                case 'Delivered':
-                    $statusBadge = 'badge-success';
-                    break;
-                default:
-                    break;
-            }
+            $user = User::with('cart.product')->with('address')->where('id', auth()->user()->id)->first();
+            $cart = $order->items;
         } else {
-            $identifier = $request->cookie('device_identifier');
-            $thisGuest = GuestUser::where('guest_identifier', $identifier)->first();
-            $guest = GuestUser::with('guest_cart.product')->with('guest_order')->where('id', $thisGuest->id)->first();
-            $orders = $guest->guest_order->where('delivery_status', '<>', 'delivered');
+            $order = Order::findOrFail($id);
+            $cart = $order->items;
+            $user = null;
+        }
 
-            if ($orders) {
-                foreach ($orders as $order) {
-                    $cartItems = $guest->guest_cart->where('order_number', $order->order_number);
-                    $user_order[$order->id] = [
-                        'order_id' => $order->id,
-                        'order_number' => $order->order_number,
-                        'full_name' => $order->first_name . ' ' . $order->last_name,
-                        'mobile_number' => $order->mobile_number,
-                        'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $order->created_at)->format('Y-m-d g:i A'),
-                        'updated_at' => Carbon::createFromFormat('Y-m-d H:i:s', $order->updated_at)->format('Y-m-d g:i A'),
-                        'address' => $order->guest_address,
-                        'remarks' => $order->remarks,
-                        'delivery_status' => $order->delivery_status,
-                        'payment_method' => $order->payment_method,
-                        'grand_total' => $order->grand_total + 50,
-                    ];
-
-                    foreach ($cartItems as $cartItem) {
-                        $total = $cartItem->quantity * $cartItem->product->price;
-                        $user_order[$order->id]['cart_item'][] = [
-                            'cartId' =>  $cartItem->id,
-                            'productId' => $cartItem->product->id,
-                            'name' => $cartItem->product->name,
-                            'img' => $cartItem->product->img,
-                            'variant' => $cartItem->product->variant,
-                            'price' => $cartItem->product->price,
-                            'quantity' => $cartItem->quantity,
-                            'total' => $total
-                        ];
-                    }
-                }
-            }
+        $statusBadge = null;
+        switch ($order->status) {
+            case 'Pending':
+                $statusBadge = 'badge-info';
+                break;
+            case 'Approved':
+                $statusBadge = 'badge-primary';
+                break;
+            case 'On The Way':
+                $statusBadge = 'badge-warning';
+                break;
+            case 'Delivered':
+                $statusBadge = 'badge-success';
+                break;
+            default:
+                break;
         }
 
         return view('client.order.show', compact('order', 'user', 'cart', 'statusBadge'));
     }
-
     public function re_order($id)
     {
-        if (auth()->check()) {
-            $user = User::with('cart.product')->with('order')->where('id', auth()->user()->id)->first();
-            $order = $user->order->where('id', $id)->first();
-            $items = $user->cart->where('order_number', $order->order_number);
-            $grandTotal = $items->sum('total');
-            $addresses = $user->address;
-            $defaultAddress = $user->address->where('default', true)->first();
-            $payment_methods = PaymentMethod::all();
-            if ($order) {
-            } else {
-                return redirect('/');
-            }
+
+        $user = User::with('cart.product')->where('id', auth()->user()->id)->first();
+        $order = Order::findOrFail($id);
+        $items = $order->items;
+        $grandTotal = 0;
+        foreach ($items as $item) {
+            $grandTotal += $item['total'];
         }
+        $addresses = $user->address;
+        $defaultAddress = $user->address->where('default', true)->first();
+        $payment_methods = PaymentMethod::all();
+        if ($order) {
+        } else {
+            return redirect()->route('index');
+        }
+
 
         return view('client.order.re_order', compact('user', 'order', 'items', 'addresses', 'defaultAddress', 'payment_methods', 'grandTotal'));
     }
-
     public function place(Request $request, $id)
     {
         $order = Order::findOrFail($id);
         function generateOrderId()
         {
-            $currentDate = Carbon::now();
+            $currentDate = now();
             $monthYear = $currentDate->format('my');
-            $lastOrder = DB::table('order')->orderByDesc('id')->first();
+            $lastOrder = DB::table('orders')->orderByDesc('id')->first();
 
             if ($lastOrder) {
                 $lastOrderDate = Carbon::parse($lastOrder->created_at);
@@ -176,13 +114,13 @@ class OrderController extends Controller
 
                 if ($lastOrderMonthYear === $monthYear) {
                     $lastOrderId = $lastOrder->order_number;
-                    $lastNumber = explode('-', $lastOrderId)[2];
-                    $nextNumber = intval($lastNumber) + 1;
-                    return 'DR-' . $monthYear . '-' . $nextNumber;
+                    $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
+                    $nextNumber = $lastNumber + 1;
+                    return 'DR' . $monthYear . $nextNumber;
                 }
             }
             // If no last order or the month/year has changed, reset the number to 1
-            return 'DR-' . $monthYear . '-1';
+            return 'DR' . $monthYear . '1';
         }
 
         $orderID = generateOrderId();
@@ -190,10 +128,8 @@ class OrderController extends Controller
         $request->validate([
             'remarks' => ['max:255'],
             'payment_method' => ['required'],
-            'delivery_option' => ['required', 'in:Delivery,Pick Up'],
         ]);
 
-        $deliveryOption = $request->input('delivery_option');
         if ($request->input('payment_method') != 'Cash On Delivery') {
             $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
             $request->validate([
@@ -224,49 +160,45 @@ class OrderController extends Controller
             $filePath = NULL;
         }
 
-        if (auth()->check()) {
-            $userId = auth()->user()->id;
-            $user = User::with('cart.product')->with('order')->with('address')->where('id', $userId)->first();
 
-            if (!$user->cart) {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
+        $userId = auth()->user()->id;
+        $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
 
-            $selectedCart = Cart::where('user_id', $userId)
-                ->where('order_number', $order->order_number)
-                ->get();
-
-            foreach ($selectedCart as $item) {
-                Cart::create([
-                    'product_id' => $item->product_id,
-                    'user_id' => $item->user_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price, // Copy the 'price' from the original record
-                    'total' => $item->total,
-                    'order_number' => $orderID,
-                ]);
-            }
-
-
-            $address = $user->address->where('default', true)->first();
-            $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->municipality . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
-            // Create a new Order instance and save it
-            $order = new Order;
-            $order->user_id = $userId;
-            $order->order_number = $orderID;
-            $order->user_address = $completeAddress;
-            $order->remarks = $request->input('remarks');
-            $order->grand_total = Cart::where('order_number', $orderID)->sum('total');
-            $order->payment_method = $paymentMethod->type;
-            $order->reference_number = $referenceNumber;
-            $order->delivery_option = $deliveryOption;
-
-            if ($request->input('payment_method') != 'Cash On Delivery') {
-                $order->payment_reciept = $filePath;
-            }
-            $order->save();
-            event(new OrderNotification($order));
+        if (!$user->cart) {
+            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
         }
+
+        $items = $order->items;
+        $grandTotal = 0;
+        foreach ($items as $item) {
+            $grandTotal += $item['total'];
+        }
+
+        $address = $user->address->where('default', true)->first();
+        $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->municipality . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
+        // Create a new Order instance and save it
+        $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
+        $order = new Order;
+        $order->name = $name;
+        $order->mobile_number = auth()->user()->mobile_number;
+        $order->order_number = $orderID;
+        $order->address = $completeAddress;
+        $order->remarks = $request->input('remarks');
+        $order->grand_total = $grandTotal;
+        $order->payment_method = $paymentMethod->type;
+        $order->reference_number = $referenceNumber;
+        $order->shipping_option = 'Delivery';
+        $order->customer_id = $userId;
+        $order->customer_type = 'online_shopper';
+        $order->items = $items;
+        $order->ip_address = $request->ip();
+
+        if ($request->input('payment_method') != 'Cash On Delivery') {
+            $order->payment_receipt = $filePath;
+        }
+        $order->save();
+        event(new OrderNotification($order));
+
 
         return redirect()->route('order_history')->with('message', 'You have placed your order');
     }

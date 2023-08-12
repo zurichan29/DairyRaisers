@@ -14,42 +14,17 @@
                 <div class="card-body d-flex and flex-column">
                     <div class="row">
                         <div class="col-md-12">
-                            @foreach ($cart as $item)
-                                <div class="row align-items-center mb-4">
-                                    <div class="col-3">
-                                        <img src="{{ asset($item->product->img) }}" class="img-fluid" alt="Item picture">
-                                    </div>
-                                    <div class="col-9">
-                                        <h6 class="font-weight-normal">
-                                            {{ $item->product->name }}
-                                            <span class="text-secondary">
-                                                {{ ' | ' . $item->product->variant }}
-                                            </span>
-                                        </h6>
-                                        <div class="row gx-5">
-                                            <div class="col">
-                                                <div class="">
-                                                    <h6 class="text-primary">
-                                                        PHP {{ $item->price . '.00' }}
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                            <div class="col">
-                                                <div class="">
-                                                    <h6 class="text-primary">
-                                                        {{ $item->quantity }} PCS
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="border-top mb-2"></div>
-                                        <h4 class="font-weight-bold text-primary">
-                                            TOTAL : PHP {{ $item->price * $item->quantity . '.00' }}
-                                        </h4>
-
-                                    </div>
-                                </div>
-                            @endforeach
+                            @auth
+                                @foreach ($cart as $item)
+                                    <x-order-display :name="$item['name']" :variant="$item['variant']" :price="$item['price']" :quantity="$item['quantity']"
+                                        :total="$item['total']" :img="$item['img']" />
+                                @endforeach
+                            @else
+                                @foreach ($cart as $item)
+                                    <x-order-display :name="$item['name']" :variant="$item['variant']" :price="$item['price']" :quantity="$item['quantity']"
+                                        :total="$item['total']" :img="$item['img']" />
+                                @endforeach
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -63,10 +38,16 @@
                             Customer Details <i class="fa-solid fa-circle-user text-primary"></i>
                         </h5>
                         <br>
-                        <h6>Name: {{ $user->first_name . ' ' . $user->last_name }}</h6>
-                        <h6>Contact: +63{{ $user->mobile_number }}</h6>
-                        <h6>Email : {{ $user->email ? $user->email : 'None' }}</h6>
-                        <h6>Address : {{ $order->user_address }}</h6>
+                        @if ($order->customer_type == 'online_shopper')
+                            <h6>Name: {{ $user->first_name . ' ' . $user->last_name }}</h6>
+                            <h6>Contact: +63{{ $user->mobile_number }}</h6>
+                            <h6>Email : {{ $user->email }}</h6>
+                            <h6>Address : {{ $order->address }}</h6>
+                        @elseif ($order->customer_type == 'guest')
+                            <h6>Name: {{ $order->name }}</h6>
+                            <h6>Contact: +63{{ $order->mobile_number }}</h6>
+                            <h6>Address : {{ $order->address }}</h6>
+                        @endif
                         <br>
                         <br>
                         <h5>
@@ -97,9 +78,10 @@
                         </div>
                         <div class="collapse mt-3" id="PaymentReciept">
                             <div class="card card-body">
-                                <a href="{{ asset('storage/'.$order->payment_reciept) }}" data-fancybox="gallery"
+                                <a href="{{ asset('storage/' . $order->payment_receipt) }}" data-fancybox="gallery"
                                     data-caption="Payment Reciept">
-                                    <img src="{{ asset('storage/'.$order->payment_reciept) }}" class="img-fluid" alt="Image">
+                                    <img src="{{ asset('storage/' . $order->payment_receipt) }}" class="img-fluid"
+                                        alt="Image">
                                 </a>
                             </div>
                         </div>

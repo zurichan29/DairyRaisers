@@ -1,6 +1,16 @@
 @extends('layouts.client')
 @section('content')
-    <div class="container ml-[23rem] my-16 bg-[#deb88757] text-center items-center justify-center p-8 rounded-[1rem] shadow-[0_.5rem_1rem_rgba(0,0,0,0.6)]"
+
+    <form class="" method="POST" action="{{ route('reset_password.validate') }}">
+        @csrf
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" class="form-control" name="email" id="email" required>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+    {{-- <div class="container ml-[23rem] my-16 bg-[#deb88757] text-center items-center justify-center p-8 rounded-[1rem] shadow-[0_.5rem_1rem_rgba(0,0,0,0.6)]"
         style="max-width: 550px">
         <div class="alert alert-danger" id="error" style="display: none;"></div>
         <h3 class="mb-5 text-[#5f9ea0] font-semibold text-2xl">Add Phone Number</h3>
@@ -212,6 +222,6 @@
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
             recaptchaVerifier.render();
         }
-    </script>
+    </script> --}}
 
 @endsection

@@ -29,7 +29,7 @@ class OrderController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             $orders = Order::with('customer')->get();
-
+            // dd($orders);
             return view('admin.orders.index', compact('orders'));
         } else {
             return redirect()->route('login.administrator');

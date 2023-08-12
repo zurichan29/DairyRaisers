@@ -1,28 +1,34 @@
 @if ($products)
-    @foreach ($products as $product)
-        <div class="box-container col-md-4 text-center" style="display:flex; max-width: 300px; min-height: 400px; margin:auto; margin-bottom:30px; padding:30px;
-            background-color: #ecf0f3; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
-            <form method="GET" action="{{ URL::secure(route('product.view', ['id' => $product->id])) }}"
-                class="item" method="POST">
-                <img src="{{ asset($product->img) }}" alt="" style="width: 60%; border-radius: 4px 4px 0 0; -webkit-border-radius: 4px 4px 0 0;">
-                <div class="panel-body text-center" style="margin-bottom: 50px">
-                    <h4>
-                        <a class="name pro-title"><strong>{{ $product->name }}</strong></a>
-                    </h4>
-                    <p class="price" style="width: 100%; border: none; outline: none; background: none;
-                    font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                    box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">₱ {{ $product->price }} </p>
-                </div>                
-                <button
-                    class="btn btn-primary" type="submit" style="width: 100%; height: 40px;
-                    border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
-                    Add to Cart
-                </button>
-            </form>
-        </div>
-    @endforeach
+    <div class="row d-flex flex-pill h-100">
+        @foreach ($products as $product)
+            <div class="col-md-3 mb-3">
+                {{-- <form method="GET" action="{{ URL::secure(route('product.view', ['id' => $product->id])) }}"> --}}
+                <div class="card shadow">
+                    <div class="card-header px-2 d-flex justify-content-between align-items-center">
+                        <h6 class="text-primary text-start">{{ $product->name }}</h6>
+                        <h6 class="text-primary">₱{{ $product->price . '.00' }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <img src="{{ asset($product->img) }}" class="img-fluid" alt="product picture">
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary add-to-cart-button"
+                                data-product-id="{{ $product->id }}">
+                                <span class="loading-spinner" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm align-middle me-1"
+                                        aria-hidden="true"></span>
+                                    <span role="status">Loading...</span>
+                                </span>
+                                <span class="btn-text">Add to Cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {{-- </form> --}}
+            </div>
+        @endforeach
+    </div>
 @else
-    <div class="">
+    <div class="font-semibold text-center p-4">
         <h1>NO PRODUCT FOUND</h1>
     </div>
 @endif

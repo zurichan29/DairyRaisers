@@ -27,33 +27,34 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(Request $request): void
     {
-    
+
         //
         //Model::unguard();
 
-        View::composer('layouts.client', function ($view) use ($request) {
+        View::composer('layouts.client', function ($view) {
             if (auth()->check()) {
                 $user = User::with('cart.product')->where('id', auth()->user()->id)->first();
                 $carts = $user->cart->where('order_number', NULL);
-                $cartCount = $carts->count();
                 $cartTotal = $carts->sum('total');
+                $cartCount = $carts->count();
             } else {
-                $identifier = $request->cookie('device_identifier');
-                $guest = GuestUser::where('guest_identifier', $identifier)->first();
-    
-                if (!$guest) {
-                    // Create a new guest user if it doesn't exist
-                    $guest = new GuestUser();
-                    $guest->guest_identifier = $identifier;
-                    $guest->save();
+                // session()->forget('order_data');
+                // session()->forget('guest_address');
+              
+
+                $dataArray = session()->has('order_data') ? session('order_data') : [];
+
+                $cartTotal = 0;
+                foreach ($dataArray as $item) {
+                    $cartTotal += $item['total'];
                 }
-    
-                $guestCart = GuestUser::with('guest_cart.product')->where('id', $guest->id)->first();
-                $carts = $guestCart->guest_cart->where('order_number', NULL);
-                $cartCount = $carts->count();
-                $cartTotal = $carts->sum('total');
+
+                $carts = $dataArray;
+                $cartCount = count($dataArray);
+                
             }
-            $view->with(['cartCount' => $cartCount, 'carts' => $carts, 'cartTotal' => $cartTotal]);
+
+            $view->with(compact('carts', 'cartTotal', 'cartCount'));
         });
     }
 }

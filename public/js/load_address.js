@@ -14,10 +14,10 @@ $.getJSON('/js/philippine_address_2019v2.json')
             });
 
         var regionCode = $('#regionSelect').val();
-        var regionCode = $('#edit-regionSelect').val();
+        // var regionCode = $('#edit-regionSelect').val();
         if (regionCode === "" || regionCode === null) {
             populateSelectOptions('#regionSelect', regions, 'Select your region');
-            populateSelectOptions('#edit-regionSelect', regions, 'Select your region');
+            // populateSelectOptions('#edit-regionSelect', regions, 'Select your region');
         }
     })
     .fail(function () {

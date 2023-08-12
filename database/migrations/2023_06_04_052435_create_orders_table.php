@@ -16,6 +16,7 @@ return new class extends Migration
             // $table->integer('user_id')->nullable();
             $table->string('order_number');
             $table->string('name')->nullable();
+            $table->string('mobile_number')->nullable();
             $table->string('store_name')->nullable();
             $table->integer('grand_total');
             $table->string('address')->nullable();
@@ -30,8 +31,9 @@ return new class extends Migration
             $table->json('items')->nullable();
 
             // Polymorphic relationship columns
-            $table->unsignedBigInteger('customer_id');
-            $table->string('customer_type');
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->string('customer_type'); // (GUEST, REGISTERED, OR RETAILER)
+            $table->string('ip_address')->nullable();
 
             $table->timestamps();
         });

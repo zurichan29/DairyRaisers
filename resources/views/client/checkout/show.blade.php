@@ -71,7 +71,7 @@
             <div class="container-fluid mt-4">
                 <div class="row w-100 justify-content-center">
                     <div class="col">
-                        <div class="card mb-3">
+                        {{-- <div class="card mb-3">
                             <div class="card-body">
                                 <div class="">
                                     <div class="row">
@@ -93,15 +93,15 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card mb-3">
+                        </div> --}}
+                        <div class="card mb-3 shadow">
                             <div class="card-body">
                                 <div class="">
-                                    @if (auth()->check())
-                                        <div class="col">
-                                            <div class="row mb-3">
-                                                <h4 class="text-primary">CONTACT INFORMATION</h4>
-                                            </div>
+                                    <div class="col">
+                                        <div class="row mb-3">
+                                            <h4 class="text-primary">CONTACT INFORMATION</h4>
+                                        </div>
+                                        @auth
                                             <div class="form-floating-like form-floating-like-sm mb-4">
                                                 <span class="form-floating-label">Name</span>
                                                 <p class="form-control-static ms-2">
@@ -117,14 +117,32 @@
                                                 <p class="form-control-static ms-2">
                                                     +63{{ Auth::user()->mobile_number }}</p>
                                             </div>
-                                            <div class="border-top border-secondary my-4"></div>
+                                        @else
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                    placeholder="name">
+                                                <label for="name">Name *</label>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">+63</span>
+                                                <div class="form-floating ">
+                                                    <input type="text" class="form-control " id="mobile_number"
+                                                        name="mobile_number" placeholder="Mobile Number" required>
+                                                    <label for="mobile_number">Mobile No. *</label>
+                                                </div>
+                                            </div>
+                                        @endauth
+
+                                        <div class="border-top border-secondary my-4"></div>
+                                        <div class="row mb-3">
+                                            <h4 id="address-text" class="text-primary">ADDRESS</h4>
+                                        </div>
+                                        @auth
                                             @if ($defaultAddress)
                                                 <div class="row mb-3">
-                                                    <h4 id="address-text" class="text-primary">ADDRESS</h4>
-                                                </div>
-                                                <div class="row mb-3">
+                                                    {{-- URL::secure(route('checkout.edit.address', ['prev' => 'checkout'])) --}}
                                                     <a id="editAddressBtn" class="btn btn-sm btn-outline-primary"
-                                                        href="{{ URL::secure(route('checkout.edit.address', ['prev' => 'checkout'])) }}">Edit
+                                                        href="{{ route('location.update-show') }}">Edit
                                                         this address</a>
                                                 </div>
                                                 <div class="row mb-3">
@@ -155,14 +173,20 @@
                                             @else
                                                 @include('client.checkout.inputAddressForm')
                                             @endif
-                                        </div>
-                                    @else
-                                        @include('client.checkout.inputAddressForm')
-                                    @endif
+                                        @else
+                                            <div class="form-floating-like form-floating-like-sm mb-2">
+                                                <span class="form-floating-label">Complete Address:</span>
+                                                <p class="form-control-static ms-2">
+                                                    {{ $addresses['complete_address'] }}</p>
+                                            </div>
+                                            <a href="{{ route('location.update-show') }}"
+                                                class="btn btn-sm btn-primary">Change</a>
+                                        @endauth
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card mb-3">
+                        <div class="card mb-3 shadow">
                             <div class="card-body">
                                 <div class="">
                                     <div class="row">
@@ -277,47 +301,22 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            @foreach ($items as $item)
-                                                <div class="row align-items-center mb-4">
-                                                    <div class="col-3">
-                                                        <img src="{{ asset($item->product->img) }}" class="img-fluid"
-                                                            alt="Item picture">
-                                                    </div>
-                                                    <div class="col-9">
-                                                        <h6 class="font-weight-normal">
-                                                            {{ $item->product->name }}
-                                                            <span class="text-secondary">
-                                                                {{ ' | ' . $item->product->variant }}
-                                                            </span>
-                                                        </h6>
-                                                        <div class="row gx-5">
-                                                            <div class="col">
-                                                                <div class="">
-                                                                    <h6 class="text-secondary">
-                                                                        ₱{{ $item->price . '.00' }}
-                                                                    </h6>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="">
-                                                                    <h6 class="text-secondary">
-                                                                        {{ $item->quantity }} PCS
-                                                                    </h6>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="border-top border-secondary mb-2"></div>
-                                                        <h5 class="font-weight-bold">
-                                                            Total: ₱{{ $item->price * $item->quantity . '.00' }}
-                                                        </h5>
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                                            @auth
+                                                @foreach ($items as $item)
+                                                    <x-display-product :name="$item->product->name" :variant="$item->product->variant->name" :price="$item->price"
+                                                        :quantity="$item->quantity" :total="$item->total" :img="$item->product->img" />
+                                                @endforeach
+                                            @else
+                                                @foreach ($items as $item)
+                                                    <x-display-product :name="$item['name']" :variant="$item['variant']" :price="$item['price']"
+                                                        :quantity="$item['quantity']" :total="$item['total']" :img="$item['img']" />
+                                                @endforeach
+                                            @endauth
                                             <div class="border-top mb-3"></div>
                                             <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" name="remarks" id="remarks"
                                                     placeholder="Remarks">
-                                                <label for="remarks">Remarks</label>
+                                                <label for="remarks">Remarks (Optional)</label>
                                             </div>
                                             <div class="border-top mb-3"></div>
                                             <div class="row align-items-center mb-4">

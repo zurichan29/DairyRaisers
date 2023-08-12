@@ -8,28 +8,62 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
 
-    {{-- <script src="//unpkg.com/alpinejs" defer></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <title>Dairy Raisers</title>
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/app.js') }}" defer></script> --}}
 
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+
     <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script>
+        function NotifyUser(status, title, message, noTimePeriod = false) {
+            console.log(noTimePeriod);
+            toastr.options.closeButton = true;
+            if (noTimePeriod === 1) { // Use === for strict comparison
+                console.log(noTimePeriod);
+                toastr.options.timeOut = 0;
+                toastr.options.extendedTimeOut = 0;
+            } else if (noTimePeriod === false) {
+                console.log(noTimePeriod);
+                toastr.options.timeOut = 10000;
+                toastr.options.extendedTimeOut = 5000;
+            }
+            toastr.options.progressBar = true;
 
-    <title>Dairy Raisers</title>
+            switch (status) {
+                case 'success':
+                    toastr.success(message, title)
+                    break;
+                case 'info':
+                    toastr.info(message, title)
+                    break;
+                case 'warning':
+                    toastr.warning(message, title)
+                    break;
+                case 'error':
+                    toastr.error(message, title)
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    </script>
+    @if (session()->has('message'))
+    {{-- @dd(session('message')) --}}
+        <script>
+            $(document).ready(function() {
+                NotifyUser("{{ session('message')['type'] }}", "{{ session('message')['title'] }}", "{{ session('message')['body'] }}", {{ session('message')['period'] }});
+            });
+        </script>
+    @endif
 
 </head>
 <!-- Custome style -->
@@ -47,7 +81,7 @@
         z-index: 9999;
     }
 
-    .spinner-border {
+    #spinner-border {
         width: 4rem;
         /* Adjust the size as needed */
         height: 4rem;
@@ -67,170 +101,86 @@
         object-fit: cover;
         /* Maintain aspect ratio and cover the container */
     }
-
-    .nav-link {
-        margin-right: 15px;
-        margin-left: 15px;
-    }
-
-    .nav-item {
-        position: relative;
-    }
-
-    .nav-link-hover {
-        transition: color 0.3s ease-in-out, transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        position: relative;
-        margin-right: 0;
-        margin-left: 0;
-    }
-
-    .nav-link-hover:hover {
-        color: #007bff;
-        transform: scale(1.1);
-    }
-
-    .nav-link-hover::before {
-        content: "";
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: #007bff;
-        transform: scaleX(0);
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .nav-link-hover:hover::before {
-        transform: scaleX(1);
-    }
 </style>
 
 <body class="">
     <div id="loading-animation-id" class="loading-overlay">
-        <div class="spinner-border text-primary" role="status">
+        <div id="spinner-border" class="spinner-border text-primary" role="status">
             <span class="sr-only">Loading...</span>
         </div>
     </div>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow fixed-top">
-        <div class="container d-flex align-items-center justify-content-between">
+    <nav
+        class="navbar navbar-expand-lg navbar-light  bg-light border-bottom shadow d-flex align-items-center justify-content-center flex-column">
+        <div class="p-0 m-0 container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <img src="{{ asset('images/company-logo.png') }}" class="img-fluid logo" alt="Company Logo">
-                <a class="navbar-brand" href="#">Dairy Raisers</a>
-            </div>
-            <div class="navbar-nav flex-grow-1 justify-content-center">
-                <ul class="navbar-nav">
+                <a class="navbar-brand p-0 m-0 fw-bold" href="#"><img src="{{ asset('images/company-logo.png') }}"
+                        class="img-fluid logo" alt="Company Logo">
+                    DAIRY RAISERS</a>
+                <ul class="navbar-nav ms-3">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('index') }}">Home</a>
+                        <a class="nav-link " href="{{ route('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('shop') }}">Products</a>
+                        <a class="nav-link " href="{{ route('shop') }}">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('order_history') }}">Orders</a>
+                        <a class="nav-link " href="{{ route('order_history') }}">Orders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('about') }}">About</a>
+                        <a class="nav-link " href="{{ route('about') }}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('contact') }}">Contact</a>
+                        <a class="nav-link " href="{{ route('contact') }}">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('faqs') }}">FAQ</a>
+                        <a class="nav-link " href="{{ route('faqs') }}">FAQ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-hover" href="{{ route('terms') }}">Terms</a>
+                        <a class="nav-link " href="{{ route('terms') }}">Terms</a>
                     </li>
                 </ul>
             </div>
-            @auth
+            <div class="row">
                 <div class="navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto"></ul>
                     <div class="d-flex gap-5 align-items-center">
                         <div class="btn-group btn-group-sm me-2" role="group"
                             aria-label="Button group with nested dropdown">
-                            <button type="button"
-                                class="btn btn-sm btn-dark font-weight-bolder">₱{{ $cartTotal . '.00' }}</button>
-                            <div class="dropdown dropdowns position-static btn-group" role="group">
-                                <a href="{{ route('cart') }}"
-                                    class="btn btn-sm btn-outline-primary position-relative dropdown-toggle"
+                            <button type="button" class="btn btn-sm btn-dark font-weight-bolder">₱<span
+                                    id="cartTotal">{{ $cartTotal }}</span>.00</button>
+                            <div class=" position-static btn-group" role="group">
+                                <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary position-relative"
                                     id="hoverDropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa-solid fa-cart-shopping me-2"></i> Cart
                                     <span
                                         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        {{ $cartCount }}
+                                        <span id="cartCount">{{ $cartCount }}</span>
                                         <span class="visually-hidden">your shopping cart</span>
                                     </span>
                                 </a>
-                                <div class="dropdown-menu dropdown-menu-end" style="width: 300px"
-                                    aria-labelledby="cartDropdown">
-                                    @if ($carts->count() != 0)
-                                        <div class="row p-2">
-                                            <div class="col-md-12">
-                                                @foreach ($carts as $item)
-                                                    <div class="row align-items-center mb-3">
-                                                        <div class="col-3">
-                                                            <img src="{{ asset($item->product->img) }}" class="img-fluid"
-                                                                alt="Item picture">
-                                                        </div>
-                                                        <div class="col">
-                                                            <p class="font-weight-normal mb-0">
-                                                                {{ $item->product->name }}
-                                                                <span class="text-secondary">
-                                                                    {{ ' | ' . $item->product->variant }}
-                                                                </span>
-                                                            </p>
-                                                            <div class="row">
-                                                                <div class="col">
-                                                                    <p class="text-secondary fw-light mb-0">
-                                                                        ₱{{ $item->price . '.00' }}
-                                                                    </p>
-                                                                </div>
-                                                                <div class="col">
-                                                                    <p class="text-secondary fw-light mb-0">
-                                                                        Quantity: {{ $item->quantity }}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="border-top mt-0 mb-1"></div>
-                                                            <p class="font-weight-bold">
-                                                                Total: ₱{{ $item->price * $item->quantity . '.00' }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                                <div class="d-grid ">
-                                                    <a href="{{ route('checkout') }}"
-                                                        class="btn btn-sm btn-primary">Checkout</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <img src="{{ asset('images/empty_cart.png') }}" class="img-fluid"
-                                            alt="empty cart">
-                                        <h5 class="text-center">Empty Cart</h5>
-                                    @endif
-                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('profile') }}" class=" btn  btn-dark">
-                            <i class="fa-solid fa-user-gear"></i>
-                        </a>
+                        @auth
+                            <a href="{{ route('profile') }}" class=" btn btn-sm btn-dark">
+                                <span>{{ auth()->user()->first_name }}</span> <i class="fa-solid fa-user-gear"></i>
+                            </a>
+                        @else
+                            <div class="col btn-group">
+                                <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark me-3">Register</a>
+                                <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
+                            </div>
+                        @endauth
                     </div>
                 </div>
-            @else
-                <div class="btn-group">
-                    <a href="{{ route('register') }}" class="me-2 btn btn-outline-dark">Register</a>
-                    <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                </div>
+            </div>
 
-            @endauth
         </div>
+
     </nav>
     <!-- Navigation -->
 
-    <main id="main-content" class="py-3 px-5">
+    <main id="" class="py-3 px-5">
         @yield('content')
     </main>
 
@@ -339,21 +289,44 @@
     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script> --}}
     <script src="{{ asset('js/app.js') }}" defer></script>
-    <script src="{{ asset('js/index.js') }}"></script>
-    <script src="{{ asset('js/load_address.js') }}"></script>
-    {{-- <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script> --}}
+    {{-- <script src="{{ asset('js/index.js') }}"></script>  --}}
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             $('#loading-animation-id').hide();
             var navbarHeight = document.querySelector('.navbar').offsetHeight;
-            var mainContent = document.getElementById('main-content');
-            mainContent.style.marginTop = navbarHeight + 'px';
+            // var mainContent = document.getElementById('main-content');
+            // mainContent.style.marginTop = navbarHeight + 'px';
+        });
+        $(document).ready(function() {
+            let logoutTimer;
+
+            function resetLogoutTimer() {
+                clearTimeout(logoutTimer);
+
+                // Set the timeout to 30 minutes (1800000 milliseconds)
+                logoutTimer = setTimeout(function() {
+                    // Call the logout function or redirect to logout URL
+                    // For example, assuming you have a logout route in Laravel:
+                    window.location.href = '{{ route('logout') }}';
+                }, 1800000); // 30 minutes
+            };
+
+            function initLogoutTimer() {
+                // Add event listeners to detect user activity
+                $(document).on('mousemove keydown', resetLogoutTimer);
+
+                // Start the timer immediately on page load
+                resetLogoutTimer();
+            };
+
+            // Call the initLogoutTimer function when the page is loaded
+            $(document).ready(initLogoutTimer);
+
+
+
         });
     </script>
 </body>
