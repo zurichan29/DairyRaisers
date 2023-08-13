@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Sales;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Response;
 
 class SalesReportController extends Controller
 {
@@ -45,6 +46,39 @@ class SalesReportController extends Controller
         return view('admin.sales_report.index', compact('years', 'currentYear', 'labels', 'earningData'));
     }
 
+    public function printDailySales()
+    {
+        $currentYear = Carbon::now()->year;
+        $years = range($currentYear, $currentYear - 9);
+
+        $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+
+        $salesData = Sales::select(
+            DB::raw('MONTH(created_at) as month'),
+            'category',
+            DB::raw('SUM(amount) as total_earnings')
+        )
+            ->groupBy('month', 'category')
+            ->orderBy('month')
+            ->get();
+
+        $labels = $months->toArray();
+        $earningData = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $monthData = $salesData->filter(function ($value) use ($i) {
+                return $value->month === ($i + 1);
+            });
+
+            $productsEarnings = $monthData->where('category', 'Products')->sum('total_earnings');
+            $buffaloEarnings = $monthData->where('category', 'Buffalo')->sum('total_earnings');
+
+            $earningData[] = [$productsEarnings, $buffaloEarnings];
+        }
+
+        return view('admin.sales_report.print', compact('years', 'currentYear', 'labels', 'earningData'));
+    }
+    
     public function updateYear(Request $request)
     {
         $selectedYear = $request->input('year');
@@ -106,4 +140,26 @@ class SalesReportController extends Controller
 
         return response()->json($salesData);
     }
+    
+
+    public function downloadChart(Request $request)
+    {
+        // Assuming you have received the chart image data from the client side
+        $base64ImageData = $request->input('chartImageData');
+
+        // Decode the base64 image data
+        $imageData = base64_decode($base64ImageData);
+
+        // Set the appropriate headers for image download
+        $headers = [
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="monthly-sales-chart.png"',
+            'Content-Length' => strlen($imageData),
+        ];
+
+        // Return the image as a downloadable response
+        return Response::make($imageData, 200, $headers);
+    }
+
+
 }

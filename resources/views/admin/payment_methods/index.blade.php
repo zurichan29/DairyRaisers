@@ -468,7 +468,7 @@
                         success: function(response) {
                             // Show success notification
                             showNotification('success', 'Payment Method Added', response.type +
-                                ' successfully addded.');
+                                'payment successfully addded.');
 
                             // Clear input fields
                             form.reset();

@@ -161,7 +161,7 @@
                                 </form>
                             </div>
                             <div class="col-md-4 d-flex justify-content-end align-items-center">
-                                <button type="button" class="btn btn-sm btn-outline-primary">
+                                <button id="downloadButton" type="button" class="btn btn-sm btn-outline-primary">
                                     <i class="fa-solid fa-print"></i> Download
                                 </button>
                             </div>
@@ -291,6 +291,10 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -469,6 +473,22 @@
             initProductStocksChart(productStocksLabels, stocksData);
             initBuffaloChart();
             initMonthlySalesChart(@json($monthlySalesLabel), @json($earningData));
+
+             //Download Chart
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("downloadButton").addEventListener("click", function () {
+                    // Get the chart image data from the canvas
+                    var chartImageData = document.getElementById("monthlySalesChart").toDataURL("application/octet-stream");
+            
+                    // Log the chart image data to the console for debugging
+                    console.log(chartImageData);
+
+                    // Redirect the user to the chart download route with the image data
+                    window.location.href = "{{ route('admin.dashboard.download-chart') }}" + "?chartImageData=" + encodeURIComponent(chartImageData);
+
+                    
+                });
+            });
 
         });
     </script>

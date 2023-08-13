@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Variants;
 use App\Models\User;
 use App\Models\Admin;
-use App\Models\Buffalo;
 use App\Models\Order;
 use App\Models\Sales;
+use App\Models\Buffalo;
+use App\Models\Product;
+use App\Models\Variants;
 use App\Models\ActivityLog;
+use Illuminate\Http\Request;
 use App\Models\PaymentMethod;
 
-use Illuminate\Http\Request;
-use App\Events\OrderNotification;
 use Illuminate\Support\Carbon;
+use App\Events\OrderNotification;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Response;
 
 class DashboardController extends Controller
 {
@@ -97,5 +98,21 @@ class DashboardController extends Controller
         event(new OrderNotification($order));
 
         return redirect()->route('admin.dashboard');
+    }
+
+    public function downloadChart(Request $request)
+    {
+        // Assuming you have received the chart image data from the client side
+        $base64ImageData = $request->input('chartImageData');
+    
+        // Set the appropriate headers for image download
+        $headers = [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'attachment; filename="chart.png"',
+            'Content-Length' => strlen(base64_decode($base64ImageData)),        
+        ];
+    
+        // Return the image as a downloadable response
+        return Response::make(base64_decode($base64ImageData), 200, $headers);
     }
 }

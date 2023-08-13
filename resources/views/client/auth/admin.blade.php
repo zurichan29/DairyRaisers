@@ -21,7 +21,7 @@
                                     <img src="/images/bg-login.png">
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="p-5">
+                                    <div style="padding-left: 25px; padding-right: 25px; padding-top: 20px;">
                                         <div class="text-center">
                                             <img src="{{ asset('images/company-logo.png') }}" class="img-fluid"
                                                 style="width: 70px;" alt="company logo">

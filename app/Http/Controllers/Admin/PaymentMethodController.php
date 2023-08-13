@@ -50,7 +50,7 @@ class PaymentMethodController extends Controller
             // Save the PaymentMethod to the database
             $paymentMethod->save();
 
-            $this->logActivity(auth()->guard('admin')->user()->name . ' has added a payment method: ' . $paymentMethod->type, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has created a new payment method: ' . $paymentMethod->type . ' .', $request);
 
             // Return a response or redirect as needed
             return response()->json([
@@ -83,7 +83,7 @@ class PaymentMethodController extends Controller
             ($paymentMethod->status == 'ACTIVATED') ? $status = 'DEACTIVATED' : $status = 'ACTIVATED';
             $paymentMethod->status = $status;
             $paymentMethod->save();
-            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $paymentMethod->type . ' to ' . $paymentMethod->status, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $paymentMethod->type . ' to ' . $paymentMethod->status . '.', $request);
 
             return response(['message' => 'success', 'id' => $id, 'status' => $status, 'type' => $paymentMethod->type]);
         }
