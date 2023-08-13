@@ -72,7 +72,7 @@ class ProductController extends Controller
             $product->status = $newStatus;
             $product->save();
 
-            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated the status of ' . $product->name . ' to ' . $product->status, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of ' . $product->name . ' to ' . $product->status . '.', $request);
 
             return response()->json($product);
         }
@@ -99,7 +99,7 @@ class ProductController extends Controller
             $product->save();
             $newStock = ($product->stocks >= 0) ? $product->stocks . ' stocks' : $product->stocks . 'stock';
 
-            $this->logActivity('Administrator has added ' . $newStock . ' to  ' . $product->name, $request);
+            $this->logActivity('Administrator added ' . $newStock . ' to ' . $product->name . '.', $request);
 
             return response()->json($product);
         }
@@ -143,7 +143,7 @@ class ProductController extends Controller
                 'price' => $product->price,
                 'variant' => $product->variant->name,
             ];
-            $this->logActivity(auth()->guard('admin')->user()->name . ' added a new product: ' . $product->name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' added a new product: ' . $product->name . '.' , $request);
 
             return response()->json($data);
         }
@@ -194,11 +194,23 @@ class ProductController extends Controller
                 'img' => $request->file('img'),
             ];
 
-            $this->logActivity(auth()->guard('admin')->user()->name . ' has updated a product: ' . $product->name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' performed an update to a product: ' . $product->name, $request);
 
             return response()->json($data);
         }
     }
+
+
+    /** --------------FUNCTIONS STARTS FORM HERE!--------------------------------------------------------- */
+
+
+
+
+
+
+
+
+
 
 
 

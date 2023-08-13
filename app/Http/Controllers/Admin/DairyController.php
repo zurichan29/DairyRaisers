@@ -66,10 +66,10 @@ class DairyController extends Controller
         $adult_female->quantity = $data['female_adult'];
         $adult_female->save();
 
-        $this->logActivity(auth()->guard('admin')->user()->name . ' update the buffalo.', $request);
+        $this->logActivity(auth()->guard('admin')->user()->name . ' performed an update on the buffalo.', $request);
 
         return response()->json([
-            'success' => 'Buffalo updated successfully ',
+            'info' => 'Buffalo updated successfully.',
             'counts' => $this->buffalo_count(),
         ]);
     }
@@ -161,10 +161,10 @@ class DairyController extends Controller
 
         $buffaloSale->save();
 
-        $this->logActivity(auth()->guard('admin')->user()->name . ' sell a buffalo: ' . $totalQuantitySold . ' Buffalo(s) sold to ' . $data['buyer_name'] . '.', $request);
+        $this->logActivity(auth()->guard('admin')->user()->name . ' performed a transaction to ' . $data['buyer_name'] . ' : ' . $totalQuantitySold . ' Buffalo(s) sold.' , $request);
 
         return response()->json([
-            'success' => "{$totalQuantitySold} Buffalo(s) sold to {$data['buyer_name']}",
+            'success' => "{$totalQuantitySold} Buffalo(s) sold to {$data['buyer_name']}.",
             'counts' => $this->buffalo_count(),
         ]);
     }

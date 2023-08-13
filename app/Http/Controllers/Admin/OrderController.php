@@ -104,7 +104,7 @@ class OrderController extends Controller
             $customer->remarks = ($request->remarks) ? $request->remarks : null;
             $customer->save();
 
-            $this->logActivity(auth()->guard('admin')->user()->name . ' has created a retailer customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' has created the following retailer customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
 
             return response()->json($customer);
         } else {
@@ -184,7 +184,7 @@ class OrderController extends Controller
             $customer->remarks = ($request->remarks) ? $request->remarks : null;
             $customer->save();
 
-            $this->logActivity('Administrator has updated a wholesale customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
+            $this->logActivity('Administrator has made the following changes to a wholesale customer: ' . $customer->first_name . ' ' . $customer->last_name, $request);
 
             return response()->json($customer);
         } else {

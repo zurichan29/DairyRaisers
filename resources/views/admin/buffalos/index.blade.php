@@ -550,7 +550,8 @@
                         type: "POST",
                         data: formObject,
                         success: function(response) {
-                            showNotification('success', 'Buffalo Update', response.success);
+                            showNotification('info', 'Buffalo Update', response.info);
+                            showNotification('infos', 'Buffalo Update', response.infos);
 
                             $('#babyMaleCount').text(response.counts.baby_male);
                             $('#babyFemaleCount').text(response.counts.baby_female);

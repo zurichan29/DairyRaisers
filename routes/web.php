@@ -4,30 +4,32 @@ use App\Models\Buffalo;
 use App\Events\OrderNotification;
 
 // ADMIN
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarGraphController;
 use App\Http\Controllers\Admin\DairyController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\VariantController;
-use App\Http\Controllers\Admin\OrderController as OrderManagement;
-use App\Http\Controllers\Admin\ActivityLogsController;
-use App\Http\Controllers\Admin\SalesReportController;
-use App\Http\Controllers\Admin\MilkStockController;
 use App\Http\Controllers\Admin\StaffController;
-use App\Http\Controllers\Admin\ProfileController;
-
-// CLIENT
-use App\Http\Controllers\Client\ClientController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Client\CheckoutController;
-use App\Http\Controllers\Client\RegisterController;
-use App\Http\Controllers\Admin\ProductStockController;
-use App\Http\Controllers\Admin\PaymentMethodController;
-use App\Http\Controllers\Client\OrderController as ClientOrder;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\ShopController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\CsvExportController;
+
+// CLIENT
+use App\Http\Controllers\Admin\VariantController;
+use App\Http\Controllers\Client\ClientController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MilkStockController;
+use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\RegisterController;
+use App\Http\Controllers\Admin\SalesReportController;
+use App\Http\Controllers\Admin\ActivityLogsController;
+use App\Http\Controllers\Admin\ProductStockController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Client\OrderController as ClientOrder;
+use App\Http\Controllers\Admin\OrderController as OrderManagement;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +131,7 @@ Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name(
 Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin/dashboard/download-chart', [DashboardController::class,'downloadChart'])->name('admin.dashboard.download-chart');
 
 // STAFF
 Route::group(['middleware' => 'check.access:staff_management'], function () {
@@ -210,6 +213,9 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
     Route::get('/admin/sales_reports/daily_sales/print/', [SalesReportController::class, 'printDailySales'])->name('admin.sales_report.print');
+    Route::get('/admin/sales_reports/daily_sales/download-csv', [CsvExportController::class, 'downloadCsv'])->name('admin.sales_reports.download-csv');
+    Route::get('/admin/sales_reports/daily_sales/download-chart', [SalesReportController::class,'downloadChart'])->name('admin.sales_reports.download-chart');
+    Route::get('/admin/sales_reports/daily_sales/download-excel', [CsvExportController::class, 'downloadExcel'])->name('admin.sales_reports.download-excel');
 });
 
 // PROFILE

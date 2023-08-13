@@ -26,7 +26,7 @@
                         </form>
                     </div>
                     <div class="col-md-4 d-flex justify-content-end align-items-center">
-                        <button type="button" class="btn btn-sm btn-outline-primary">
+                        <button id="downloadButton" type="button" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-print"></i> Download
                         </button>
                     </div>
@@ -63,15 +63,15 @@
                         <button type="button" id="copy" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-copy"></i> Copy
                         </button>
-                        <button type="button" id="csv" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="csv" onclick="export_data()" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-file-csv"></i> CSV
                         </button>
-                        <button type="button" id="excel" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="export" onclick="export_data()" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-regular fa-file-excel"></i> Excel
                         </button>
-                        <button type="button" id="print" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.sales_report.print') }}" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-print"></i> Print
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -107,6 +107,14 @@
         <div id="printContainer" style="display: none;"></div>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+        <!-- Include Clipboard.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
         <script>
             $(document).ready(function() {
@@ -384,21 +392,118 @@
                 var earningData = @json($earningData);
                 console.log(earningData);
                 initializeChart(labels, earningData);
-            });
-            
-            document.getElementById("print").addEventListener("click", function () {
-            var table = document.getElementById("dataTable");
-            if (table) {
-                var newWin = window.open('', '_blank');
-                newWin.document.open();
-                newWin.document.write('<html><body>');
-                newWin.document.write('<table border="1">' + table.innerHTML + '</table>');
-                newWin.document.write('</body></html>');
-                newWin.document.close();
-                newWin.print();
-            }
-        });
 
-        </script>
+                
+                // Initialize Clipboard.js
+
+                new ClipboardJS('#copy', {
+                    text: function (trigger) {
+                        // Find the datatable
+                        var dataTable = $('#dataTable');
+
+                        // Extract and format the datatable data
+                        var dataTableData = [];
+
+                        // Include the table header
+                        var headerRow = [];
+                        dataTable.find('thead th').each(function () {
+                            headerRow.push($(this).text());
+                        });
+                        dataTableData.push(headerRow.join('\t'));
+
+                        // Include the data rows
+                        dataTable.find('tbody tr').each(function () {
+                            var row = [];
+                            $(this).find('td').each(function () {
+                                row.push($(this).text());
+                            });
+                            dataTableData.push(row.join('\t')); // Use tab delimiter for columns
+                        });
+
+                        // Include the footer row
+                        var footerRow = [];
+                        dataTable.find('tfoot th').each(function () {
+                            footerRow.push($(this).text());
+                        });
+                        dataTableData.push(footerRow.join('\t'));
+
+                        return dataTableData.join('\n'); // Use newline delimiter for rows
+                    }
+                });
+
+                // Handle button click event
+                $('#copy').click(function () {
+                    alert('Data copied to clipboard!');
+                });
+
+            });
+
+            //Download CSV
+            function export_data() {
+                window.location.href = "{{ route('admin.sales_reports.download-csv') }}";
+            };
+
+            
+            //Download Chart
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("downloadButton").addEventListener("click", function () {
+                    // Get the chart image data from the canvas
+                    var chartImageData = document.getElementById("myBarChart").toDataURL("image/png");
+        
+                    // Redirect the user to the chart download route with the image data
+                    window.location.href = "{{ route('admin.sales_reports.download-chart') }}" + "?chartImageData=" + encodeURIComponent(chartImageData);
+                });
+            });
+
+            //Export Excel
+            function export_data() {
+                let table = document.getElementById("dataTable");
+                let headerRow = table.getElementsByTagName("thead")[0].getElementsByTagName("tr")[0];
+                let footerRow = table.getElementsByTagName("tfoot")[0].getElementsByTagName("tr")[0];
+                let dataRows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+                
+                let data = [];
+
+                // Include the header row
+                let headerData = [];
+                for (let j = 0; j < headerRow.cells.length; j++) {
+                    headerData.push(headerRow.cells[j].innerText);
+                }
+                data.push(headerData.join("\t"));
+
+                // Include the data rows
+                for (let i = 0; i < dataRows.length; i++) {
+                    let row = dataRows[i];
+                    let rowData = [];
+
+                    for (let j = 0; j < row.cells.length; j++) {
+                        rowData.push(row.cells[j].innerText);
+                    }
+
+                    data.push(rowData.join("\t"));
+                }
+
+                // Include the footer row
+                let footerData = [];
+                for (let j = 0; j < footerRow.cells.length; j++) {
+                    footerData.push(footerRow.cells[j].innerText);
+                }
+                data.push(footerData.join("\t"));
+
+                let excelData = data.join("\n");
+                let blob = new Blob([excelData], { type: "application/vnd.ms-excel" });
+                let url = URL.createObjectURL(blob);
+
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "Daily-Sales.xls";
+                a.click();
+
+                URL.revokeObjectURL(url);
+            };
+
+
+
+        </script>  
     @endif
 @endsection
