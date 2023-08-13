@@ -1,9 +1,9 @@
 @extends('layouts.client')
 @section('content')
-    <div class="text-center text-dark fw-bolder mb-3">
+    <div class="text-center text-dark fw-bolder mt-3">
         <p class="fs-2">SELECT YOUR LOCATION</p>
     </div>
-    <form method="POST" action="{{ route('location.confirm', ['backRoute' => Route::currentRouteName()]) }}" class="container mb-3">
+    <form method="POST" action="{{ route('location.confirm', ['backRoute' => Route::currentRouteName()]) }}" class="container py-5 mb-5">
         @error('address')
             <div class="alert alert-danger">{{ $message }}</div>
         @enderror

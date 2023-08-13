@@ -65,7 +65,15 @@ class CheckoutController extends Controller
             foreach ($cartItems as $item) {
                 $grandTotal += $item['total'];
             }
-            // dd($cartItems);
+        }
+
+        if (empty($cartItems)) {
+            return redirect()->back()->with('message', [
+                'type' => 'error',
+                'title' => 'Error',
+                'body' => 'Please select atleast 1 product.',
+                'period' => false,
+            ]);
         }
 
         $paymentMethod = PaymentMethod::all();
@@ -197,10 +205,8 @@ class CheckoutController extends Controller
         $user = Auth::user();
         $defaultAddressId = $request->input('default_address_id');
 
-        // Update the default flag for user addresses
         User_Address::where('user_id', $user->id)->update(['default' => false]);
 
-        // Set the selected address as the default
         $address = User_Address::where('user_id', $user->id)->findOrFail($defaultAddressId);
         $address->default = true;
         $address->save();
@@ -275,7 +281,12 @@ class CheckoutController extends Controller
             $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
 
             if (!$user->cart) {
-                return redirect()->route('index');
+                return redirect()->route('index')->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Please select atleast 1 product.',
+                    'period' => false,
+                ]);
             }
 
             $cart = $user->cart;
@@ -372,6 +383,15 @@ class CheckoutController extends Controller
             ]);
 
             $orderData = session('order_data', []);
+
+            if (empty($orderData)) {
+                return redirect()->back()->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Please select atleast 1 product.',
+                    'period' => false,
+                ]);
+            }
             $guestAddress = session('guest_address');
             $grandTotal = 0;
             foreach ($orderData as $item) {
@@ -404,6 +424,11 @@ class CheckoutController extends Controller
 
             event(new OrderNotification($order));
         }
-        return redirect()->route('order_history')->with('message', 'You have placed your order');
+        return redirect()->route('order_history')->with('message', [
+            'type' => 'success',
+            'title' => 'Order Placed',
+            'body' => 'Your order has been successfully placed. Thank you for shopping with us!',
+            'period' => false,
+        ]);
     }
 }

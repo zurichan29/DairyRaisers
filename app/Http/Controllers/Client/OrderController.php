@@ -29,20 +29,26 @@ class OrderController extends Controller
     //
     public function index(Request $request)
     {
+        $firstData = null;
         if (auth()->check()) {
             $orders = Order::with('customer')
                 ->where('customer_type', 'online_shopper')
                 ->where('customer_id', auth()->user()->id)
                 ->orderByDesc('created_at')
                 ->get();
-            $firstData = $orders[0]->items[0];
+            if ($orders->isNotEmpty()) {
+                $firstData = $orders[0]->items[0];
+            }
         } else {
             $ip_address = $request->ip();
+
             $orders = Order::where('customer_type', 'guest')
                 ->where('ip_address', $ip_address)
                 ->orderByDesc('created_at')
                 ->get();
-            $firstData = $orders[0]->items[0];
+            if ($orders->isNotEmpty()) {
+                $firstData = $orders[0]->items[0];
+            }
         }
         return view('client.order.index', compact('orders', 'firstData'));
     }

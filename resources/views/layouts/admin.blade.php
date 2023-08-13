@@ -88,6 +88,14 @@
         });
     </script>
 
+    @if (session()->has('message'))
+        <script>
+            $(document).ready(function() {
+                showNotification("{{ session('message')['type'] }}", "{{ session('message')['title'] }}", "{{ session('message')['body'] }}");
+            });
+        </script>
+    @endif
+
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
     <title>Admin | Dairy Raisers</title>
 </head>

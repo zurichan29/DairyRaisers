@@ -48,7 +48,12 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->new_password);
             $user->save();
             $this->logActivity(auth()->guard('admin')->user()->name . ' update the password', $request);
-            return redirect()->route('admin.profile.index');
+            return redirect()->route('admin.profile.index')->with('message', [
+                'type' => 'info',
+                'body' => 'Your password has been successfully changed. Please keep your new password secure.',
+                'title' => 'Password Change Successful',
+            ]);
+
         } else {
             return redirect()->route('login.administrator');
         }
@@ -76,7 +81,6 @@ class ProfileController extends Controller
 
         $this->logActivity(auth()->guard('admin')->user()->name . ' update the avatar', $request);
 
-        // Redirect back with a success message
         return redirect()->back()->with('success', 'Avatar updated successfully.');
     }
 

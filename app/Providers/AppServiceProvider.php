@@ -32,16 +32,13 @@ class AppServiceProvider extends ServiceProvider
         //Model::unguard();
 
         View::composer('layouts.client', function ($view) {
+            $user = null;
             if (auth()->check()) {
                 $user = User::with('cart.product')->where('id', auth()->user()->id)->first();
                 $carts = $user->cart->where('order_number', NULL);
                 $cartTotal = $carts->sum('total');
                 $cartCount = $carts->count();
             } else {
-                // session()->forget('order_data');
-                // session()->forget('guest_address');
-              
-
                 $dataArray = session()->has('order_data') ? session('order_data') : [];
 
                 $cartTotal = 0;
@@ -54,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
                 
             }
 
-            $view->with(compact('carts', 'cartTotal', 'cartCount'));
+            $view->with(compact('carts', 'cartTotal', 'cartCount', 'user'));
         });
     }
 }

@@ -1,74 +1,54 @@
 @extends('layouts.client')
 @section('content')
-    <section class="container">
-        <div class="wrapper">
-            <img src="{{ asset('images/Baka.png') }}" class="logo" alt="">
-        </div>
-        <div class="text-center mt-4">
-            Login
-        </div>
-        <p class="have text-center mt-2"> Don't have an account?
-            <a href="{{ route('register') }}" class="text-[#8b6a3e]"> Register</a>
-        </p>
+    <form class="container py-5" method="POST" action="{{ route('authenticate') }}">
+        @csrf
 
-        <form class="p-3 mt-3" method="POST" action="{{ route('authenticate') }}">
-            @error('not_valid')
-                <p class="text-danger">{{ $message }}</p>
-            @enderror
-            @csrf
-            <div class="">
-                <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" name="email" id="email" required>
-                @error('email')
-                    <p class="text-danger">{{ $message }}</p>
-                @enderror
-            </div>
-            <div class="">
-                <label for="password" class="form-label">Password:</label>
-                <input type="password" class="form-control" name="password" id="password" required>
-                @error('password')
-                    <p class="text-danger">{{ $message }}</p>
-                @enderror
-            </div>
-            {{-- <label for="user_field" class="label">
-                    Enter Your Mobile Number
-                </label>
-                <div>
-                    <span>+63 </span><input type="string" id="user_field" name="user_field" 
-                    value="{{ old('user_field') }}" class="box" style="width: 14rem; border: none; outline: none; background: none;
-                        font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 20px; border-radius: 10px;
-                        box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;">
+        <div class="row">
+            <div class="col">
+                <div class="card d-flex flex-fill h-100 shadow">
+                    <div class="card-body">
+                        @error('not_valid')
+                            <p class="text-danger">{{ $message }}</p>
+                        @enderror
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email"
+                                value="{{ old('name') }}" placeholder="name@example.com">
+                            <label for="email">Email *</label>
+                            @error('email')
+                                <p class="text-danger">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password" value="{{ old('password') }}">
+                            <label for="password">Password *</label>
+                            @error('password')
+                                <p class="text-danger">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <input type="checkbox" name="remember" id="remember">
+                            <label for="remember">Remember Me</label>
+                        </div>
+                        <div class="d-grid d-flex justify-content-between align-items-stretch">
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i>
+                                Login</button>
+                            <a href="{{ route('reset_password') }}" class="btn btn-outline-primary"><i
+                                    class="fa-solid fa-arrows-rotate"></i> Reset Password</a>
+                        </div>
+                    </div>
                 </div>
-                @error('user_field')
-                    <p class="text-red-500 text-xs mt-2 w-[18rem] absolute items-center justify-center text-center">
-                         <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i> {{ $message }}</p>
-                @enderror
-
-                <label for="password"
-                    class="label mt-4">Password</label>
-                <div>
-                    <input type="password" class="box" name="password" value="{{ old('password') }}" style="width: 16rem; border: none;
-                    outline: none; background: none; font-size:1rem; color: #666; padding: 10px 15px 10px 10px; margin-bottom: 15px;
-                    border-radius: 10px; box-shadow: inset 5px 5px 5px #cbced1, inset -5px -5px 5px #fff;"/>
+            </div>
+            <div class="col">
+                <div class="card d-flex flex-fill h-100 bg-primary text-white">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center h-100">
+                        <p class="fs-3">LOGIN YOUR ACCOUNT</p>
+                        <p>Don't have an account yet? <a href="{{ URL::secure(route('register')) }}"
+                                class="link-underline-light text-white fw-bolder"><u>SIGNUP</u></a> here.</p>
+                    </div>
                 </div>
-                @error('password')
-                    <p class="text-red-500 text-xs mt-2 flex items-center justify-center text-center">
-                         <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i> {{ $message }}</p>
-                @enderror --}}
-
-            <div>
-                <input type="checkbox" name="remember" id="remember">
-                <label for="remember">Remember Me</label>
             </div>
-
-            <input type="submit" value="Login" class="btn btn-primary mt-3" name="submit"
-                style=" width: 100%; height: 40px;
-                    border-radius: 10px; box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff; letter-spacing: 1.2px;">
-
-            <div class="text-center mt-2">
-                <a href="{{ URL::secure(route('reset_password')) }}">Forgot your password?</a>
-            </div>
-        </form>
         </div>
-    </section>
+    </form>
 @endsection

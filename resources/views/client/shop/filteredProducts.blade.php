@@ -2,15 +2,15 @@
     <div class="row d-flex flex-pill h-100">
         @foreach ($products as $product)
             <div class="col-md-3 mb-3">
-                {{-- <form method="GET" action="{{ URL::secure(route('product.view', ['id' => $product->id])) }}"> --}}
-                <div class="card shadow">
+                <div class="card shadow d-flex flex-pill h-100">
                     <div class="card-header px-2 d-flex justify-content-between align-items-center">
                         <h6 class="text-primary text-start">{{ $product->name }}</h6>
                         <h6 class="text-primary">₱{{ $product->price . '.00' }}</h6>
                     </div>
-                    <div class="card-body">
-                        <img src="{{ asset($product->img) }}" class="img-fluid" alt="product picture">
-                        <div class="d-grid">
+                    <div class="card-body d-flex justify-content-between align-items-center flex-column">
+                        <img src="{{ asset($product->img) }}" class="img-fluid" style="height: 220px"
+                            alt="product picture">
+                        <div class="d-grid mt-3">
                             <button type="submit" class="btn btn-primary add-to-cart-button"
                                 data-product-id="{{ $product->id }}">
                                 <span class="loading-spinner" style="display: none;">
@@ -23,7 +23,6 @@
                         </div>
                     </div>
                 </div>
-                {{-- </form> --}}
             </div>
         @endforeach
     </div>

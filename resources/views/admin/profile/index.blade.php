@@ -1,20 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-    <form action="{{ route('admin.profile.update-avatar') }}" class="mb-3" method="POST" enctype="multipart/form-data">
-        @csrf
-        <img class=" rounded-circle" style="width: 50px" src="{{ Storage::url($profile->img) }}">
-        <div class="mb-3">
-            <label for="formFile" class="form-label">Change Avatar</label>
-            <input class="form-control" type="file" name="avatar" id="formFile">
-        </div>
-        @error('avatar')
-            <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-        <button type="submit" class="btn btn-primary">Update Avatar</button>
-    </form>
-
-    <form action="{{ route('admin.profile.update-password') }}" method="POST">
+{{-- action="{{ route('admin.profile.update-password') }}" method="POST" --}}
+    <form id="adminProfileForm" class="container" >
         @csrf
         <div class="form-floating mb-3">
             <input type="text" class="form-control" name="name" id="name" placeholder="Name"
@@ -51,35 +39,39 @@
         </div>
 
         <div class="form-floating mb-3">
-            <label for="current_password">{{ __('Current Password') }}</label>
             <input id="current_password" type="password" class="form-control" name="current_password"
-                placeholder="Current Password" required>
+            placeholder="Current Password" required>
+            <label for="current_password">{{ __('Current Password') }}</label>
             @error('current_password')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="form-floating mb-3">
-            <label for="new_password">{{ __('New Password') }}</label>
             <input id="new_password" type="password" class="form-control" name="new_password" placeholder="New Password"
-                required>
+            required>
+            <label for="new_password">{{ __('New Password') }}</label>
             @error('new_password')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="form-floating mb-3">
-            <label for="new_password_confirmation">{{ __('Confirm New Password') }}</label>
             <input id="new_password_confirmation" type="password" class="form-control" name="new_password_confirmation"
-                placeholder="New Password Confirmation" required>
+            placeholder="New Password Confirmation" required>
+            <label for="new_password_confirmation">{{ __('Confirm New Password') }}</label>
         </div>
-
+        
         <button type="submit" class="btn btn-primary">Update Password</button>
     </form>
 
     <script>
         $(document).ready(function() {
+            $('#adminProfileForm').submit(function(e) {
+                e.preventDefault();
 
+
+            });
         });
     </script>
 @endsection

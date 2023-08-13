@@ -1,158 +1,220 @@
 @extends('layouts.client')
 @section('content')
     <!-- Remove Confirmation Modal -->
-    <div class="modal fade" id="removeConfirmationModal" tabindex="-1" aria-labelledby="removeConfirmationModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
-                    <button type="button" class="close" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to remove the selected address?
+                    Are you sure you want to delete this address?
                 </div>
                 <div class="modal-footer">
-                    <form method="POST" id="removeAddressForm">
-                        @csrf
-                        <input type="hidden" name="address_id" id="remove_address_id">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                        <button type="submit" class="btn btn-danger" id="confirmRemoveButton">Yes</button>
-                    </form>
-
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">
+                        <span class="loading-spinner" style="display: none;">
+                            <span class="spinner-border spinner-border-sm align-middle me-1" aria-hidden="true"></span>
+                            <span role="status">Loading...</span>
+                        </span>
+                        <span class="btn-text"><i class="fa-solid fa-rotate-right"></i>
+                            Delete</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!--Default Confirmation Modal -->
-    <div class="modal fade" id="defaultConfirmationModal" tabindex="-1" aria-labelledby="defaultConfirmationModalLabel"
+
+    <!-- Default Confirmation Modal -->
+    <div class="modal fade" id="confirmDefaultModal" tabindex="-1" aria-labelledby="confirmDefaultModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="confirmDefaultModalLabel">Confirm Default</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to make this address as default?
+                    Are you sure you want to set this address as default?
                 </div>
                 <div class="modal-footer">
-                    <form method="POST" id="defaultAddressForm">
-                        @csrf
-                        <input type="hidden" name="address_id" id="default_address_id">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                        <button type="submit" class="btn btn-danger" id="confirmDefaultButton">Yes</button>
-                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="confirmDefaultBtn">
+                        <span class="loading-spinner" style="display: none;">
+                            <span class="spinner-border spinner-border-sm align-middle me-1" aria-hidden="true"></span>
+                            <span role="status">Loading...</span>
+                        </span>
+                        <span class="btn-text"><i class="fa-solid fa-rotate-right"></i>
+                            Yes</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="">
-        <p>ADDRESSES</p>
-    </div>
+    <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('profile') }}">Profile</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Address</li>
+        </ol>
+    </nav>
+    <div class="container mb-5">
+        <div class="d-flex justify-content-start align-items-center mb-4">
+            <a href="{{ route('address.create') }}" class="me-3 btn btn-success"><i class="fa-solid fa-circle-plus"></i>
+                Create Address</a>
+        </div>
 
-    <a href="{{ route('address.create') }}" class="btn btn-primary">Create Address</a>
 
-    <button type="button" id="edit-button" class="btn btn-primary">Edit Address</button>
-    <button type="button" id="remove-button" class="btn btn-danger">Remove Address</button>
-    <button type="button" id="default-button" class="btn btn-info">Set to Default</button>
-
-    <div class="container">
-        <div class="row" id="user-address">
-            @foreach ($addresses as $key => $value)
-                <div class="col">
-                    <div class="card shadow">
-                        <div class="card-header text-center">
-                            <input type="radio" class="btn-check" name="select-address" value="{{ $value->id }}"
-                                id="address-{{ $key + 1 }}" autocomplete="off">
-                            <label class="btn btn-outline-success" for="address-{{ $key + 1 }}">select</label>
-                            <p>Address {{ $key + 1 }}</p>
+        <div class="">
+            <div class="row" id="user-address">
+                @if ($addresses->isNotEmpty())
+                    @foreach ($addresses as $key => $value)
+                        <div class="col">
+                            <div class="card shadow d-flex flex-fill h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center text-center">
+                                    <p class="fw-bold">Address #{{ $key + 1 }}
+                                        @if ($value->default == 1)
+                                            <span class="ms-2 badge rounded-pill bg-danger">
+                                                <span id="cartCount">default</span>
+                                        @endif
+                                    </p>
+                                    <div class="dropdown">
+                                        <button class="btn rounded-3 btn-light" type="button" id="actionsDropdown"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
+                                            <a href="{{ route('address.edit', ['id' => $value->id]) }}"
+                                                class="dropdown-item">
+                                                Edit
+                                            </a>
+                                            <buttton type="button" class="dropdown-item default-button"
+                                                data-address-id="{{ $value->id }}" data-toggle="modal"
+                                                data-target="#confirmDefaultModal">
+                                                Set as default
+                                            </buttton>
+                                            <button type="button" class="dropdown-item remove-button"
+                                                data-address-id="{{ $value->id }}" data-toggle="modal"
+                                                data-target="#confirmDeleteModal">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{ $value->street . ' ' . ucwords(strtolower($value->barangay)) . ', ' . ucwords(strtolower($value->municipality)) . ', ' . ucwords(strtolower($value->province)) . ', ' . $value->zip_code . ' Philippines' }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <p>{{ $value->default }}</p>
-                            <p>{{ $key + 1 }}</p>
-                            <p>{{ $value->region }}</p>
-                            <p>{{ $value->province }}</p>
-                            <p>{{ $value->municipality }}</p>
-                            <p>{{ $value->barangay }}</p>
-                            <p>{{ $value->street }}</p>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
+                    @endforeach
+                @else
+                    <p>You have no address yet. Please create in order to make a purchase.</p>
+                @endif
+            </div>
         </div>
     </div>
+
 
 
     <script>
         $(document).ready(function() {
 
-            $("#edit-button").click(function() {
-                var selectedAddress = $("input[name='select-address']:checked").val();
-                if (selectedAddress) {
-                    var url = "{{ route('address.edit', ['id' => ':id']) }}";
-                    url = url.replace(':id', selectedAddress);
-                    location.href = url;
-                } else {
-                    NotifyUser('error', 'Error', 'No address selected.');
+            var address_id;
+
+            $(document).on('click', '.remove-button', function() {
+                address_id = $(this).data('address-id');
+            });
+
+            $('#confirmDeleteBtn').click(function() {
+                var submitBtn = $(this);
+                var loadingSpinner = submitBtn.find('.loading-spinner');
+                var buttonText = submitBtn.find('.btn-text');
+
+                submitBtn.prop('disabled', true);
+                buttonText.hide();
+                loadingSpinner.show();
+
+                if (address_id) {
+                    $.ajax({
+                        url: "{{ route('address.delete') }}", // Replace with your route
+                        type: "POST",
+                        data: {
+                            address_id: address_id,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            $('#user-address').html(response);
+                            NotifyUser('info', 'Address update',
+                                'User address has been deleted.', false);
+
+
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            var errorResponse = xhr.responseJSON;
+                            console.log(errorResponse);
+
+                            NotifyUser('error', 'Error',
+                                'Something went wrong. Please try again.', false);
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false);
+                            buttonText.show();
+                            loadingSpinner.hide();
+                            $('#confirmDeleteModal .btn-secondary').trigger('click');
+                        }
+                    });
                 }
             });
 
-            $("#remove-button").click(function() {
-                var selectedAddress = $("input[name='select-address']:checked").val();
-                if (selectedAddress) {
-                    $('#removeConfirmationModal').modal('show');
-                } else {
-                    NotifyUser('error', 'Error', 'No address selected.');
-                }
+            $(document).on('click', '.default-button', function() {
+                address_id = $(this).data('address-id');
+                console.log(address_id);
             });
 
-            $("#cancelRemoveButton, #removeConfirmationModal .close").click(function() {
-                $('#removeConfirmationModal').modal('hide');
-            });
+            $('#confirmDefaultBtn').click(function() {
+                var submitBtn = $(this);
+                var loadingSpinner = submitBtn.find('.loading-spinner');
+                var buttonText = submitBtn.find('.btn-text');
 
-            // Handle the removal confirmation
-            $("#confirmRemoveButton").click(function() {
-                var selectedAddress = $("input[name='select-address']:checked").val();
-                if (selectedAddress) {
-                    // Update the form action with the selected address ID
-                    var formAction = "{{ route('address.delete', ['id' => 'ADDRESS_ID']) }}";
-                    formAction = formAction.replace('ADDRESS_ID', selectedAddress);
-                    $("#removeAddressForm").attr("action", formAction);
+                submitBtn.prop('disabled', true);
+                buttonText.hide();
+                loadingSpinner.show();
 
-                    $('#removeAddressForm').submit(); // Submit the form
-                }
-            });
+                if (address_id) {
+                    $.ajax({
+                        url: "{{ route('address.default') }}",
+                        type: "POST",
+                        data: {
+                            address_id: address_id,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            $('#user-address').html(response);
+                            NotifyUser('info', 'Address update',
+                                'Address has been selected as default.', false);
+                            $('#confirmDefaultModal').modal('hide');
+                            console.log($('#confirmDefaultModal'));
 
-            $("#default-button").click(function() {
-                var selectedAddress = $("input[name='select-address']:checked").val();
-                if (selectedAddress) {
-                    $('#defaultConfirmationModal').modal('show');
-                } else {
-                    NotifyUser('error', 'Error', 'No address selected.');
-                }
-            });
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            var errorResponse = xhr.responseJSON;
+                            console.log(errorResponse);
 
-            $("#canceldefaultButton, #defaultConfirmationModal .close").click(function() {
-                $('#defaultConfirmationModal').modal('hide');
-            });
-
-            // Handle the removal confirmation
-            $("#confirmDefaultButton").click(function() {
-                var selectedAddress = $("input[name='select-address']:checked").val();
-                if (selectedAddress) {
-                    // Update the form action with the selected address ID
-                    var formAction = "{{ route('address.default', ['id' => 'ADDRESS_ID']) }}";
-                    formAction = formAction.replace('ADDRESS_ID', selectedAddress);
-                    $("#defaultAddressForm").attr("action", formAction);
-
-                    $('#defaultAddressForm').submit();
+                            NotifyUser('error', 'Error',
+                                'Something went wrong. Please try again.', false);
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false);
+                            buttonText.show();
+                            loadingSpinner.hide();
+                            $('#confirmDefaultModal .btn-secondary').trigger('click');
+                        }
+                    });
                 }
             });
         });

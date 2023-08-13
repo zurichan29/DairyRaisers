@@ -57,10 +57,10 @@
         }
     </script>
     @if (session()->has('message'))
-    {{-- @dd(session('message')) --}}
         <script>
             $(document).ready(function() {
-                NotifyUser("{{ session('message')['type'] }}", "{{ session('message')['title'] }}", "{{ session('message')['body'] }}", {{ session('message')['period'] }});
+                NotifyUser("{{ session('message')['type'] }}", "{{ session('message')['title'] }}",
+                    "{{ session('message')['body'] }}", {{ session('message')['period'] }});
             });
         </script>
     @endif
@@ -114,8 +114,8 @@
         class="navbar navbar-expand-lg navbar-light  bg-light border-bottom shadow d-flex align-items-center justify-content-center flex-column">
         <div class="p-0 m-0 container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <a class="navbar-brand p-0 m-0 fw-bold" href="#"><img src="{{ asset('images/company-logo.png') }}"
-                        class="img-fluid logo" alt="Company Logo">
+                <a class="navbar-brand p-0 m-0 fw-bold" href="#"><img
+                        src="{{ asset('images/company-logo.png') }}" class="img-fluid logo" alt="Company Logo">
                     DAIRY RAISERS</a>
                 <ul class="navbar-nav ms-3">
                     <li class="nav-item">
@@ -162,9 +162,15 @@
                             </div>
                         </div>
                         @auth
-                            <a href="{{ route('profile') }}" class=" btn btn-sm btn-dark">
-                                <span>{{ auth()->user()->first_name }}</span> <i class="fa-solid fa-user-gear"></i>
-                            </a>
+                            <div id="user-name">
+                                @php
+                                    $modifiedName = str_replace(' ', '', $user->first_name);
+                                    $displayedName = strlen($modifiedName) > 9 ? substr($modifiedName, 0, 9) . '...' : $modifiedName;
+                                @endphp
+                                <a href="{{ route('profile') }}" class=" btn btn-sm btn-dark">
+                                    <span>{{ $displayedName }}</span> <i class="fa-solid fa-user-gear"></i>
+                                </a>
+                            </div>
                         @else
                             <div class="col btn-group">
                                 <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark me-3">Register</a>
@@ -282,17 +288,10 @@
         <!-- Copyright -->
     </footer>
     <!-- Footer -->
-
-    <script>
-        var isLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
-    </script>
     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
-    {{-- <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script> --}}
     <script src="{{ asset('js/app.js') }}" defer></script>
-    {{-- <script src="{{ asset('js/index.js') }}"></script>  --}}
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             $('#loading-animation-id').hide();
@@ -300,35 +299,38 @@
             // var mainContent = document.getElementById('main-content');
             // mainContent.style.marginTop = navbarHeight + 'px';
         });
-        $(document).ready(function() {
-            let logoutTimer;
-
-            function resetLogoutTimer() {
-                clearTimeout(logoutTimer);
-
-                // Set the timeout to 30 minutes (1800000 milliseconds)
-                logoutTimer = setTimeout(function() {
-                    // Call the logout function or redirect to logout URL
-                    // For example, assuming you have a logout route in Laravel:
-                    window.location.href = '{{ route('logout') }}';
-                }, 1800000); // 30 minutes
-            };
-
-            function initLogoutTimer() {
-                // Add event listeners to detect user activity
-                $(document).on('mousemove keydown', resetLogoutTimer);
-
-                // Start the timer immediately on page load
-                resetLogoutTimer();
-            };
-
-            // Call the initLogoutTimer function when the page is loaded
-            $(document).ready(initLogoutTimer);
-
-
-
-        });
     </script>
+    @if (auth()->check())
+        <script>
+            $(document).ready(function() {
+                let logoutTimer;
+
+                function resetLogoutTimer() {
+                    clearTimeout(logoutTimer);
+
+                    // Set the timeout to 30 minutes (1800000 milliseconds)
+                    logoutTimer = setTimeout(function() {
+                        // Call the logout function or redirect to logout URL
+                        // For example, assuming you have a logout route in Laravel:
+                        window.location.href = '{{ route('logout') }}';
+                    }, 1800000); // 30 minutes
+                };
+
+                function initLogoutTimer() {
+                    // Add event listeners to detect user activity
+                    $(document).on('mousemove keydown', resetLogoutTimer);
+
+                    // Start the timer immediately on page load
+                    resetLogoutTimer();
+                };
+
+                // Call the initLogoutTimer function when the page is loaded
+                $(document).ready(initLogoutTimer);
+
+            });
+        </script>
+    @endif
+
 </body>
 
 </html>

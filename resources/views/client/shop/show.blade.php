@@ -1,8 +1,6 @@
 @extends('layouts.client')
 @section('content')
-    @if (session('message'))
-        <p>{{ session('message') }}</p>
-    @endif
+
     <div class="row mb-3">
         <div class="col align-items-stretch">
             <div class="card shadow h-100">
@@ -46,19 +44,19 @@
                                 <span class="ml-2">and start ordering!</span>
                             @endif
                         @endauth
-
                     </div>
                     <div>
                         <!-- Empty space for vertical justification -->
                     </div>
                 </div>
                 <div>
-                    <form class="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search">
+                    <form id="searchForm"
+                        class="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
+                            <input id="searchInput" type="text" class="form-control bg-light small"
+                                placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button id="searchButton" class="btn btn-primary" type="button">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
@@ -108,14 +106,14 @@
                         <div class="row d-flex flex-pill h-100">
                             @foreach ($products as $product)
                                 <div class="col-md-3 mb-3">
-                                    <div class="card shadow">
+                                    <div class="card shadow d-flex flex-pill h-100">
                                         <div class="card-header px-2 d-flex justify-content-between align-items-center">
                                             <h6 class="text-primary text-start">{{ $product->name }}</h6>
                                             <h6 class="text-primary">₱{{ $product->price . '.00' }}</h6>
                                         </div>
-                                        <div class="card-body">
-                                            <img src="{{ asset($product->img) }}" class="img-fluid" alt="product picture">
-                                            <div class="d-grid">
+                                        <div class="card-body d-flex justify-content-between align-items-center flex-column">
+                                            <img src="{{ asset($product->img) }}" class="img-fluid" style="height: 220px" alt="product picture">
+                                            <div class="d-grid mt-3">
                                                 <button type="submit" class="btn btn-primary add-to-cart-button"
                                                     data-product-id="{{ $product->id }}">
                                                     <span class="loading-spinner" style="display: none;">
@@ -245,7 +243,24 @@
 
             initAddItem();
 
+            $('#searchButton').click(function() {
+                var searchValue = $('#searchInput').val();
+                searchProducts(searchValue);
+            });
+
+            $('#searchInput').keypress(function(e) {
+                if (e.which === 13) { // Check if the pressed key is "Enter"
+                    e.preventDefault(); // Prevent the default behavior (form submission)
+                    $('#searchButton').trigger('click'); // Trigger the search button click
+                }
+            });
+
             $('input[name="variants[]"], select[name="sort_by"]').on('change', function() {
+                var searchValue = $('#searchInput').val();
+                searchProducts(searchValue);
+            });
+
+            function searchProducts(query) {
                 var selectedVariants = $('input[name="variants[]"]:checked').map(function() {
                     return $(this).val();
                 }).get();
@@ -253,13 +268,14 @@
 
                 $('#filter-products-loading').show();
                 $('#filtered-products').html('');
-
+                console.log(selectedSortBy);
                 $.ajax({
                     url: "{{ route('shop') }}",
                     type: "GET",
                     data: {
                         variants: selectedVariants,
-                        sort_by: selectedSortBy
+                        sort_by: selectedSortBy,
+                        search_query: query
                     },
                     success: function(response) {
                         $('#filtered-products').html(response);
@@ -267,12 +283,13 @@
                     error: function(xhr) {
                         console.log(xhr);
                     },
-                    complete: function(xhr) {
+                    complete: function() {
                         $('#filter-products-loading').hide();
                         initAddItem();
                     }
                 });
-            });
+            }
+
         });
     </script>
 

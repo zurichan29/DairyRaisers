@@ -456,7 +456,7 @@
                         url: "{{ route('admin.staff.update') }}",
                         type: 'POST',
                         data: formData,
-                        processData: false, // Prevent jQuery from processing the data
+                        processData: false,
                         contentType: false,
                         success: function(response) {
                             showNotification('info', 'Staff Updated', response['name'] +

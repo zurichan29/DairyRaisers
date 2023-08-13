@@ -11,13 +11,8 @@
             text-align: center;
         }
     </style>
-    <section class="icons carts">
-        <div class="text-center mb-3">
-            <p class="fs-2 text-primary">Cart</p>
-            <div>
-                <a href="{{ route('shop') }}" class="">
-                    <i class="fa-solid fa-angle-left"></i> Continue Shopping</a>
-            </div>
+        <div class="coontainer text-center mb-3">
+            <p class="fs-2">Your Cart</p>
             @if ($cart)
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle" cellspacing="0">
@@ -85,7 +80,6 @@
                 </div>
             @endif
         </div>
-    </section>
 
     <script>
         $(document).ready(function() {

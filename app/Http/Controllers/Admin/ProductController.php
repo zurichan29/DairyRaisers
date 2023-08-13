@@ -124,7 +124,7 @@ class ProductController extends Controller
 
             // Handle the uploaded image
             $image = $request->file('img');
-            $imageName = 'picture.' . $image->getClientOriginalExtension();
+            $imageName = 'picture_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
 
             // Store the 'img' column in the database with the image path
@@ -154,7 +154,7 @@ class ProductController extends Controller
         if (auth()->guard('admin')->check()) {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|min:3',
-                // 'img' => 'image|mimes:jpeg,jpg,png|max:5120',
+                'img' => 'image|mimes:jpeg,jpg,png|max:5120',
                 'variant' => 'required|exists:variants,name',
                 'price' => 'required|numeric',
             ]);
@@ -169,13 +169,10 @@ class ProductController extends Controller
             // Fetch the variant data
             $variant = Variants::where('name', $request->variant)->first();
 
-            // Handle the uploaded image
             if ($request->hasFile('img')) {
                 $image = $request->file('img');
-                $imageName = 'picture.' . $image->getClientOriginalExtension();
+                $imageName = 'picture_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageName);
-
-                // Update the 'img' column in the database with the image path
                 $product->img = 'images/' . $imageName;
             }
 
@@ -194,6 +191,7 @@ class ProductController extends Controller
                 'price' => $product->price,
                 'variant' => $updatedVariant->name,
                 'stock' => $product->stock,
+                'img' => $request->file('img'),
             ];
 
             $this->logActivity(auth()->guard('admin')->user()->name . ' has updated a product: ' . $product->name, $request);
@@ -202,7 +200,7 @@ class ProductController extends Controller
         }
     }
 
-    
+
 
     // Method to log the activity
     private function logActivity($activityDescription, $request)

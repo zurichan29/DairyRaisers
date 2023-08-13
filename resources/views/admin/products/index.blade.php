@@ -47,13 +47,13 @@
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control" name="name" id="addName"
                                             placeholder="Name">
-                                        <label for="addName">Name</label>
+                                        <label for="addName">Name *</label>
                                         <div id="add-product-name-error" class="error-container"></div>
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input type="file" class="form-control" name="img" id="addImg"
                                             placeholder="Product Image">
-                                        <label for="addImg">Product Image</label>
+                                        <label for="addImg">Product Image *</label>
                                         <div id="add-product-img-error" class="error-container"></div>
                                     </div>
                                     <div class="form-floating mb-3">
@@ -62,13 +62,13 @@
                                                 <option value="{{ $variant->name }}">{{ $variant->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label for="addVariant">Variants:</label>
+                                        <label for="addVariant">Variants *</label>
                                         <div id="add-product-variant-error" class="error-container"></div>
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input type="number" class="form-control" name="price" id="addPrice"
                                             placeholder="Price">
-                                        <label for="addPrice">Price</label>
+                                        <label for="addPrice">Price *</label>
                                         <div id="add-product-price-error" class="error-container"></div>
                                     </div>
                                     <button type="submit" id="addProductBtn" class="btn btn-primary mb-3">
@@ -103,7 +103,7 @@
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control" name="name" id="editName"
                                             placeholder="Name">
-                                        <label for="editName">Name</label>
+                                        <label for="editName">Name *</label>
                                         <div id="edit-product-name-error" class="error-container"></div>
                                     </div>
 
@@ -113,15 +113,21 @@
                                                 <option value="{{ $variant->name }}">{{ $variant->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label for="editVariant">Variants:</label>
+                                        <label for="editVariant">Variants *</label>
                                         <div id="edit-product-variant-error" class="error-container"></div>
                                     </div>
 
                                     <div class="form-floating mb-3">
                                         <input type="number" class="form-control" name="price" id="editPrice"
                                             placeholder="Price">
-                                        <label for="editPrice">Price</label>
+                                        <label for="editPrice">Price *</label>
                                         <div id="edit-product-price-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="file" class="form-control" name="img" id="editImg"
+                                            placeholder="Product Image">
+                                        <label for="editImg">Product Image</label>
+                                        <div id="edit-product-img-error" class="error-container"></div>
                                     </div>
                                     <button type="submit" id="editProductBtn" class="btn btn-primary mb-3">
                                         <span class="loading-spinner" style="display: none;">
@@ -877,6 +883,7 @@
                     var productId = $('#editProductId').val();
 
                     var form = this;
+                    var formData = new FormData(form); // Create FormData object
 
                     // Get the submit button, loading spinner, and button text elements within the form
                     var submitBtn = $(form).find('#editProductBtn');
@@ -892,18 +899,14 @@
                     $.ajax({
                         url: "{{ route('admin.products.update') }}", // Replace with the desired URL for updating a product
                         type: 'POST',
-                        data: {
-                            product_id: productId,
-                            name: $('#editName').val(),
-                            price: $('#editPrice').val(),
-                            variant: $('#editVariant').val(),
-                            _token: "{{ csrf_token() }}"
-                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             showNotification('info', 'Updated', response['name'] +
                                 ' has updated successfully.');
 
-
+                            console.log(response);
                             refreshDataTable();
 
                             // Re-enable the submit button, show the button text, and hide the loading spinner

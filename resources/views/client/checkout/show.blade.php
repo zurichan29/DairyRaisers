@@ -43,18 +43,6 @@
         }
     </style>
 
-    @error('remarks')
-        <p>{{ $message }}</p>
-    @enderror
-
-    @error('delivery_option')
-        <p>{{ $message }}</p>
-    @enderror
-
-    @error('reference_number')
-        <p>{{ $message }}</p>
-    @enderror
-
     <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('cart') }}">Cart</a></li>
@@ -65,7 +53,7 @@
     <h2 class="my-3 text-center font-weight-bold text-primary">CHECKOUT ORDER</h2>
     <div class="border-top mb-2"></div>
     <section>
-        <form method="POST" action="{{ route('checkout.place_order') }}" class="" id="addressForm"
+        <form method="POST" action="{{ route('checkout.place_order') }}" class="mb-5" id="addressForm"
             enctype="multipart/form-data">
             @csrf
             <div class="container-fluid mt-4">

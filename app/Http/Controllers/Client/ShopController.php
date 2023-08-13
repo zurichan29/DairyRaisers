@@ -22,11 +22,17 @@ class ShopController extends Controller
     public function show(Request $request)
     {
         $variant = $request->input('variants', []);
+        $searchQuery = $request->input('search_query');
         $products = Product::query();
         if ($products) {
             if (!empty($variant)) {
                 $products->whereIn('variants_id', $variant);
             }
+
+            if (!empty($searchQuery)) {
+                $products->where('name', 'like', "%$searchQuery%");
+            }
+
             // Sorting logic based on the selected option
             $sortBy = $request->input('sort_by');
             if ($sortBy === 'low_to_high') {
@@ -34,6 +40,7 @@ class ShopController extends Controller
             } elseif ($sortBy === 'high_to_low') {
                 $products->orderBy('price', 'desc');
             }
+
             $products = $products->get();
 
             if ($request->ajax()) {

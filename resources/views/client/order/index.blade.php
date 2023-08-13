@@ -1,8 +1,8 @@
 @extends('layouts.client')
 @section('content')
 
-    @if ($orders)
-        <div class="container-fluid pt-4">
+    <div class="container-fluid py-5">
+        @if ($orders->isNotEmpty())
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <h4 class="mb-3 font-weight-normal text-center">Order History <i class="fas fa-shopping-cart ml-1"></i>
@@ -79,7 +79,8 @@
                                             </h6>
                                             <div class="col">
                                                 <h5 class="badge badge-light text-center text-wrap py-2"><i
-                                                        class="{{ $opt_icon }} me-1"></i> {{ $order->delivery_option }}
+                                                        class="{{ $opt_icon }} me-1"></i>
+                                                    {{ $order->delivery_option }}
                                                 </h5>
                                                 <h5 class="badge {{ $statusBadge }} text-center text-wrap py-2"
                                                     style="width: 8rem;">
@@ -93,20 +94,18 @@
                             </div>
                         </div>
                     @endforeach
+
                 </div>
             </div>
-        </div>
-        </div>
-    @else
-        <div class="empty block ml-[32%] mt-28 text-[#5f9ea0] justify-center text-center items-center">
-            <img src="{{ asset('images/empty.png') }}" class="w-28 ml-[20%]" alt="">
-            <div class="w-2/4 text-xl font-semibold text-center pt-5 pl-10">
-                <h1>NO ORDERS</h1>
+        @else
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <img src="{{ asset('images/no_data.png') }}" class="img-fluid" style="width: 200px" alt="">
+                <div class="">
+                    <h3>NO ORDERS</h3>
+                </div>
             </div>
-        </div>
-    @endif
+        @endif
     </div>
 
-    </section>
 
 @endsection

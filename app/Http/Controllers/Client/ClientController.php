@@ -18,10 +18,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-use App\Mail\VerifyEmail;
-use Illuminate\Support\Facades\Mail;
-
-
 class ClientController extends Controller
 {
     public function menu()
@@ -32,7 +28,7 @@ class ClientController extends Controller
     public function address()
     {
         $address = User_Address::where('user_id', auth()->user()->id)->get();
-
+      
         return view('client.profile.address', ['addresses' => $address]);
     }
 
@@ -115,7 +111,7 @@ class ClientController extends Controller
 
     public function address_delete(Request $request)
     {
-        $address = User_Address::where('id', $request->id)->where('user_id', auth()->user()->id)->first();
+        $address = User_Address::where('id', $request->address_id)->where('user_id', auth()->user()->id)->first();
 
         if ($address) {
             $isDefault = $address->default;
@@ -123,7 +119,7 @@ class ClientController extends Controller
 
             if ($isDefault) {
                 $newDefaultAddress = User_Address::where('user_id', auth()->user()->id)
-                    ->where('id', '<>',  $request->id)
+                    ->where('id', '<>',  $request->address_id)
                     ->first();
 
                 if ($newDefaultAddress) {
@@ -131,29 +127,20 @@ class ClientController extends Controller
                     $newDefaultAddress->save();
                 }
             }
-            
-            return redirect()->route('profile.address')->with('message', [
-                'type' => 'info',
-                'title' => 'Address update',
-                'body' => 'User address has been deleted.',
-                'period' => false,
-            ]);
-            // return response()->json(['address' => $address]);
+
+            $addresses = User_Address::where('user_id', auth()->user()->id)->get();
+            if ($request->ajax()) {
+                return view('client.profile.reload-address', compact('addresses'));
+            }
         } else {
-            // return response()->json(['errors' => $address],422);
-            return redirect()->route('profile.address')->with('message', [
-                'type' => 'error',
-                'title' => 'Error',
-                'body' => 'Something went wrong. Please try again.',
-                'period' => false,
-            ]);
+            return response()->json(['errors' => $address], 422);
         }
     }
 
     public function address_edit($id)
     {
         $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->first();
-        
+
         if ($address) {
             $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
             $addressData = json_decode($jsonData, true);
@@ -222,8 +209,7 @@ class ClientController extends Controller
 
     public function address_default(Request $request)
     {
-        $address = User_Address::where('id', $request->id)->where('user_id', auth()->user()->id)->first();
-
+        $address = User_Address::where('id', $request->address_id)->where('user_id', auth()->user()->id)->first();
         if ($address && $address->default == 0) {
             $currentDefault = User_Address::where('user_id', auth()->user()->id)
                 ->where('default', 1)
@@ -235,43 +221,69 @@ class ClientController extends Controller
             $address->default = 1;
             $address->save();
 
-            return redirect()->route('profile.address')->with('message', [
-                'type' => 'info',
-                'title' => 'Address update',
-                'body' => 'Address has been selected as default.',
-                'period' => false,
-            ]);
+            // return redirect()->route('profile.address')->with('message', [
+            //     'type' => 'info',
+            //     'title' => 'Address update',
+            //     'body' => 'Address has been selected as default.',
+            //     'period' => false,
+            // ]);
+
+            $addresses = User_Address::where('user_id', auth()->user()->id)->get();
+            if ($request->ajax()) {
+                return view('client.profile.reload-address', compact('addresses'));
+            }
         } else {
-            return redirect()->route('profile.address')->with('message', [
-                'type' => 'error',
-                'title' => 'Error',
-                'body' => 'Invalid address or already set as default.',
-                'period' => false,
-            ]);
+
+            return response()->json(['errors' => $address], 422);
+            // return redirect()->route('profile.address')->with('message', [
+            //     'type' => 'error',
+            //     'title' => 'Error',
+            //     'body' => 'Invalid address or already set as default.',
+            //     'period' => false,
+            // ]);
         }
     }
 
-    public function editName(Request $request)
+    public function edit_profile(Request $request)
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255|min:3',
-            'last_name' => 'required|string|max:255|min:3',
-            'mobile_number' => ['required', 'integer', 'digits:10', 'regex:/^9/'],
+        $user = User::where('id', auth()->user()->id)->first();
+        $validator = Validator::make($request->all(), [
+            'first_name' => [
+                'required',
+                'string',
+                'max:255',
+                'min:3',
+                Rule::unique('users', 'first_name')->ignore($user->id),
+            ],
+            'last_name' => [
+                'required',
+                'string',
+                'max:255',
+                'min:3',
+                Rule::unique('users', 'last_name')->ignore($user->id),
+            ],
+            'mobile_number' => [
+                'required',
+                'integer',
+                'digits:10',
+                'regex:/^9/',
+                Rule::unique('users', 'mobile_number')->ignore($user->id),
+            ],
         ]);
 
-        $user = User::where('id', auth()->user()->id)->first();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'user' => $user], 422);
+        }
+
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->mobile_number = $request->mobile_number;
 
         $user->save();
 
-        return redirect()->route('profile')->with('message', [
-            'type' => 'success',
-            'title' => 'Profile updated',
-            'body' => 'Your profile has been updated.',
-            'period' => false,
-        ]);
+        if($request->ajax()) {
+            return view('client.profile.reload-user-name', compact('user'));
+        }
     }
 
     public function showChangePassForm()
@@ -312,179 +324,5 @@ class ClientController extends Controller
             'body' => 'Your password has been updated successfully.',
             'period' => false,
         ]);
-    }
-
-    public function EmailForm()
-    {
-        if (auth()->check()) {
-            $user = User::where('id', auth()->user()->id)->first();
-            if ($user->email != NULL && $user->email_verified_at == NULL) {
-                return view('client.profile.verifyEmail', ['user' => $user]);
-            } else if ($user->email == NULL) {
-                return view('client.profile.EmailForm');
-            } else {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-    }
-
-    public function EmailVerifyShow()
-    {
-        if (auth()->check()) {
-            $user = User::where('id', auth()->user()->id)->first();
-            if ($user->email != NULL && $user->email_verified_at == NULL) {
-                return view('client.profile.verifyEmail', ['user' => $user]);
-            } else {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-    }
-
-    public function createEmail(Request $request)
-    {
-        if (auth()->check()) {
-            $user = User::where('id', auth()->user()->id)->first();
-
-            $token = Str::random(40);
-
-            // Validate the uniqueness of the token
-            $validator = Validator::make($request->all(), [
-                'verification_token' => [
-                    'nullable',
-                    'string',
-                    'max:255',
-                    Rule::unique('users')->where(function ($query) use ($token) {
-                        return $query->where('verification_token', $token);
-                    }),
-                ],
-            ]);
-
-            // If the token is not unique, generate a new one
-            if ($validator->fails()) {
-                $token = Str::random(40);
-            }
-
-            $request->validate([
-                'email' => 'required|email',
-            ]);
-
-            $user->email = $request->input('email');
-            $user->email_verify_token = $token;
-            $user->save();
-
-            Mail::to($user->email)->send(new VerifyEmail($user));
-
-            return redirect()->route('email.show');
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-    }
-
-    public function resendMail()
-    {
-        $user = User::where('id', auth()->user()->id)->first();
-        if ($user && auth()->check()) {
-
-            if ($user->email_code_cooldown != null && $user->email_code_cooldown <= Carbon::now()) {
-                $user->email_code_cooldown = null;
-                $user->email_code_count = 0;
-                $user->save();
-            }
-
-            if ($user->email_code_count < 3) {
-
-                $token = Str::random(40);
-                $user->email_verify_token = $token;
-                $user->email_code_count = $user->email_code_count + 1;
-                $user->save();
-                Mail::to($user->email)->send(new VerifyEmail($user));
-                return redirect()->back()->with('message', 'Code successfully sent. Please again your mailbox.');
-            }
-
-            if ($user->email_code_cooldown == NULL) {
-                $user->email_code_cooldown = Carbon::now()->addMinutes(60);
-                $user->save();
-            }
-
-            $remainingTime = Carbon::createFromFormat('Y-m-d H:i:s', $user->email_code_cooldown)->format('Y-m-d g:i A');
-
-            return redirect()->back()->withErrors('resend', 'You have reach maximum sent of OTP. Please wait in ' . $remainingTime);
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-    }
-
-    public function verifyEmail($token, $email)
-    {
-        $user = User::where('email', $email)->where('email_verify_token', $token)->first();
-
-        if (!$user) {
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-        }
-
-        $user->email_code_count = 0;
-        $user->email_code_cooldown = null;
-        $user->email_verified_at = Carbon::now();
-        $user->email_verify_token = null;
-        $user->save();
-
-        return redirect('/')->with('success', 'Email verified successfully.');
-    }
-
-    public function ChangeEmailForm()
-    {
-        if (auth()->check()) {
-            $user = User::where('id', auth()->user()->id)->first();
-            if ($user->email != NULL && $user->email_verified_at == NULL) {
-                return view('client.profile.changeEmail');
-            } else {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-    }
-
-    public function ChangeEmail(Request $request)
-    {
-        if (auth()->check()) {
-            $user = User::where('id', auth()->user()->id)->first();
-            if ($user->email) {
-                $token = Str::random(40);
-
-                // Validate the uniqueness of the token
-                $validator = Validator::make($request->all(), [
-                    'verification_token' => [
-                        'nullable',
-                        'string',
-                        'max:255',
-                        Rule::unique('users')->where(function ($query) use ($token) {
-                            return $query->where('verification_token', $token);
-                        }),
-                    ],
-                ]);
-
-                // If the token is not unique, generate a new one
-                if ($validator->fails()) {
-                    $token = Str::random(40);
-                }
-
-                $user = User::where('id', auth()->user()->id)->first();
-
-                $request->validate([
-                    'email' => 'required|email',
-                ]);
-
-                $user->email = $request->input('email');
-                $user->email_verify_token = $token;
-                $user->save();
-
-                Mail::to($user->email)->send(new VerifyEmail($user));
-
-                return redirect()->route('email.show');
-            } else {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
-        }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 }

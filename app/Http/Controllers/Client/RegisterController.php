@@ -42,7 +42,6 @@ class RegisterController extends Controller
         $user->mobile_number = $request->mobile_number;
         $user->email = $request->email;
         $user->email_verify_token = Str::random(60);
-        $user->mobile_verified_at = Carbon::now();
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->password = Hash::make($request->input('password'));

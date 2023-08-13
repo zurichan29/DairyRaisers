@@ -85,7 +85,7 @@ Route::group(['middleware' => 'check.client:' . false], function () {
 Route::group(['middleware' => 'check.client:' . true], function () {
     /** USER PROFILE OR SETTINGS */
     Route::get('/profile', [ClientController::class, 'menu'])->name('profile');
-    Route::post('/profile/edit/name', [ClientController::class, 'editName'])->name('edit.name');
+    Route::post('/profile/edit', [ClientController::class, 'edit_profile'])->name('profile.edit');
     Route::get('/profile/change_password', [ClientController::class, 'showChangePassForm'])->name('profile.change_password');
     Route::post('/profile/change_password/validate', [ClientController::class, 'validatePass'])->name('profile.change_password.validate');
     // ADDRESS
@@ -96,14 +96,6 @@ Route::group(['middleware' => 'check.client:' . true], function () {
     Route::get('/profile/address/edit/{id}', [ClientController::class, 'address_edit'])->name('address.edit');
     Route::put('/profile/address/update/{id}', [ClientController::class, 'address_update'])->name('address.update');
     Route::post('/profile/address/make_default', [ClientController::class, 'address_default'])->name('address.default');
-    // EMAIL
-    Route::get('/profile/email', [ClientController::class, 'EmailForm'])->name('email.form');
-    Route::get('/profile/change-email', [ClientController::class, 'ChangeEmailForm'])->name('email.change-show');
-    Route::get('/profile/email/verify', [ClientController::class, 'EmailVerifyShow'])->name('email.show');
-    Route::post('/profile/change-email/verify', [ClientController::class, 'ChangeEmail'])->name('email.change');
-    Route::post('/profile/create/email', [ClientController::class, 'createEmail'])->name('email.create');
-    Route::post('/profile/email/resend_code', [ClientController::class, 'resendMail'])->name('email.resend');
-    Route::get('/verify-email/{token}/{email}', [ClientController::class, 'verifyEmail'])->name('email.verify');
     // RE-ORDERS
     Route::get('/orders/re-order/{id}', [ClientOrder::class, 're_order'])->name('orders.re-order');
     Route::post('/orders/re-order/{id}/place', [ClientOrder::class, 'place'])->name('orders.re-order.place');

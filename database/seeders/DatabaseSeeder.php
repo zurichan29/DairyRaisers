@@ -45,16 +45,14 @@ class DatabaseSeeder extends Seeder
 
         $this->seedOnlineShoppers();
         $this->seedRetailers();
-        
+
         $this->seedOrders();
         $this->seedSalesData();
         $this->seedProducts();
         $this->seedBuffalo();
-
-       
     }
 
-    
+
     private function seedCart()
     {
         // Cart::Create([
@@ -100,7 +98,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'sample@gmail.com',
             'password' =>  Hash::make('2329Cjay'),
             'mobile_number' => '9262189071',
-            'email_verified_at' => Carbon::now(), 
+            'email_verified_at' => Carbon::now(),
         ]);
 
         User::Create([
@@ -109,7 +107,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'myasd@gmail.com',
             'password' =>  Hash::make('2329Marie'),
             'mobile_number' => '9972654851',
-            'email_verified_at' => Carbon::now(), 
+            'email_verified_at' => Carbon::now(),
         ]);
         User_Address::Create([
             'user_id' => 1,
@@ -453,17 +451,23 @@ class DatabaseSeeder extends Seeder
             'items' => [
                 [
                     'product_id' => 1,
+                    'name' => 'Choco Milk',
+                    'variant' => 'Milk',
                     'price' => 100,
                     'discount' => 0,
                     'quantity' => 2,
                     'total' => 200,
+                    'img' => 'images/baka.png',
                 ],
                 [
                     'product_id' => 4,
+                    'name' => 'Plain Yoghurt',
+                    'variant' => 'Yoghurt',
                     'price' => 50,
                     'discount' => 0,
                     'quantity' => 3,
                     'total' => 150,
+                    'img' => 'images/baka.png',
                 ],
                 // Add more items as needed
             ],
@@ -587,27 +591,26 @@ class DatabaseSeeder extends Seeder
 
     private function seedBuffalo()
     {
-        
-            Buffalo::create([
-                'gender' => 'male',
-                'age' => 'baby',
-                'quantity' => 100,
-            ]);
-            Buffalo::create([
-                'gender' => 'male',
-                'age' => 'adult',
-                'quantity' => 100,
-            ]);
-            Buffalo::create([
-                'gender' => 'female',
-                'age' => 'baby',
-                'quantity' => 100,
-            ]);
-            Buffalo::create([
-                'gender' => 'female',
-                'age' => 'adult',
-                'quantity' => 100,
-            ]);
-        
+
+        Buffalo::create([
+            'gender' => 'male',
+            'age' => 'baby',
+            'quantity' => 100,
+        ]);
+        Buffalo::create([
+            'gender' => 'male',
+            'age' => 'adult',
+            'quantity' => 100,
+        ]);
+        Buffalo::create([
+            'gender' => 'female',
+            'age' => 'baby',
+            'quantity' => 100,
+        ]);
+        Buffalo::create([
+            'gender' => 'female',
+            'age' => 'adult',
+            'quantity' => 100,
+        ]);
     }
 }
