@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('buyer_name');
             $table->string('buyer_address');
+            $table->string('mobile_number');
             $table->json('details')->nullable();
             $table->integer('total_quantity');
             $table->decimal('grand_total', 8, 2)->default(0);

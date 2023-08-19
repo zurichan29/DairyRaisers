@@ -59,29 +59,6 @@
             <div class="container-fluid mt-4">
                 <div class="row w-100 justify-content-center">
                     <div class="col">
-                        {{-- <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="">
-                                    <div class="row">
-                                        <div class="col mb-3">
-                                            <h4 class="text-primary">DELIVERY OPTIONS</h4>
-                                        </div>
-                                        <div class="px-3">
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="delivery" value="Delivery" checked>
-                                                <label class="form-check-label" for="delivery">Delivery</label>
-                                            </div>
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="pickup" value="Pick Up">
-                                                <label class="form-check-label" for="pickup">Pick Up</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="card mb-3 shadow">
                             <div class="card-body">
                                 <div class="">
@@ -110,6 +87,9 @@
                                                 <input type="text" class="form-control" id="name" name="name"
                                                     placeholder="name">
                                                 <label for="name">Name *</label>
+                                                @error('name')
+                                                    <p class="text-danger">{{ $message }}</p>
+                                                @enderror
                                             </div>
                                             <div class="input-group mb-3">
                                                 <span class="input-group-text">+63</span>
@@ -118,6 +98,17 @@
                                                         name="mobile_number" placeholder="Mobile Number" required>
                                                     <label for="mobile_number">Mobile No. *</label>
                                                 </div>
+                                                @error('mobile_number')
+                                                    <p class="text-danger">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    placeholder="email">
+                                                <label for="email">Email *</label>
+                                                @error('email')
+                                                    <p class="text-danger">{{ $message }}</p>
+                                                @enderror
                                             </div>
                                         @endauth
 
@@ -130,7 +121,7 @@
                                                 <div class="row mb-3">
                                                     {{-- URL::secure(route('checkout.edit.address', ['prev' => 'checkout'])) --}}
                                                     <a id="editAddressBtn" class="btn btn-sm btn-outline-primary"
-                                                        href="{{ route('location.update-show') }}">Edit
+                                                        href="{{ route('checkout.edit.address') }}">Edit
                                                         this address</a>
                                                 </div>
                                                 <div class="row mb-3">
@@ -190,7 +181,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="modal fade" id="viewPaymentOptions" data-bs-backdrop="static"
                                         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
                                         aria-hidden="true">
@@ -307,9 +297,14 @@
                                                 <label for="remarks">Remarks (Optional)</label>
                                             </div>
                                             <div class="border-top mb-3"></div>
+                                            <div class="row align-items-center mb-3">
+                                                <h5 class="font-weight-bold">TOTAL:
+                                                    ₱{{ $grandTotal . '.00' }}</h5>
+                                                <h5 class="font-weight-bold">Delivery Fee: ₱{{ $delivery_fee }}.00</h5>
+                                            </div>
                                             <div class="row align-items-center mb-4">
                                                 <h4 class="font-weight-bold text-primary">GRAND TOTAL:
-                                                    ₱{{ $grandTotal . '.00' }}</h4>
+                                                    ₱{{ $grandTotal + $delivery_fee . '.00' }}</h4>
                                             </div>
                                             <div class="row align-items-center mb-4">
                                                 <button type="submit" class="btn btn-primary">Place Order</button>

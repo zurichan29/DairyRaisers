@@ -58,32 +58,6 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="">
-                                    <div class="row">
-                                        <div class="col mb-3">
-                                            <h4 class="text-primary">DELIVERY OPTIONS</h4>
-                                        </div>
-                                        <div class="px-3">
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="delivery" value="Delivery"
-                                                    {{ $order->delivery_option === 'Delivery' ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="delivery">Delivery</label>
-                                            </div>
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="delivery_option"
-                                                    id="pickup" value="Pick Up"
-                                                    {{ $order->delivery_option === 'Pick Up' ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="pickup">Pick Up</label>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="">
                                     @if (auth()->check())
                                         <div class="col">
                                             <div class="row mb-3">
@@ -111,7 +85,7 @@
                                                 </div>
                                                 <div class="row mb-3">
                                                     <a id="editAddressBtn" class="btn btn-sm btn-outline-primary"
-                                                        href="{{ URL::secure(route('checkout.edit.address', ['prev' => $order->id])) }}">Edit
+                                                        href="{{ URL::secure(route('order.edit.address', ['id' => $order->id])) }}">Edit
                                                         this address</a>
                                                 </div>
                                                 <div class="row mb-3">
@@ -234,8 +208,8 @@
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input type="text" class="form-control" name="reference_number"
-                                            id="reference_number" placeholder="Reference number or control number"
-                                            disabled readonly>
+                                            id="reference_number" placeholder="Reference number or control number" disabled
+                                            readonly>
                                         <label for="reference_number" id="reference_label">Reference / Control No.</label>
                                     </div>
 
@@ -273,9 +247,14 @@
                                                 <label for="remarks">Remarks</label>
                                             </div>
                                             <div class="border-top mb-3"></div>
+                                            <div class="row align-items-center mb-3">
+                                                <h5 class="font-weight-bold">TOTAL:
+                                                    ₱{{ $grandTotal . '.00' }}</h5>
+                                                <h5 class="font-weight-bold">Delivery Fee: ₱{{ $delivery_fee }}.00</h5>
+                                            </div>
                                             <div class="row align-items-center mb-4">
                                                 <h4 class="font-weight-bold text-primary">GRAND TOTAL:
-                                                    ₱{{ $grandTotal . '.00' }}</h4>
+                                                    ₱{{ $grandTotal + $delivery_fee . '.00' }}</h4>
                                             </div>
                                             <div class="row align-items-center mb-4">
                                                 <button type="submit" class="btn btn-primary">Place Order</button>

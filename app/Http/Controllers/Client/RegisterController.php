@@ -66,7 +66,7 @@ class RegisterController extends Controller
             $user->email_verify_token = null;
             $user->save();
 
-            if(auth()->check()) {
+            if (auth()->check()) {
                 auth()->logout();
             }
 
@@ -114,7 +114,7 @@ class RegisterController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if ($user->email_code_count >= 3 && Carbon::now() >= $user->email_code_cooldown) {
+        if (($user->email_code_count >= 3 && Carbon::now() >= $user->email_code_cooldown) || Carbon::now() >= $user->email_code_cooldown) {
             $user->email_code_count = 0;
             $user->email_code_cooldown =  null;
             $user->save();
@@ -127,10 +127,8 @@ class RegisterController extends Controller
 
         // Update email_code_count and email_code_cooldown
         $user->email_code_count = $user->email_code_count + 1;
-        if ($user->email_code_count >= 3) {
-            $user->email_code_cooldown = Carbon::now()->addHour();
-        }
-        $user->email_verify_token = Str::random(40);
+        $user->email_code_cooldown = Carbon::now()->addHour();
+        $user->email_verify_token = Str::random(60);
         $user->save();
 
         Mail::to($user->email)->send(new VerifyEmail($user));

@@ -29,7 +29,7 @@ class DashboardController extends Controller
             $buffalos = Buffalo::all();
             $products = Product::all();
             $orders = Order::all();
-            $logs = ActivityLog::latest()->limit(5)->get();
+            $logs = ActivityLog::latest()->limit(7)->get();
             $payment_methods = PaymentMethod::all();
 
             $buffaloData = [];

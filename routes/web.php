@@ -74,7 +74,7 @@ Route::group(['middleware' => 'check.client:' . false], function () {
     Route::get('/reset-password', [AuthController::class, 'reset_password'])->name('reset_password');
     Route::post('/check-reset-password-form', [AuthController::class, 'verify_rp'])->name('reset_password.validate');
     Route::get('/reset-password/{token}/{email}', [AuthController::class, 'new_password'])->name('reset_password.new-password');
-    Route::post('/reset-password/{token}/{email}/validate', [AuthController::class, 'verify_np'])->name('reset_password.verify-new-password');
+    Route::post('/reset-password/new-password/{token}/{email}/validate', [AuthController::class, 'verify_np'])->name('reset_password.verify-new-password');
 
     /**REGISTER */
     Route::get('/register', [RegisterController::class, 'show'])->name('register');
@@ -96,11 +96,13 @@ Route::group(['middleware' => 'check.client:' . true], function () {
     Route::post('/profile/address/store', [ClientController::class, 'address_store'])->name('address.store');
     Route::post('/profile/address/delete', [ClientController::class, 'address_delete'])->name('address.delete');
     Route::get('/profile/address/edit/{id}', [ClientController::class, 'address_edit'])->name('address.edit');
-    Route::put('/profile/address/update/{id}', [ClientController::class, 'address_update'])->name('address.update');
+    Route::post('/profile/address/update/{id}', [ClientController::class, 'address_update'])->name('address.update');
     Route::post('/profile/address/make_default', [ClientController::class, 'address_default'])->name('address.default');
     // RE-ORDERS
     Route::get('/orders/re-order/{id}', [ClientOrder::class, 're_order'])->name('orders.re-order');
     Route::post('/orders/re-order/{id}/place', [ClientOrder::class, 'place'])->name('orders.re-order.place');
+    Route::get('/orders/update-location/{id}', [ClientOrder::class, 'showEditAddressForm'])->name('order.edit.address');
+    Route::post('/orders/update-location/validate/{id}', [ClientOrder::class, 'checkEditAddress'])->name('order.edit.address.validate');    
 });
 
 
@@ -112,26 +114,32 @@ Route::get('/logout/admin', [AuthController::class, 'logout_admin'])->name('logo
 Route::get('/orders', [ClientOrder::class, 'index'])->name('order_history');
 Route::get('/orders/{id}', [ClientOrder::class, 'show'])->name('orders.show');
 
-
 /** CHECKOUT */
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 Route::post('/checkout/place_order', [CheckoutController::class, 'placeOrder'])->name('checkout.place_order');
 Route::post('/checkout/upload', [CheckoutController::class, 'uploadAndExtractText'])->name('checkout.upload');
 
-Route::get('/checkout/address/edit', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit.address');
-Route::post('/checkout/address/edit/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit.address.validate');
+Route::get('/checkout/update-location', [CheckoutController::class, 'showEditAddressForm'])->name('checkout.edit.address');
+Route::post('/checkout/update-location/validate', [CheckoutController::class, 'checkEditAddress'])->name('checkout.edit.address.validate');
 Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaultAddress'])->name('checkout.default_address');
 
 
 
 // ADMIN
-
-// Route::post('/send-notifications', [DashboardController::class, 'send_notifications'])->name('send-notifications');
 Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name('login.administrator');
 Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
+
+Route::get('/administrator/password/reset', [AuthController::class, 'showLinkRequestForm'])->name('admin.password.request');
+Route::post('/administrator/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('admin.password.email');
+Route::get('/administrator/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('admin.password.reset');
+Route::post('/administrator/password/reset', [AuthController::class, 'resetAdminPassword'])->name('admin.password.new');
+
+// Route::get('/administrator/password/reset', [AuthController::class, 'admin_reset_password'])->name('login.administrator.reset-password');
+// Route::post('/administrator/password/reset/validate', [AuthController::class, 'admin_validate_rp'])->name('login.administrator.reset-password.validate');
+// Route::get('/administrator/password/reset', [AuthController::class, 'reset_password_admin'])->name('login.administrator.new-password');
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-Route::get('/admin/dashboard/download-chart', [DashboardController::class,'downloadChart'])->name('admin.dashboard.download-chart');
+Route::get('/admin/dashboard/download-chart', [DashboardController::class, 'downloadChart'])->name('admin.dashboard.download-chart');
 
 // STAFF
 Route::group(['middleware' => 'check.access:staff_management'], function () {
@@ -152,6 +160,7 @@ Route::group(['middleware' => 'check.access:buffalos_management'], function () {
     Route::post('/admin/dairy/buffalo-sales-fetch', [DairyController::class, 'buffalo_sales_fetch'])->name('admin.dairy.buffalo-sales-fetch');
     Route::post('/admin/dairy/buffalo-fetch', [DairyController::class, 'buffalo_fetch'])->name('admin.dairy.buffalo-fetch');
     Route::get('/admin/dairy/buffalo-invoice/{id}', [DairyController::class, 'buffalo_show'])->name('admin.dairy.buffalo-show');
+    Route::get('/admin/dairy/print-invoice/{id}', [DairyController::class, 'printInvoice'])->name('admin.dairy.print-invoice');
 });
 
 //PRODUCTS (INVENTORY AND VARIANT)
@@ -172,6 +181,7 @@ Route::group(['middleware' => 'check.access:inventory'], function () {
 // ORDERS
 Route::group(['middleware' => 'check.access:orders'], function () {
     Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
+    Route::get('/admin/orders/print-invoce/{id}', [OrderManagement::class, 'printInvoice'])->name('admin.orders.print-invoice');
     Route::get('/admin/orders/create', [OrderManagement::class, 'create'])->name('admin.orders.create');
     Route::post('/admin/orders/create/customer', [OrderManagement::class, 'store_customer'])->name('admin.orders.create_customer_details');
     Route::post('/admin/orders/create/store_selected_products', [OrderManagement::class, 'selected_products'])->name('admin.orders.selected_products');
@@ -212,13 +222,9 @@ Route::group(['middleware' => 'check.access:sales_report'], function () {
     Route::get('/admin/sales_reports', [SalesReportController::class, 'index'])->name('admin.sales_report.index');
     Route::post('/admin/sales_reports/update-year', [SalesReportController::class, 'updateYear'])->name('admin.sales_report.update-year');
     Route::post('/admin/sales_reports/daily-sales', [SalesReportController::class, 'dailySales'])->name('admin.sales_report.daily-sales');
-    Route::get('/admin/sales_reports/daily_sales/print/', [SalesReportController::class, 'printDailySales'])->name('admin.sales_report.print');
-    Route::get('/admin/sales_reports/daily_sales/download-csv', [CsvExportController::class, 'downloadCsv'])->name('admin.sales_reports.download-csv');
-    Route::get('/admin/sales_reports/daily_sales/download-chart', [SalesReportController::class,'downloadChart'])->name('admin.sales_reports.download-chart');
-    Route::get('/admin/sales_reports/daily_sales/download-excel', [CsvExportController::class, 'downloadExcel'])->name('admin.sales_reports.download-excel');
+    Route::get('/admin/sales_reports/daily_sales/download-chart', [SalesReportController::class, 'downloadChart'])->name('admin.sales_reports.download-chart');
 });
 
 // PROFILE
 Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
 Route::post('/admin/profile/update-password', [ProfileController::class, 'update_password'])->name('admin.profile.update-password');
-Route::post('/admin/profile/update-avatar', [ProfileController::class, 'update_avatar'])->name('admin.profile.update-avatar');

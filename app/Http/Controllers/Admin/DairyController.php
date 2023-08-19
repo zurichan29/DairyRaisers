@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Buffalo;
 use App\Models\BuffaloSales;
-use App\Models\MilkStock;
+use App\Models\Sales;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class DairyController extends Controller
 {
@@ -80,11 +81,12 @@ class DairyController extends Controller
         $validator = Validator::make($request->all(), [
             'buyer_name' => 'required|string|max:255',
             'buyer_address' => 'required|string|max:255',
+            'mobile_number' => ['required', 'numeric', 'digits:10', 'regex:/^9\d{9}$/'],
             'categories' => 'required|array|min:1',
             'categories.*.gender' => 'required|in:male,female',
             'categories.*.age' => 'required|in:baby,adult',
-            'categories.*.quantity' => 'nullable|integer|min:1',
-            'categories.*.price' => 'nullable|numeric|min:1',
+            'categories.*.quantity' => 'nullable|integer|min:0',
+            'categories.*.price' => 'nullable|numeric|min:0',
         ]);
 
         // Add custom validation rule for each category
@@ -154,6 +156,7 @@ class DairyController extends Controller
         $buffaloSale = new BuffaloSales([
             'buyer_name' => $data['buyer_name'],
             'buyer_address' => $data['buyer_address'],
+            'mobile_number' => $data['mobile_number'],
             'details' => json_encode($details),
             'total_quantity' => $totalQuantitySold,
             'grand_total' => $grandTotal,
@@ -161,10 +164,19 @@ class DairyController extends Controller
 
         $buffaloSale->save();
 
-        $this->logActivity(auth()->guard('admin')->user()->name . ' performed a transaction to ' . $data['buyer_name'] . ' : ' . $totalQuantitySold . ' Buffalo(s) sold.' , $request);
+        $this->logActivity(auth()->guard('admin')->user()->name . ' performed a transaction to ' . $data['buyer_name'] . ' : ' . $totalQuantitySold . ' Buffalo(s) sold.', $request);
+
+        Sales::create([
+            'category' => 'Buffalo',
+            'name' => 'Buffalo',
+            'price' => $grandTotal,
+            'quantity' => $totalQuantitySold,
+            'amount' => $grandTotal,
+            'created_at' => Carbon::now(),
+        ]);
 
         return response()->json([
-            'success' => "{$totalQuantitySold} Buffalo(s) sold to {$data['buyer_name']}.",
+            'success' => "Sold {$totalQuantitySold} Buffalo(s) to {$data['buyer_name']}. Transaction completed successfully.",
             'counts' => $this->buffalo_count(),
         ]);
     }
@@ -193,6 +205,9 @@ class DairyController extends Controller
         return view('admin.buffalos.show', compact('buffalo_sales'));
     }
 
+    public function printInvoice(Request $request, $id) {
+        $buffalo_sales = BuffaloSales::where('id', $id)->first();
+    }
 
 
 

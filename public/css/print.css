@@ -1,8 +1,70 @@
-/* Hide unwanted elements when printing */
-body * {
-    visibility: hidden;
-}
+/* Print Styles */
+@media print {
 
-table {
-    visibility: visible;
+    /* Hide the print button and back button in the printed version */
+    #buffaloPrintButton,
+    .btn-secondary {
+        display: none;
+    }
+
+    /* Center align the company logo */
+    .card-header img {
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Increase font size for headings in the printed version */
+    .fw-bold {
+        font-weight: bold;
+    }
+
+    .fs-4 {
+        font-size: 1.5rem;
+        /* Adjust the font size as needed */
+    }
+
+    /* Add a border to the signature area */
+    .signature {
+        border: 1px solid #000;
+        padding: 20px;
+        min-height: 100px;
+        /* Adjust the height as needed */
+    }
+
+    /* Increase font size for the table headers in the printed version */
+    .table thead th {
+        font-size: 14px;
+        /* Adjust the font size as needed */
+    }
+
+    /* Reduce font size for table content in the printed version */
+    .table tbody td {
+        font-size: 12px;
+        /* Adjust the font size as needed */
+    }
+
+    /* Adjust spacing for the receipt content in the printed version */
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Reduce spacing between rows in the printed version */
+    .row {
+        margin-bottom: 10px;
+    }
+
+    /* Center align the text in the receipt area */
+    .text-center {
+        text-align: center;
+    }
+
+    /* Right align the text in the receipt area */
+    .text-end {
+        text-align: right;
+    }
+
+    /* Underline the name for the cashier/representative */
+    .mb-0 u {
+        text-decoration: underline;
+    }
 }

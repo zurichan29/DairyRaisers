@@ -211,9 +211,17 @@
                                 Add Product
                             </span>
                         </button>
-                        <a href="{{ route('admin.products.print') }}" class="btn btn-outline-primary">
-                            <i class="fa-solid fa-print"></i> Print
-                        </a>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button type="button" id="copy" class="mr-2 btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                            <button type="button" id="downloadExcelButton" class="mr-2 btn btn-sm btn-outline-primary">
+                                <i class="fa-regular fa-file-excel"></i> Excel
+                            </button>
+                            <button type="button" id="printButton" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-print"></i> Print
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -437,6 +445,12 @@
             </div>
         </div>
 
+        {{-- PRINT, EXCEL, AND COPY SOURCE --}}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.0.63/print.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
 
         <script>
             $(document).ready(function() {
@@ -444,52 +458,10 @@
                 var currentDataTablePage = 1; // Variable to store the current page number
 
                 function formatDateTime(data) {
-                    const dateTime = moment(data);
+                    const dateTime = moment(data, 'YYYY-MM-DD HH:mm:ss');
                     const time = dateTime.format('h:mm A'); // Format time in 12-hour format
                     const date = dateTime.format('M/D/YYYY'); // Format date
-
                     return time + '<br>' + date; // Separate time and date with a line break (<br>)
-                }
-
-                // Function to handle the click event of the 'status-btn'
-                function handleStatusButtonClick(productId, productName, currentStatus) {
-                    var action = currentStatus === 'AVAILABLE' ? 'deactivate' : 'activate';
-
-                    // Show the confirmation modal with the appropriate message
-                    var confirmationModal = $('#confirmationModal');
-                    var confirmationModalBody = $('#confirmationModalBody');
-                    confirmationModalBody.text('Would you like to ' + action + ' the product: ' + productName + '?');
-                    confirmationModal.modal('show');
-
-                    // Add a click event listener to the 'Yes' button in the confirmation modal
-                    $('#confirmActionBtn').off().on('click', function() {
-                        // Close the confirmation modal
-                        confirmationModal.modal('hide');
-
-                        // Perform the status update action
-                        $.ajax({
-                            url: "{{ route('admin.products.updateStatus') }}", // Replace with your route URL for updating the product status
-                            type: "POST",
-                            data: {
-                                _token: '{{ csrf_token() }}',
-                                productId: productId,
-                                currentStatus: currentStatus,
-                            },
-                            success: function(response) {
-                                // Show success notification
-                                showNotification('info', 'Status changed', response.name +
-                                    ' status is now ' + response.status + '.');
-                                // Refresh the DataTable after updating the status
-                                refreshDataTable();
-                            },
-                            error: function(xhr) {
-                                console.error(xhr.responseText);
-                                // Show error notification
-                                showNotification('error', 'Error',
-                                    'Failed to update product status.');
-                            }
-                        });
-                    });
                 }
 
                 dataTable = $('#dataTable').DataTable({
@@ -531,6 +503,125 @@
                         });
                     },
                 });
+
+                // Initialize Clipboard.js
+                new ClipboardJS('#copy', {
+                    text: function(trigger) {
+                        // Find the datatable
+                        var dataTable = $('#dataTable');
+
+                        // Extract and format the datatable data
+                        var dataTableData = [];
+
+                        // Include the table header
+                        var headerRow = [];
+                        dataTable.find('thead th').each(function() {
+                            headerRow.push($(this).text());
+                        });
+                        dataTableData.push(headerRow.join('\t'));
+
+                        // Include the data rows
+                        dataTable.find('tbody tr').each(function() {
+                            var row = [];
+                            $(this).find('td').each(function() {
+                                row.push($(this).text());
+                            });
+                            dataTableData.push(row.join('\t')); // Use tab delimiter for columns
+                        });
+
+                        // Include the footer row
+                        var footerRow = [];
+                        dataTable.find('tfoot th').each(function() {
+                            footerRow.push($(this).text());
+                        });
+                        dataTableData.push(footerRow.join('\t'));
+
+                        return dataTableData.join('\n'); // Use newline delimiter for rows
+                    }
+                });
+
+                // Handle button click event
+                $('#copy').click(function() {
+                    showNotification('success', 'Data copied to clipboard!');
+                });
+
+                $('#printButton').on('click', function() {
+                    if (dataTable.rows().count() > 0) {
+                        printJS({
+                            printable: 'dataTable', // Provide the ID of the element to print
+                            type: 'html', // Specify the type of content
+                        });
+                    } else {
+                        showNotification('error', 'No data to print');
+                    }
+                });
+
+                // Add event listener for the download button
+                $('#downloadExcelButton').on('click', function() {
+                    var wb = XLSX.utils.table_to_book(document.getElementById('dataTable'));
+                    var wbout = XLSX.write(wb, {
+                        bookType: 'xlsx',
+                        bookSST: true,
+                        type: 'binary'
+                    });
+
+                    function s2ab(s) {
+                        var buf = new ArrayBuffer(s.length);
+                        var view = new Uint8Array(buf);
+                        for (var i = 0; i !== s.length; ++i) {
+                            view[i] = s.charCodeAt(i) & 0xFF;
+                        }
+                        return buf;
+                    }
+
+                    var blob = new Blob([s2ab(wbout)], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    var filename = 'inventory.xlsx'; // You can customize the filename here
+                    saveAs(blob, filename);
+                });
+
+                // Function to handle the click event of the 'status-btn'
+                function handleStatusButtonClick(productId, productName, currentStatus) {
+                    var action = currentStatus === 'AVAILABLE' ? 'deactivate' : 'activate';
+
+                    // Show the confirmation modal with the appropriate message
+                    var confirmationModal = $('#confirmationModal');
+                    var confirmationModalBody = $('#confirmationModalBody');
+                    confirmationModalBody.text('Would you like to ' + action + ' the product: ' + productName + '?');
+                    confirmationModal.modal('show');
+
+                    // Add a click event listener to the 'Yes' button in the confirmation modal
+                    $('#confirmActionBtn').off().on('click', function() {
+                        // Close the confirmation modal
+                        confirmationModal.modal('hide');
+
+                        // Perform the status update action
+                        $.ajax({
+                            url: "{{ route('admin.products.updateStatus') }}", // Replace with your route URL for updating the product status
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                productId: productId,
+                                currentStatus: currentStatus,
+                            },
+                            success: function(response) {
+                                // Show success notification
+                                showNotification('info', ' Product Availability Update', 'The ' +
+                                    response.name + ' status has been updated to ' + response
+                                    .status + '.');
+
+                                refreshDataTable();
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                // Show error notification
+                                showNotification('error', 'Error',
+                                    'Something went wrong. Please try again.');
+                            }
+                        });
+                    });
+                }
 
                 // Function to initialize DataTable
                 function initializeDataTable(data) {
@@ -749,8 +840,9 @@
                         success: function(response) {
 
                             // Show success notification
-                            showNotification('success', 'Stocks Added', response.name +
-                                ' stocks updated successfully.');
+                            showNotification('info', 'Product Stock Update', 'The ' +
+                                response.name +
+                                '  stock has been increased by ' + response.stock + ' unit(s).');
 
                             refreshDataTable();
 
@@ -830,8 +922,8 @@
                         success: function(response) {
 
                             // Show success notification
-                            showNotification('success', 'Added', 'Product: ' + response.name +
-                                ' successfully added.');
+                            showNotification('success', 'New Product Added',
+                                'A new product has been added successfully.');
 
                             refreshDataTable();
 
@@ -903,8 +995,9 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            showNotification('info', 'Updated', response['name'] +
-                                ' has updated successfully.');
+                            showNotification('info', 'Product Update Successful', 'The ' + response[
+                                    'name'] +
+                                ' details have been updated successfully.');
 
                             console.log(response);
                             refreshDataTable();
@@ -1063,8 +1156,9 @@
                         success: function(response) {
 
                             // Show success notification
-                            showNotification('info', 'Update', 'Variant: ' + response.name +
-                                ' updated successfully.');
+                            showNotification('info', 'Variant Update Successful', 'The ' + response
+                                .name +
+                                ' details have been updated successfully.');
 
                             refreshVariantTable();
                             refreshDataTable();
@@ -1139,9 +1233,8 @@
                         success: function(response) {
 
                             // Show success notification
-                            showNotification('success', 'Variant Added', 'Variant: ' + response
-                                .name +
-                                ' successfully added.');
+                            showNotification('success', 'New Variant Added',
+                                'A new variant has been added successfully.');
 
                             refreshVariantTable();
 

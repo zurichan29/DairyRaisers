@@ -245,15 +245,26 @@
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control disable-on-submit" name="buyer_name"
                                     id="buyer_name" placeholder="buyer name">
-                                <label class="">Buyer Name:</label>
+                                <label class="">Buyer Name *</label>
                                 <div id="sell-buffalo-buyer_name-error" class="error-container text-danger"></div>
                             </div>
 
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control disable-on-submit" name="buyer_address"
                                     id="buyer_address" placeholder="buyer address">
-                                <label class="">Buyer Address:</label>
+                                <label class="">Buyer Address *</label>
                                 <div id="sell-buffalo-buyer_address-error" class="error-container text-danger">
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">+63</span>
+                                <div class="form-floating">
+                                    <input type="number" class="form-control disable-on-submit" name="mobile_number"
+                                        id="mobile_number" placeholder="mobile_number">
+                                    <label class="">Phone No *</label>
+                                </div>
+                                <div id="sell-buffalo-mobile_number-error" class="error-container text-danger">
                                 </div>
                             </div>
 
@@ -388,12 +399,19 @@
         </div>
 
         <script>
-            $(document).ready(function() {
-
+            $(".quantity").on("input", function() {
+                if ($(this).val() < 0) {
+                    $(this).val(0);
+                }
             });
-        </script>
 
-        <script>
+            // Event listener for the price input
+            $(".price").on("input", function() {
+                if ($(this).val() < 0) {
+                    $(this).val(0);
+                }
+            });
+
             function calculateTotal() {
                 var grandTotal = 0;
 
@@ -550,8 +568,8 @@
                         type: "POST",
                         data: formObject,
                         success: function(response) {
-                            showNotification('info', 'Buffalo Update', response.info);
-                            showNotification('infos', 'Buffalo Update', response.infos);
+                            showNotification('info', 'Stock Update Successful',
+                                'The buffalo stocks have been updated successfully.');
 
                             $('#babyMaleCount').text(response.counts.baby_male);
                             $('#babyFemaleCount').text(response.counts.baby_female);
@@ -625,7 +643,7 @@
                         type: "POST",
                         data: formObject,
                         success: function(response) {
-                            showNotification('success', 'Buffalo Sold', response.success);
+                            showNotification('success', 'Buffalo Sale', response.success);
 
                             $('#babyMaleCount').text(response.counts.baby_male);
                             $('#babyFemaleCount').text(response.counts.baby_female);
@@ -645,8 +663,6 @@
                             $('.error-container').html('');
                             console.log(errorResponse.errors);
                             if (errorResponse.errors || errorResponse.stock) {
-
-
 
                                 if (errorResponse.errors) {
                                     var categoriesErrors = Object.keys(errorResponse.errors).filter(

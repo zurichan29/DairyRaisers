@@ -13,8 +13,6 @@ use App\Models\Retailer;
 use App\Models\Buffalo;
 use App\Models\Product;
 use App\Models\Variants;
-use App\Models\MilkStock;
-use App\Models\ProductStock;
 use App\Models\User_Address;
 use App\Models\PaymentMethod;
 use App\Models\Sales;
@@ -42,7 +40,6 @@ class DatabaseSeeder extends Seeder
             'status' => 'ACTIVATED'
         ]);
 
-
         $this->seedOnlineShoppers();
         $this->seedRetailers();
 
@@ -51,7 +48,6 @@ class DatabaseSeeder extends Seeder
         $this->seedProducts();
         $this->seedBuffalo();
     }
-
 
     private function seedCart()
     {
@@ -89,7 +85,6 @@ class DatabaseSeeder extends Seeder
         //     'total' => 50
         // ]);
     }
-
     private function seedUserandAddress()
     {
         User::Create([
@@ -445,6 +440,9 @@ class DatabaseSeeder extends Seeder
     {
         // Orders for Online Shopper 1
         $order1 = Order::create([
+            'name' => 'Christian Jay Jacalne',
+            'mobile_number' => '9262189072',
+            'email' => 'krischang29@gmail.com',
             'order_number' => 'DR08231',
             'customer_id' => 1, // Replace with the actual online shopper ID (e.g., $onlineShopper1->id)
             'customer_type' => 'online_shopper',
@@ -472,7 +470,7 @@ class DatabaseSeeder extends Seeder
                 // Add more items as needed
             ],
             'grand_total' => 350,
-            'address' => 'Sta. Cecilia 2 BRGY. JULUGAN VIII, TANZA, CAVITE, REGION IV-A 4108, PHILIPPINES',
+            'address' => 'Sta. Cecilia 2 Brgt. Julugan viii, Tanza, Cavite 4108, Philippines',
             'shipping_option' => 'Delivery',
             'payment_method' => 'Gcash',
             'reference_number' => '123456789B',
@@ -480,6 +478,9 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Online Shopper 2
         $order2 = Order::create([
+            'name' => 'Christian Jay Jacalne',
+            'mobile_number' => '9262189072',
+            'email' => 'krischang29@gmail.com',
             'order_number' => 'DR08232',
             'customer_id' => 2, // Replace with the actual online shopper ID (e.g., $onlineShopper2->id)
             'customer_type' => 'online_shopper',
@@ -494,7 +495,7 @@ class DatabaseSeeder extends Seeder
                 // Add more items as needed
             ],
             'grand_total' => 300,
-            'address' => 'street 22221 BRGY. ALIMA, BACOOR CITY, CAVITE, REGION IV-A 4109, PHILIPPINES',
+            'address' => 'street 22221 Brgy. Alima, Baccor City, Cavite  4109, Philippines',
             'shipping_option' => 'Delivery',
             'payment_method' => 'Gcash',
             'reference_number' => '987654321A',
@@ -502,6 +503,9 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Retailer 1
         $order3 = Order::create([
+            'name' => 'Christian Jay Jacalne',
+            'mobile_number' => '9262189072',
+            'email' => 'krischang29@gmail.com',
             'order_number' => 'DR08233',
             'customer_id' => 1, // Replace with the actual retailer ID (e.g., $retailer1->id)
             'customer_type' => 'retailer',
@@ -516,7 +520,7 @@ class DatabaseSeeder extends Seeder
                 // Add more items as needed
             ],
             'grand_total' => 450,
-            'address' => 'street 1111 BRGY. CABULALAAN, BACARRA, ILOCOS NORTE, REGION I 4001, PHILIPPINES',
+            'address' => 'street 1111 Brgy. Cabulalan, Bacarra, Ilocos Norte  4001, Philippines',
             'shipping_option' => 'Delivery',
             'payment_method' => 'Gcash',
             'reference_number' => '987654321F',
@@ -524,6 +528,9 @@ class DatabaseSeeder extends Seeder
 
         // Orders for Retailer 2
         $order4 = Order::create([
+            'name' => 'Christian Jay Jacalne',
+            'mobile_number' => '9262189072',
+            'email' => 'krischang29@gmail.com',
             'order_number' => 'DR08234',
             'customer_id' => 2, // Replace with the actual retailer ID (e.g., $retailer2->id)
             'customer_type' => 'retailer',
@@ -538,7 +545,30 @@ class DatabaseSeeder extends Seeder
                 // Add more items as needed
             ],
             'grand_total' => 480,
-            'address' => 'street 2222 BRGY. SAN ANTONIO, BASCO, BATANES, REGION II 4002, PHILIPPINES',
+            'address' => 'street 2222 Brgy. San Antonio, Basco, Batanes 4002, Philippines',
+            'shipping_option' => 'Delivery',
+            'payment_method' => 'Gcash',
+            'reference_number' => '123456789G',
+        ]);
+
+        $order4 = Order::create([
+            'name' => 'Christian Jay Jacalne',
+            'mobile_number' => '9262189072',
+            'email' => 'krischang29@gmail.com',
+            'order_number' => 'DR08234',
+            'customer_id' => null,
+            'customer_type' => 'guest',
+            'items' => [
+                [
+                    'product_id' => 4,
+                    'price' => 50,
+                    'discount' => 2,
+                    'quantity' => 10,
+                    'total' => 480,
+                ],
+            ],
+            'grand_total' => 480,
+            'address' => 'street 2222 Brgy. San Antonio, Basco, Batanes 4002, Philippines',
             'shipping_option' => 'Delivery',
             'payment_method' => 'Gcash',
             'reference_number' => '123456789G',
@@ -547,8 +577,87 @@ class DatabaseSeeder extends Seeder
 
     private function seedSalesData(): void
     {
-        $currentDate = Carbon::now();
-        $lastMonthDate = $currentDate->copy()->subMonth();
+        // Create sales data for 2022
+        for ($i = 1; $i <= 12; $i++) {
+            $currentDate = Carbon::create(2022, $i, 1);
+            $lastMonthDate = $currentDate->copy()->subMonth();
+
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Choco Milk', // Product name
+                'price' => 100, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Fresh Milk', // Product name
+                'price' => 100, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Plain Yoghurt', // Product name
+                'price' => 50, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+
+            Sales::create([
+                'category' => 'Buffalo',
+                'name' => 'Buffalo', // Product name
+                'price' => rand(1000, 5000), // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+        }
+
+        // Create sales data for 2023
+        for ($i = 1; $i <= 12; $i++) {
+            $currentDate = Carbon::create(2023, $i, 1);
+            $lastMonthDate = $currentDate->copy()->subMonth();
+
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Choco Milk', // Product name
+                'price' => 100, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Fresh Milk', // Product name
+                'price' => 100, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+
+            Sales::create([
+                'category' => 'Products',
+                'name' => 'Plain Yoghurt', // Product name
+                'price' => 50, // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+
+            Sales::create([
+                'category' => 'Buffalo',
+                'name' => 'Buffalo', // Product name
+                'price' => rand(1000, 5000), // Product price
+                'quantity' => rand(10, 100), // Product quantity sold
+                'amount' => rand(1000, 2000),
+                'created_at' => $currentDate,
+            ]);
+        }
 
         // Create sales data for the current month
         Sales::create([

@@ -16,8 +16,7 @@ class Order extends Model
     'items' => 'array',
   ];
   protected $fillable = [
-
-    'items',
+    'name', 'mobile_number', 'email', 'items', 'store_name',
     'customer_id', 'customer_type', 'order_number', 'grand_total', 'user_address',
     'remarks', 'comments', 'delivery_option', 'payment_method',
     'reference_number', 'payment_receipt', 'status'

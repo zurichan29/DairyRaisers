@@ -26,7 +26,7 @@
                         </form>
                     </div>
                     <div class="col-md-4 d-flex justify-content-end align-items-center">
-                        <button id="downloadButton" type="button" class="btn btn-sm btn-outline-primary">
+                        <button id="downloadChartButton" type="button" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-print"></i> Download
                         </button>
                     </div>
@@ -53,7 +53,6 @@
                             <select lect id="categoryFilter" name="categoryFilter" class="form-select form-select-sm mr-2">
                                 <option value="">All</option>
                                 <option value="Products">Products</option>
-                                <option value="Milk">Milk</option>
                                 <option value="Buffalo">Buffalo</option>
                             </select>
                             <button type="button" id="applyCategoryFilterBtn" class="btn btn-sm btn-primary">Apply</button>
@@ -63,15 +62,12 @@
                         <button type="button" id="copy" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-copy"></i> Copy
                         </button>
-                        <button type="button" id="csv" onclick="export_data()" class="mr-2 btn btn-sm btn-outline-primary">
-                            <i class="fa-solid fa-file-csv"></i> CSV
-                        </button>
-                        <button type="button" id="export" onclick="export_data()" class="mr-2 btn btn-sm btn-outline-primary">
+                        <button type="button" id="downloadExcelButton" class="mr-2 btn btn-sm btn-outline-primary">
                             <i class="fa-regular fa-file-excel"></i> Excel
                         </button>
-                        <a href="{{ route('admin.sales_report.print') }}" class="btn btn-sm btn-outline-primary">
+                        <button type="button" id="printButton" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-print"></i> Print
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -103,18 +99,16 @@
             </div>
         </div>
 
-        <!-- Hidden container to store the custom print content -->
-        <div id="printContainer" style="display: none;"></div>
+        {{-- CHART --}}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
-        <!-- Include Clipboard.js -->
+        {{-- PRINT, EXCEL, AND COPY SOURCE --}}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.0.63/print.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
 
         <script>
             $(document).ready(function() {
@@ -124,21 +118,20 @@
 
                 dataTable = $('#dataTable').DataTable();
 
-
-                // Initialize daterangepicker
                 $('#dateRange').daterangepicker({
                     opens: 'right',
                     autoUpdateInput: false,
                 });
 
-                // Add event listener for applying the date range
                 $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
                     $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format(
                         'YYYY-MM-DD'));
 
                     var startDate = picker.startDate.format('YYYY-MM-DD');
                     var endDate = picker.endDate.format('YYYY-MM-DD');
-                    var category = $('#categoryFilter').val(); // Get the selected category value
+                    var category = $('#categoryFilter').val();
+                    console.log(startDate);
+                    console.log(endDate);
                     refreshDataTable(startDate, endDate, category);
                 });
 
@@ -249,6 +242,22 @@
                     var category = $('#categoryFilter').val(); // Get the selected category value
                     refreshDataTable(startDate, endDate, category);
                 });
+
+                // Add event listener for the download button
+                $('#downloadChartButton').on('click', function() {
+                    var selectedYear = $('#year').val();
+                    downloadChartImage(selectedYear);
+                });
+
+                // Function to capture chart as image and initiate download
+                function downloadChartImage(year) {
+                    var canvas = $('#myBarChart')[0];
+                    var image = canvas.toDataURL('image/png'); // Convert canvas to base64 image
+                    // Construct the filename using the selected year
+                    var filename = 'monthly_sales_chart_' + year + '.png';
+                    // Use downloadjs to initiate the download
+                    download(image, filename, 'image/png');
+                }
 
                 // Function to initialize the chart
                 function initializeChart(labels, earningData) {
@@ -393,11 +402,9 @@
                 console.log(earningData);
                 initializeChart(labels, earningData);
 
-                
                 // Initialize Clipboard.js
-
                 new ClipboardJS('#copy', {
-                    text: function (trigger) {
+                    text: function(trigger) {
                         // Find the datatable
                         var dataTable = $('#dataTable');
 
@@ -406,15 +413,15 @@
 
                         // Include the table header
                         var headerRow = [];
-                        dataTable.find('thead th').each(function () {
+                        dataTable.find('thead th').each(function() {
                             headerRow.push($(this).text());
                         });
                         dataTableData.push(headerRow.join('\t'));
 
                         // Include the data rows
-                        dataTable.find('tbody tr').each(function () {
+                        dataTable.find('tbody tr').each(function() {
                             var row = [];
-                            $(this).find('td').each(function () {
+                            $(this).find('td').each(function() {
                                 row.push($(this).text());
                             });
                             dataTableData.push(row.join('\t')); // Use tab delimiter for columns
@@ -422,7 +429,7 @@
 
                         // Include the footer row
                         var footerRow = [];
-                        dataTable.find('tfoot th').each(function () {
+                        dataTable.find('tfoot th').each(function() {
                             footerRow.push($(this).text());
                         });
                         dataTableData.push(footerRow.join('\t'));
@@ -432,78 +439,48 @@
                 });
 
                 // Handle button click event
-                $('#copy').click(function () {
-                    alert('Data copied to clipboard!');
+                $('#copy').click(function() {
+                    showNotification('success', 'Data copied to clipboard!');
                 });
 
-            });
-
-            //Download CSV
-            function export_data() {
-                window.location.href = "{{ route('admin.sales_reports.download-csv') }}";
-            };
-
-            
-            //Download Chart
-            document.addEventListener("DOMContentLoaded", function () {
-                document.getElementById("downloadButton").addEventListener("click", function () {
-                    // Get the chart image data from the canvas
-                    var chartImageData = document.getElementById("myBarChart").toDataURL("image/png");
-        
-                    // Redirect the user to the chart download route with the image data
-                    window.location.href = "{{ route('admin.sales_reports.download-chart') }}" + "?chartImageData=" + encodeURIComponent(chartImageData);
+                $('#printButton').on('click', function() {
+                    if (dataTable.rows().count() > 0) {
+                        printJS({
+                            printable: 'dataTable', // Provide the ID of the element to print
+                            type: 'html', // Specify the type of content
+                            // header: '<h2>Your Sales Report</h2>', // Optional header content
+                        });
+                    } else {
+                        showNotification('error', 'No data to print');
+                    }
                 });
-            });
 
-            //Export Excel
-            function export_data() {
-                let table = document.getElementById("dataTable");
-                let headerRow = table.getElementsByTagName("thead")[0].getElementsByTagName("tr")[0];
-                let footerRow = table.getElementsByTagName("tfoot")[0].getElementsByTagName("tr")[0];
-                let dataRows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-                
-                let data = [];
+                // Add event listener for the download button
+                $('#downloadExcelButton').on('click', function() {
+                    var wb = XLSX.utils.table_to_book(document.getElementById('dataTable'));
+                    var wbout = XLSX.write(wb, {
+                        bookType: 'xlsx',
+                        bookSST: true,
+                        type: 'binary'
+                    });
 
-                // Include the header row
-                let headerData = [];
-                for (let j = 0; j < headerRow.cells.length; j++) {
-                    headerData.push(headerRow.cells[j].innerText);
-                }
-                data.push(headerData.join("\t"));
-
-                // Include the data rows
-                for (let i = 0; i < dataRows.length; i++) {
-                    let row = dataRows[i];
-                    let rowData = [];
-
-                    for (let j = 0; j < row.cells.length; j++) {
-                        rowData.push(row.cells[j].innerText);
+                    function s2ab(s) {
+                        var buf = new ArrayBuffer(s.length);
+                        var view = new Uint8Array(buf);
+                        for (var i = 0; i !== s.length; ++i) {
+                            view[i] = s.charCodeAt(i) & 0xFF;
+                        }
+                        return buf;
                     }
 
-                    data.push(rowData.join("\t"));
-                }
+                    var blob = new Blob([s2ab(wbout)], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    var filename = 'month_sales.xlsx'; // You can customize the filename here
+                    saveAs(blob, filename);
+                });
 
-                // Include the footer row
-                let footerData = [];
-                for (let j = 0; j < footerRow.cells.length; j++) {
-                    footerData.push(footerRow.cells[j].innerText);
-                }
-                data.push(footerData.join("\t"));
-
-                let excelData = data.join("\n");
-                let blob = new Blob([excelData], { type: "application/vnd.ms-excel" });
-                let url = URL.createObjectURL(blob);
-
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = "Daily-Sales.xls";
-                a.click();
-
-                URL.revokeObjectURL(url);
-            };
-
-
-
-        </script>  
+            });
+        </script>
     @endif
 @endsection

@@ -122,28 +122,49 @@
                                         Customer Details <i class="fa-solid fa-circle-user text-primary"></i>
                                     </h5>
                                     <br>
-                                    @if ($order->customer_type == 'online_shopper')
-                                        <h6>Name:
-                                            <strong>{{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}</strong>
-                                        </h6>
-                                        <h6>Contact: <strong>+63{{ $order->customer->user->mobile_number }}</strong></h6>
-                                        <h6>Email:
-                                            <strong>{{ $order->customer->user->email ? $order->customer->user->email : 'none' }}</strong>
-                                        </h6>
-                                    @elseif ($order->customer_type == 'retailer')
-                                        <h6>Name:
-                                            <strong>{{ $order->customer->first_name . ' ' . $order->customer->last_name }}</strong>
-                                        </h6>
-                                        <h6>Contact: <strong>+63{{ $order->customer->mobile_number }}</strong></h6>
-                                        <h6>Store: <strong>{{ $order->customer->store_name }}</strong></h6>
-                                    @elseif ($order->customer_type == 'guest')
-                                        <h6>Name:
-                                            <strong>{{ $order->name }}</strong>
-                                        </h6>
-                                        <h6>Contact: <strong>+63{{ $order->mobile_number }}</strong></h6>
+                                    <div class="row">
+                                        <div class="col ">
+                                            <p class="">Name:</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="">{{ $order->name }}</p>
+                                        </div>
+                                    </div>
+                                    @if ($order->customer_type == 'retailer')
+                                        <div class="row">
+                                            <div class="col ">
+                                                <p class="">Store:</p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <p class="">{{ $order->store_name }}</p>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="row">
+                                            <div class="col ">
+                                                <p class="">Email:</p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <p class="">{{ $order->email }}</p>
+                                            </div>
+                                        </div>
                                     @endif
-                                    </h6>
-                                    <h6 style="line-height: 1.5rem;">Address : <strong>{{ $order->address }}</strong></h6>
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="">Mobile No.</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="">+63{{ $order->mobile_number }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="">Address:</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="">{{ $order->address }}</p>
+                                        </div>
+                                    </div>
                                     <br>
                                     <hr>
                                     <br>
@@ -151,7 +172,9 @@
                                         <h5>
                                             Invoice <i class="fa-solid fa-credit-card text-primary"></i>
                                         </h5>
-                                        <button type="button" id="print" class="btn btn-sm btn-outline-primary">
+                                        <button type="button" id="printInvoiceButton"
+                                            onclick="printInvoice({{ $order->id }})"
+                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fa-solid fa-print"></i> Print Invoice
                                         </button>
                                     </div>
@@ -177,7 +200,9 @@
                                             </h6>
                                         </div>
                                     </div>
-                                    @if ($order->customer_type == 'online_shopper')
+                                    @if (
+                                        ($order->customer_type == 'online_shopper' || $order->customer_type == 'guest') &&
+                                            $order->payment_method != 'Cash On Delivery')
                                         <br>
                                         <button type="button" class="btn btn-sm btn-info order-edit-btn"
                                             data-order-id="{{ $order->id }}">Edit</button>
@@ -190,9 +215,9 @@
                                         </div>
                                         <div class="collapse mt-3" id="PaymentReciept">
                                             <div class="card card-body">
-                                                <a href="{{ asset('storage/' . $order->payment_reciept) }}"
+                                                <a href="{{ asset('storage/' . $order->payment_receipt) }}"
                                                     data-fancybox="gallery" data-caption="Payment Reciept">
-                                                    <img src="{{ asset('storage/' . $order->payment_reciept) }}"
+                                                    <img src="{{ asset('storage/' . $order->payment_receipt) }}"
                                                         class="img-fluid" alt="Image">
                                                 </a>
                                             </div>
@@ -353,8 +378,9 @@
                                     <div class="card-body d-flex and flex-column">
                                         <div class="d-grid text-center">
                                             <h5 class="mt-2 font-weight-light">Order has been rejected...</h5>
-                                            <img src="{{ asset('images/rejected.png') }}" class="img-fluid"
+                                            <img src="{{ asset('images/rejected.png') }}" class="img-fluid mx-auto"
                                                 alt="Manage Order Picture">
+                                            <h5>Reasons: {{ $order->comments }}</h5>
                                         </div>
                                     </div>
                                 </div>
@@ -390,6 +416,25 @@
         </div>
 
         <script>
+            function printInvoice(id) {
+                const printWindow = window.open(`{{ route('admin.orders.print-invoice', '') }}/${id}`, '_blank');
+
+                const closePrintTab = function() {
+                    printWindow.close();
+                };
+
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
+
+                // Listen for the beforeprint event
+                window.addEventListener('beforeprint', closePrintTab);
+
+                // Remove the event listener if the user cancels the print
+                window.addEventListener('afterprint', function() {
+                    window.removeEventListener('beforeprint', closePrintTab);
+                });
+            }
             $(document).ready(function() {
                 $("[data-fancybox]").fancybox({
                     thumbs: {
@@ -403,56 +448,6 @@
                         'close'
                     ]
                 });
-
-                function showNotification(status, message, productName) {
-                    var notification = $('#Notification');
-                    var notificationHeader = notification.find('.toast-header');
-                    var notificationBody = notification.find('.toast-body');
-                    var iconClass = '';
-                    var headerClass = '';
-                    var headerText = '';
-
-                    // Update classes, icon, and header text based on the status
-                    switch (status) {
-                        case 'success':
-                            headerClass = 'bg-success';
-                            iconClass = 'fa-solid fa-circle-check';
-                            headerText = 'Success';
-                            break;
-                        case 'updated':
-                            headerClass = 'bg-info';
-                            iconClass = 'fa-solid fa-circle-info';
-                            headerText = 'Updated';
-                            break;
-                        case 'deleted':
-                            headerClass = 'bg-warning';
-                            iconClass = 'fa-solid fa-trash';
-                            headerText = 'Deleted';
-                            break;
-                        case 'error':
-                            headerClass = 'bg-danger';
-                            iconClass = 'fa-solid fa-circle-xmark';
-                            headerText = 'Error';
-                            break;
-                        default:
-                            break;
-                    }
-
-                    // Update the notification content and classes
-                    notificationHeader.find('strong').removeClass().addClass('me-auto').html(
-                        '<i class="me-2 fa-solid ' + iconClass + '"></i> ' + headerText);
-                    notification.find('.toast-header').removeClass().addClass('toast-header text-white').addClass(
-                        headerClass);
-                    notificationBody.text(message);
-
-                    // Show the notification with fade-in and fade-out animations
-                    notification.toast({
-                        animation: true
-                    });
-
-                    // Show the notification
-                    notification.toast('show');
-                }
 
                 $(document).on('click', '.order-edit-btn', function() {
                     var orderId = $('.order-edit-btn').data('order-id');
@@ -499,8 +494,9 @@
                             $('#editOrderModal').modal('hide');
 
                             // Show success notification
-                            showNotification('updated', 'Order: ' + response.order_number +
-                                ' updated successfully.');
+                            showNotification('info', 'Order Reference Updated',
+                                'The reference number of the order has been successfully updated '
+                            );
 
                             $('#ref').text(response.ref);
 

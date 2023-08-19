@@ -9,7 +9,7 @@ class Buffalo extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['gender', 'age'];
+    protected $fillable = ['gender', 'age', 'price', 'total', 'quantity', ''];
 
     protected $table = 'buffalo';
 

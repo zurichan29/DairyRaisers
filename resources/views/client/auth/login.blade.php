@@ -26,11 +26,6 @@
                                 <p class="text-danger">{{ $message }}</p>
                             @enderror
                         </div>
-
-                        <div class="mb-3">
-                            <input type="checkbox" name="remember" id="remember">
-                            <label for="remember">Remember Me</label>
-                        </div>
                         <div class="d-grid d-flex justify-content-between align-items-stretch">
                             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i>
                                 Login</button>

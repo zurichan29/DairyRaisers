@@ -100,6 +100,13 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        'admins' => [
+            'provider' => 'admins', // Adjust the provider to match your configuration
+            'table' => 'password_resets_admin', // Use the correct table name
+            'expire' => 60,
+        ],
+
+
     ],
 
     /*

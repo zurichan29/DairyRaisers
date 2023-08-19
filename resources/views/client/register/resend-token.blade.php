@@ -1,27 +1,34 @@
 @extends('layouts.client')
 
 @section('content')
-    <form class="mb-3 container" id="resendTokenForm">
+    <form class="my-5 container" style="width: 500px" id="resendTokenForm">
         @csrf
-        <p class="mb-3">Kindly enter your email address to resend another verification mail.</p>
-        <div class="input-group has-validation mb-3">
-            <span class="input-group-text">@</span>
-            <div class="form-floating">
-                <input type="email" class="form-control disable-on-submit" id="email" name="email"
-                    placeholder="Username" required>
-                <label for="email">Email *</label>
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="fw-bold">Resend Email Verification</h5>
+                <p>To resend the email verification link, please enter your email address below. Clicking the link in the email will verify your account.</p>
             </div>
-            <div id="resend-token-email-error" class="error-container"></div>
+            <div class="card-body">
+                <div class="input-group has-validation mb-3">
+                    <span class="input-group-text">@</span>
+                    <div class="form-floating">
+                        <input type="email" class="form-control disable-on-submit" id="email" name="email"
+                            placeholder="Username" required>
+                        <label for="email">Email *</label>
+                    </div>
+                    <div id="resend-token-email-error" class="error-container"></div>
+                </div>
+                <div class="text-success" id="message"></div>
+                <button type="submit" id="resendTokenBtn" class="btn btn-primary mb-3">
+                    <span class="loading-spinner" style="display: none">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </span>
+                    <span class="btn-text">Submit</span>
+                </button>
+                <div id="timer" style="display: none;"></div>
+            </div>
         </div>
-        <div class="text-success" id="message"></div>
-        <button type="submit" id="resendTokenBtn" class="btn btn-primary mb-3">
-            <span class="loading-spinner" style="display: none">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Loading...
-            </span>
-            <span class="btn-text">Submit</span>
-        </button>
-        <div id="timer" style="display: none;"></div>
     </form>
 
     <script>
@@ -45,7 +52,7 @@
                     }
                 }, 1000);
             }
-           
+
 
             $('#resendTokenForm').submit(function(e) {
                 e.preventDefault();

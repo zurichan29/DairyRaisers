@@ -14,30 +14,26 @@
     <!-- Add this script tag to include moment.js library -->
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> --}}
 
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" >
+    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css" >
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-    <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
+        rel="stylesheet" >
+    <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet" >
+    <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css"
+        >
+    <script src="{{ asset('js/jquery.min.js') }}" ></script>
 
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('js/toastr.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ asset('css/fancybox.min.css') }}" />
     <script src="{{ asset('js/fancybox.min.js') }}"></script>
-    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" /> --}}
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script> --}}
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/daterangepicker.css') }}" />
-    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> --}}
 
     <script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/daterangerpicker.min.js') }}"></script>
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> --}}
-    {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script> --}}
 
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
@@ -45,7 +41,7 @@
             toastr.options.closeButton = true;
             toastr.options.timeOut = 0;
             toastr.options.extendedTimeOut = 0;
-            toastr.info(order.order_number + ': for ' + order.delivery_option, 'New Order');
+            toastr.info('A new order has been successfully placed (' + order.order_number + ').', ' New Order Placed');
         }
 
         function showNotification(status, title, message) {
@@ -72,26 +68,13 @@
                     break;
             }
         }
-
-        // Enable pusher logging - don't include this in production
-        Pusher.logToConsole = true;
-
-        var pusher = new Pusher('f25da7ad5e99d90d9214', {
-            cluster: 'ap1'
-        });
-
-        var channel = pusher.subscribe('admin-channel');
-        channel.bind('order-notification', function(data) {
-
-            var order = JSON.parse(JSON.stringify(data));
-            orderNotification(order.order);
-        });
     </script>
 
     @if (session()->has('message'))
         <script>
             $(document).ready(function() {
-                showNotification("{{ session('message')['type'] }}", "{{ session('message')['title'] }}", "{{ session('message')['body'] }}");
+                showNotification("{{ session('message')['type'] }}", "{{ session('message')['title'] }}",
+                    "{{ session('message')['body'] }}");
             });
         </script>
     @endif
@@ -101,6 +84,9 @@
 </head>
 
 <body id="page-top">
+    <audio id="notification-sound">
+        <source src="{{ asset('sounds/order_notification_sound.wav') }}" type="audio/wav">
+    </audio>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -331,6 +317,11 @@
     <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
+
+    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}" ></script>
+    <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}" ></script>
+    <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}" ></script>
+
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
 
@@ -339,6 +330,36 @@
 
     <script>
         $(document).ready(function() {
+
+            // Enable pusher logging - don't include this in production
+            Pusher.logToConsole = true;
+
+            var pusher = new Pusher('f25da7ad5e99d90d9214', {
+                cluster: 'ap1'
+            });
+
+            var channel = pusher.subscribe('admin-channel');
+            channel.bind('order-notification', function(data) {
+                var order = JSON.parse(JSON.stringify(data));
+                var notificationSound = $('#notification-sound')[0];
+
+                // Play the notification sound
+                notificationSound.play();
+                orderNotification(order.order);
+            });
+
+            $("input[type='number']").on("keydown", function(event) {
+                // Allow only digits, backspace, and decimal point
+                if (!((event.keyCode >= 48 && event.keyCode <= 57) || // Digits
+                        event.keyCode === 8 || // Backspace
+                        event.keyCode === 46 || // Delete
+                        event.keyCode === 37 || // Left arrow
+                        event.keyCode === 39 || // Right arrow
+                        event.keyCode === 190 || // Decimal point (.)
+                        event.keyCode === 110)) { // Numpad decimal point (.)
+                    event.preventDefault();
+                }
+            });
             // Get the current route name
             var currentRoute = '{{ Route::currentRouteName() }}';
 

@@ -117,7 +117,7 @@ class StaffController extends Controller
         $staff = Admin::where('verification_token', $token)->where('is_verified', false)->first();
 
         if (!$staff) {
-            abort(404); // Or redirect to an error page
+            abort(404); 
         }
 
         return view('admin.staffs.password_setup', compact('token'));

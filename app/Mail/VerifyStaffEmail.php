@@ -34,6 +34,6 @@ class VerifyStaffEmail extends Mailable
     public function build()
     {
         return $this->subject('Verify Staff Email')
-        ->markdown('admin.staffs.verify_email');
+        ->markdown('admin.staffs.verify_email', ['staff' => $this->staff]);
     }
 }

@@ -6,336 +6,351 @@
             {{ session('no_access') }}
         </div>
     @else
-        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}">All Orders</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Create Order</li>
-            </ol>
-        </nav>
-        <form action="{{ route('admin.orders.store_order') }}" method="POST">
-            @csrf
+        @error('customer_details')
+            <script>
+                $(document).ready(function() {
+                    showNotification('error', 'No Selected Customer', 'Please select a customer before proceeding.');
+                });
+            </script>
+        @enderror
+        <div class="container ">
 
-            <div class="card shadow mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title">Select Customer</h5>
-                    <div class="">
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#addCustomerDetailsModal"
-                            class="btn btn-primary">Add
-                            Customer
-                            Details</button>
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal"
-                            id="edit-customer-details-btn" class="btn btn-primary">Edit
-                            Selected Customer</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="customerTable" style="font-size: 14px">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Store</th>
-                                    <th scope="col">Address</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($customer_details as $customer)
-                                    <tr>
-                                        <td>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="customer_details"
-                                                    value="{{ $customer->id }}" id="{{ $customer->id }}">
-                                            </div>
-                                        </td>
-                                        <td>{{ $customer->first_name . ' ' . $customer->last_name }}</td>
-                                        <td>{{ $customer->store_name }}</td>
-                                        <td>{{ $customer->complete_address }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}">All Orders</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Order</li>
+                </ol>
+            </nav>
+            <form action="{{ route('admin.orders.store_order') }}" method="POST">
+                @csrf
 
-
-
-            {{-- SELECTING A PRODUCT --}}
-
-            <!-- Minimal UI for product selection and order details -->
-            <div class="container mt-4">
-                <div class="row">
-                    <div class="col-md-8 mx-auto">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Select Products</h5>
-                                <div class="table-responsive">
-                                    <table class="table table-striped" id="dataTable" style="font-size: 14px">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Select</th>
-                                                <th scope="col">Product</th>
-                                                <th scope="col">Price</th>
-                                                <th scope="col">Variant</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($products as $product)
-                                                <tr>
-                                                    <td>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                value="{{ $product->id }}"
-                                                                id="product_{{ $product->id }}">
-                                                        </div>
-                                                    </td>
-                                                    <td>{{ $product->name }}</td>
-                                                    <td>₱{{ $product->price }}.00</td>
-                                                    <td>{{ $product->variant->name }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                <div class="card shadow mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">Select Customer</h5>
+                        <div class="">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#addCustomerDetailsModal"
+                                class="btn btn-sm btn-primary me-3">Add
+                                Customer
+                                Details</button>
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal"
+                                id="edit-customer-details-btn" class="btn btn-sm btn-primary">Edit
+                                Selected Customer</button>
                         </div>
                     </div>
-                </div>
-                <div class="card mt-4">
                     <div class="card-body">
-                        <h5 class="card-title">Selected Products</h5>
-                        <div id="selectedProductsContainer" class="row">
-                            <!-- Selected products will be displayed here -->
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="customerTable" style="font-size: 14px">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Store</th>
+                                        <th scope="col">Address</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($customer_details as $customer)
+                                        <tr>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="customer_details"
+                                                        value="{{ $customer->id }}" id="{{ $customer->id }}">
+                                                </div>
+                                            </td>
+                                            <td>{{ $customer->first_name . ' ' . $customer->last_name }}</td>
+                                            <td>{{ $customer->store_name }}</td>
+                                            <td>{{ $customer->complete_address }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">Select Products</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="dataTable" style="font-size: 14px">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Select</th>
+                                                    <th scope="col">Product</th>
+                                                    <th scope="col">Price</th>
+                                                    <th scope="col">Variant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($products as $product)
+                                                    @if ($product->status == 'AVAILABLE' || $product->stocks > 0)
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        value="{{ $product->id }}"
+                                                                        id="product_{{ $product->id }}">
+                                                                </div>
+                                                            </td>
+                                                            <td>{{ $product->name }}</td>
+                                                            <td>₱{{ $product->price }}.00</td>
+                                                            <td>{{ $product->variant->name }}</td>
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-ccenter">
+                                    <h5 class="card-title">Selected Products</h5>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="selectedProductsContainer" class="row">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- add costumer details Modal -->
+            <div class="modal fade" id="addCustomerDetailsModal" tabindex="-1"
+                aria-labelledby="addCustomerDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-primary" id="addCustomerDetailsModalLabel">Create Customer Details
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="POST" id="addCustomerDetailsForm">
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" name="first_name" id="first_name"
+                                                placeholder="Name">
+                                            <label for="first_name">First Name *</label>
+                                            <div id="add-customer_details-first_name-error" class="error-container"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" name="last_name" id="last_name"
+                                                placeholder="Name">
+                                            <label for="last_name">Last Name *</label>
+                                            <div id="add-customer_details-last_name-error" class="error-container"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" name="mobile_number" id="mobile_number"
+                                        placeholder="mobile_number">
+                                    <label for="mobile_number">Phone No. *</label>
+                                    <div id="add-customer_details-mobile_number-error" class="error-container"></div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="store_name" id="store_name"
+                                        placeholder="Name">
+                                    <label for="store_name">Store Name *</label>
+                                    <div id="add-customer_details-store_name-error" class="error-container"></div>
+                                </div>
+
+                                <div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="regionSelect" name="region"
+                                            aria-label="select region">
+                                            <option disabled selected value="">Select your region</option>
+                                        </select>
+                                        <label for="payment_method">Region *</label>
+                                        <div id="add-customer_details-region-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="provinceSelect" name="province"
+                                            aria-label="select province">
+                                            <option disabled selected value="">Select your province</option>
+                                        </select>
+                                        <label for="provinceSelect">Province *</label>
+                                        <div id="add-customer_details-province-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="municipalitySelect" name="municipality"
+                                            aria-label="select municipality">
+                                            <option disabled selected value="">Select your municipality</option>
+                                        </select>
+                                        <label for="municipalitySelect">Municipality *</label>
+                                        <div id="add-customer_details-municipality-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="barangaySelect" name="barangay"
+                                            aria-label="select barangay">
+                                            <option disabled selected value="">Select your barangay</option>
+                                        </select>
+                                        <label for="barangaySelect">Barangay *</label>
+                                        <div id="add-customer_details-barangay-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="street" id="street"
+                                            placeholder="enter street">
+                                        <label for="street">Street Name, Building, House No. *</label>
+                                        <div id="add-customer_details-street-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="zip_code" id="zip_code"
+                                            placeholder="enter zip_code">
+                                        <label for="zip_code">Zip Code *</label>
+                                        <div id="add-customer_details-zip_code-error" class="error-container"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="remarks" id="remarks"
+                                        placeholder="enter remarks">
+                                    <label for="remarks">Remarks</label>
+                                    <div id="add-customer_details-remarks-error" class="error-container"></div>
+                                </div>
+
+                                <button type="submit" id="addCustomerDetailsBtn" class="btn btn-primary mb-3">
+                                    <span class="loading-spinner" style="display: none;">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        Loading...
+                                    </span>
+                                    <span class="btn-text">Submit</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+            <!-- edit costumer details Modal -->
+            <div class="modal fade" id="editCustomerDetailsModal" tabindex="-1"
+                aria-labelledby="editCustomerDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-primary" id="editCustomerDetailsModalLabel">Edit Customer Details
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="POST" id="editCustomerDetailsForm">
 
-        <!-- add costumer details Modal -->
-        <div class="modal fade" id="addCustomerDetailsModal" tabindex="-1" aria-labelledby="addCustomerDetailsModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-primary" id="addCustomerDetailsModalLabel">Create Customer Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="POST" id="addCustomerDetailsForm">
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="first_name" id="first_name"
-                                            placeholder="Name">
-                                        <label for="first_name">First Name *</label>
-                                        <div id="add-customer_details-first_name-error" class="error-container"></div>
+                                <input type="hidden" name="customer_id" id="editCustomerId">
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" name="first_name"
+                                                id="edit-first_name" placeholder="Name">
+                                            <label for="edit-first_name">First Name *</label>
+                                            <div id="edit-customer_details-first_name-error" class="error-container">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" name="last_name"
+                                                id="edit-last_name" placeholder="Name">
+                                            <label for="edit-last_name">Last Name *</label>
+                                            <div id="edit-customer_details-last_name-error" class="error-container"></div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="last_name" id="last_name"
-                                            placeholder="Name">
-                                        <label for="last_name">Last Name *</label>
-                                        <div id="add-customer_details-last_name-error" class="error-container"></div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" name="mobile_number"
+                                        id="edit-mobile_number" placeholder="mobile_number">
+                                    <label for="edit-mobile_number">Phone No. *</label>
+                                    <div id="edit-customer_details-mobile_number-error" class="error-container"></div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="store_name" id="edit-store_name"
+                                        placeholder="Name">
+                                    <label for="edit-store_name">Store Name *</label>
+                                    <div id="edit-customer_details-store_name-error" class="error-container"></div>
+                                </div>
+
+                                <div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="edit-regionSelect" name="region"
+                                            aria-label="select region">
+                                            <option disabled selected value="">Select your region</option>
+                                        </select>
+                                        <label for="edit-regionSelect">Region *</label>
+                                        <div id="edit-customer_details-region-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="edit-provinceSelect" name="province"
+                                            aria-label="select province">
+                                            <option disabled selected value="">Select your province</option>
+                                        </select>
+                                        <label for="edit-provinceSelect">Province *</label>
+                                        <div id="edit-customer_details-province-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="edit-municipalitySelect" name="municipality"
+                                            aria-label="select municipality">
+                                            <option disabled selected value="">Select your municipality</option>
+                                        </select>
+                                        <label for="edit-municipalitySelect">Municipality *</label>
+                                        <div id="edit-customer_details-municipality-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="edit-barangaySelect" name="barangay"
+                                            aria-label="select barangay">
+                                            <option disabled selected value="">Select your barangay</option>
+                                        </select>
+                                        <label for="edit-barangaySelect">Barangay *</label>
+                                        <div id="edit-customer_details-barangay-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="street" id="edit-street"
+                                            placeholder="enter street">
+                                        <label for="edit-street">Street Name, Building, House No. *</label>
+                                        <div id="edit-customer_details-street-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="zip_code" id="edit-zip_code"
+                                            placeholder="enter zip_code">
+                                        <label for="edit-zip_code">Zip Code *</label>
+                                        <div id="edit-customer_details-zip_code-error" class="error-container"></div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="form-floating mb-3">
-                                <input type="number" class="form-control" name="mobile_number" id="mobile_number"
-                                    placeholder="mobile_number">
-                                <label for="mobile_number">Phone No. *</label>
-                                <div id="add-customer_details-mobile_number-error" class="error-container"></div>
-                            </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="remarks" id="edit-remarks"
+                                        placeholder="enter remarks">
+                                    <label for="edit-remarks">Remarks</label>
+                                    <div id="edit-customer_details-remarks-error" class="error-container"></div>
+                                </div>
 
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="store_name" id="store_name"
-                                    placeholder="Name">
-                                <label for="store_name">Store Name *</label>
-                                <div id="add-customer_details-store_name-error" class="error-container"></div>
-                            </div>
-
-                            <div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="regionSelect" name="region"
-                                        aria-label="select region">
-                                        <option disabled selected value="">Select your region</option>
-                                    </select>
-                                    <label for="payment_method">Region *</label>
-                                    <div id="add-customer_details-region-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="provinceSelect" name="province"
-                                        aria-label="select province">
-                                        <option disabled selected value="">Select your province</option>
-                                    </select>
-                                    <label for="provinceSelect">Province *</label>
-                                    <div id="add-customer_details-province-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="municipalitySelect" name="municipality"
-                                        aria-label="select municipality">
-                                        <option disabled selected value="">Select your municipality</option>
-                                    </select>
-                                    <label for="municipalitySelect">Municipality *</label>
-                                    <div id="add-customer_details-municipality-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="barangaySelect" name="barangay"
-                                        aria-label="select barangay">
-                                        <option disabled selected value="">Select your barangay</option>
-                                    </select>
-                                    <label for="barangaySelect">Barangay *</label>
-                                    <div id="add-customer_details-barangay-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="street" id="street"
-                                        placeholder="enter street">
-                                    <label for="street">Street Name, Building, House No. *</label>
-                                    <div id="add-customer_details-street-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="zip_code" id="zip_code"
-                                        placeholder="enter zip_code">
-                                    <label for="zip_code">Zip Code *</label>
-                                    <div id="add-customer_details-zip_code-error" class="error-container"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="remarks" id="remarks"
-                                    placeholder="enter remarks">
-                                <label for="remarks">Remarks</label>
-                                <div id="add-customer_details-remarks-error" class="error-container"></div>
-                            </div>
-
-                            <button type="submit" id="addCustomerDetailsBtn" class="btn btn-primary mb-3">
-                                <span class="loading-spinner" style="display: none;">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
-                                    Loading...
-                                </span>
-                                <span class="btn-text">Submit</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- edit costumer details Modal -->
-        <div class="modal fade" id="editCustomerDetailsModal" tabindex="-1"
-            aria-labelledby="editCustomerDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-primary" id="editCustomerDetailsModalLabel">Edit Customer Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="POST" id="editCustomerDetailsForm">
-
-                            <input type="hidden" name="customer_id" id="editCustomerId">
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="first_name"
-                                            id="edit-first_name" placeholder="Name">
-                                        <label for="edit-first_name">First Name *</label>
-                                        <div id="edit-customer_details-first_name-error" class="error-container"></div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="last_name" id="edit-last_name"
-                                            placeholder="Name">
-                                        <label for="edit-last_name">Last Name *</label>
-                                        <div id="edit-customer_details-last_name-error" class="error-container"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="number" class="form-control" name="mobile_number" id="edit-mobile_number"
-                                    placeholder="mobile_number">
-                                <label for="edit-mobile_number">Phone No. *</label>
-                                <div id="edit-customer_details-mobile_number-error" class="error-container"></div>
-                            </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="store_name" id="edit-store_name"
-                                    placeholder="Name">
-                                <label for="edit-store_name">Store Name *</label>
-                                <div id="edit-customer_details-store_name-error" class="error-container"></div>
-                            </div>
-
-                            <div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="edit-regionSelect" name="region"
-                                        aria-label="select region">
-                                        <option disabled selected value="">Select your region</option>
-                                    </select>
-                                    <label for="edit-regionSelect">Region *</label>
-                                    <div id="edit-customer_details-region-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="edit-provinceSelect" name="province"
-                                        aria-label="select province">
-                                        <option disabled selected value="">Select your province</option>
-                                    </select>
-                                    <label for="edit-provinceSelect">Province *</label>
-                                    <div id="edit-customer_details-province-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="edit-municipalitySelect" name="municipality"
-                                        aria-label="select municipality">
-                                        <option disabled selected value="">Select your municipality</option>
-                                    </select>
-                                    <label for="edit-municipalitySelect">Municipality *</label>
-                                    <div id="edit-customer_details-municipality-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="edit-barangaySelect" name="barangay"
-                                        aria-label="select barangay">
-                                        <option disabled selected value="">Select your barangay</option>
-                                    </select>
-                                    <label for="edit-barangaySelect">Barangay *</label>
-                                    <div id="edit-customer_details-barangay-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" name="street" id="edit-street"
-                                        placeholder="enter street">
-                                    <label for="edit-street">Street Name, Building, House No. *</label>
-                                    <div id="edit-customer_details-street-error" class="error-container"></div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="zip_code" id="edit-zip_code"
-                                        placeholder="enter zip_code">
-                                    <label for="edit-zip_code">Zip Code *</label>
-                                    <div id="edit-customer_details-zip_code-error" class="error-container"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="remarks" id="edit-remarks"
-                                    placeholder="enter remarks">
-                                <label for="edit-remarks">Remarks</label>
-                                <div id="edit-customer_details-remarks-error" class="error-container"></div>
-                            </div>
-
-                            <button type="submit" id="editCustomerDetailsBtn" class="btn btn-primary mb-3">
-                                <span class="loading-spinner" style="display: none;">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
-                                    Loading...
-                                </span>
-                                <span class="btn-text">Submit</span>
-                            </button>
-                        </form>
+                                <button type="submit" id="editCustomerDetailsBtn" class="btn btn-primary mb-3">
+                                    <span class="loading-spinner" style="display: none;">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        Loading...
+                                    </span>
+                                    <span class="btn-text">Submit</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -794,8 +809,8 @@
                         contentType: false,
                         success: function(response) {
 
-                            showNotification('info', 'Customer Update', 'Updated Customer: ' +
-                                response.first_name + ' ' + response.last_name);
+                            showNotification('info', ' Customer Details Updated',
+                                ' The customer details have been successfully updated.');
 
                             refreshCustomerTable(response.id);
 
@@ -868,8 +883,8 @@
                         contentType: false,
                         success: function(response) {
 
-                            showNotification('success', 'Customer Added', 'New Customer: ' +
-                                response.first_name + ' ' + response.last_name);
+                            showNotification('success', 'New Customer Added',
+                                ' A new customer has been added successfully.');
 
                             refreshCustomerTable(response.id);
 
@@ -915,6 +930,119 @@
 
             });
         </script>
-        <script src="{{ asset('js/load_address.js') }}"></script>
+        <script>
+            $.getJSON('/js/philippine_address_2019v2.json')
+                .done(function (data) {
+                    var allowedRegionCodes = ['01', '02', '03', '4A', '05', 'CAR', 'NCR'];
+
+                    var regions = Object.keys(data)
+                        .filter(function (regionCode) {
+                            return allowedRegionCodes.includes(regionCode);
+                        })
+                        .map(function (regionCode) {
+                            return {
+                                code: regionCode,
+                                name: data[regionCode].region_name
+                            };
+                        });
+
+                    var regionCode = $('#regionSelect').val();
+                    // var regionCode = $('#edit-regionSelect').val();
+                    if (regionCode === "" || regionCode === null) {
+                        populateSelectOptions('#regionSelect', regions, 'Select your region');
+                        // populateSelectOptions('#edit-regionSelect', regions, 'Select your region');
+                    }
+                })
+                .fail(function () {
+                    console.error('Failed to load address data.');
+                });
+
+            function populateSelectOptions(selectId, options, placeholder) {
+                var select = $(selectId);
+                select.empty();
+                select.append($('<option disabled selected value="">' + placeholder + '</option>').text(placeholder)); // Add placeholder option
+                $.each(options, function (index, option) {
+                    select.append($('<option></option>').val(option.code).text(option.name));
+                });
+            }
+
+            $('#regionSelect').on('change', function () {
+                var regionCode = $(this).val();
+                if (regionCode) {
+                    $.getJSON('/js/philippine_address_2019v2.json')
+                        .done(function (data) {
+                            var provinceList = data[regionCode].province_list;
+                            var provinces = Object.keys(provinceList).map(function (provinceName) {
+                                return {
+                                    code: provinceName,
+                                    name: provinceName
+                                };
+                            });
+
+                            populateSelectOptions('#provinceSelect', provinces, 'Select your province');
+                            $('#municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+                            $('#barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+                        })
+                        .fail(function () {
+                            console.error('Failed to load address data.');
+                        });
+                } else {
+                    $('#provinceSelect').empty().append($('<option disabled selected value="">Select your province</option>').text('Select your province'));
+                    $('#municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+                    $('#barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+                }
+            });
+
+            $('#provinceSelect').on('change', function () {
+                var regionCode = $('#regionSelect').val();
+                var provinceName = $(this).val();
+                if (provinceName && regionCode) {
+                    $.getJSON('/js/philippine_address_2019v2.json')
+                        .done(function (data) {
+                            var municipalityList = data[regionCode].province_list[provinceName].municipality_list;
+                            var municipalities = Object.keys(municipalityList).map(function (municipalityName) {
+                                return {
+                                    code: municipalityName,
+                                    name: municipalityName
+                                };
+                            });
+
+                            populateSelectOptions('#municipalitySelect', municipalities, 'Select your municipality');
+                            $('#barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+                        })
+                        .fail(function () {
+                            console.error('Failed to load address data.');
+                        });
+                } else {
+                    $('#municipalitySelect').empty().append($('<option disabled selected value="">Select your municipality</option>').text('Select your municipality'));
+                    $('#barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+                }
+            });
+
+            $('#municipalitySelect').on('change', function () {
+                var regionCode = $('#regionSelect').val();
+                var provinceName = $('#provinceSelect').val();
+                var municipalityName = $(this).val();
+                if (municipalityName && provinceName && regionCode) {
+                    $.getJSON('/js/philippine_address_2019v2.json')
+                        .done(function (data) {
+                            var barangayList = data[regionCode].province_list[provinceName].municipality_list[municipalityName].barangay_list;
+                            var barangays = barangayList.map(function (barangayName) {
+                                return {
+                                    code: barangayName,
+                                    name: barangayName
+                                };
+                            });
+
+                            populateSelectOptions('#barangaySelect', barangays, 'Select your barangay');
+                        })
+                        .fail(function () {
+                            console.error('Failed to load address data.');
+                        });
+                } else {
+                    $('#barangaySelect').empty().append($('<option disabled selected value="">Select your barangay</option>').text('Select your barangay'));
+                }
+            });
+        </script>
     @endif
 @endsection

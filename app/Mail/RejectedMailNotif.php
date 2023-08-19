@@ -13,30 +13,30 @@ class RejectedMailNotif extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $orderData; // Add a public property to hold the order data
+    public $order; // Add a public property to hold the order data
     /**
      * Create a new message instance.
      */
-    public function __construct(array $orderData)
+    public function __construct(array $order)
     {
-        $this->orderData = $orderData;
+        $this->order = $order;
     }
     /**
      * Get the message envelope.
      */
 
-    public function build()
+     public function build()
     {
-        return $this->subject('Your Order has been Rejected')
-            ->markdown('client.template.rejectedMailNotif')
-            ->with('orderData', $this->orderData);
+        return $this->subject('Order Rejected : ' . $this->order['order_number'])
+            ->markdown('components.rejectedOrder')
+            ->with('orderData', $this->order);
     }
 
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Dairy Raisers : your order has been rejected',
+            subject: 'Order Rejected : ' . $this->order['order_number'],
         );
     }
 

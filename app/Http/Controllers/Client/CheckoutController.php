@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Http;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\Product;
 use App\Models\PaymentReciept;
@@ -33,17 +33,16 @@ class CheckoutController extends Controller
 {
     public function checkout()
     {
+        $delivery_fee = 38;
         if (auth()->check()) {
             $userId = auth()->user()->id;
             $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
             $address = $user->address;
 
             $defaultAddress = $user->address->where('default', true)->first();
-
             $cartItems = $user->cart;
             $cart = [];
             $grandTotal = $cartItems->sum('total');
-            $shippingFee = 50;
 
             foreach ($cartItems as $cartItem) {
                 $cart[] = [
@@ -67,7 +66,7 @@ class CheckoutController extends Controller
             }
         }
 
-        if (empty($cartItems)) {
+        if (!$cartItems->isNotEmpty()) {
             return redirect()->back()->with('message', [
                 'type' => 'error',
                 'title' => 'Error',
@@ -84,7 +83,80 @@ class CheckoutController extends Controller
             'items' => $cartItems,
             'grandTotal' => $grandTotal,
             'payment_methods' => $paymentMethod,
+            'delivery_fee' => $delivery_fee
         ]);
+    }
+
+    public function update_location_checkout(Request $request)
+    {
+        $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+        $addressData = json_decode($jsonData, true);
+
+        $addresses = $request->validate([
+            'barangay' => ['string', 'required', 'max:255'],
+            'municipality' => ['string', 'required', 'max:255'],
+            'street' => ['string', 'required', 'max:255'],
+            'zip_code' => ['integer', 'required', 'digits:4']
+        ]);
+
+        // Set the fixed region and province
+        $addresses['region'] = '4A';
+        $addresses['province'] = 'CAVITE';
+
+        // Validation for municipality and barangay
+        $municipality = $request->input('municipality');
+        $barangay = $request->input('barangay');
+
+        // Validate if the municipality and barangay are valid within the fixed region and province
+        if (
+            isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]) &&
+            in_array($barangay, $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]['barangay_list'])
+        ) {
+            // Address validation successful, continue storing process
+
+            // Rest of the code remains unchanged
+        } else {
+            throw ValidationException::withMessages([
+                'address' => 'Something went wrong with the address value, please try again.',
+            ]);
+        }
+
+        if (auth()->check()) {
+            $address = User_Address::where('user_id', auth()->user()->id)->where('default', 1)->first();
+        } else {
+            $address = session('guest_address');
+        }
+
+        if ($address) {
+            if (auth()->check()) {
+                $address['region'] = $addresses['region'];
+                $address['province'] = $addresses['province'];
+                $address['municipality'] = $addresses['municipality'];
+                $address['barangay'] = $addresses['barangay'];
+                $address['street'] = $addresses['street'];
+                $address['zip_code'] = $addresses['zip_code'];
+                $address->save();
+            } else {
+
+                $address['region'] = $addresses['region'];
+                $address['province'] = $addresses['province'];
+                $address['municipality'] = $addresses['municipality'];
+                $address['barangay'] = $addresses['barangay'];
+                $address['street'] = $addresses['street'];
+                $address['zip_code'] = $addresses['zip_code'];
+                $address['complete_address'] = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
+
+                session(['guest_address' => $address]);
+            }
+            return redirect()->route('shop')->with('message', [
+                'type' => 'info',
+                'title' => 'Address updated',
+                'body' => null,
+                'period' => false,
+            ]);
+        } else {
+            return redirect()->route('index');
+        }
     }
 
     public function uploadAndExtractText(Request $request)
@@ -122,82 +194,71 @@ class CheckoutController extends Controller
 
     public function showEditAddressForm(Request $request)
     {
-        if (auth()->check()) {
-            $address = User_Address::where('default', true)->where('user_id', auth()->user()->id)->first();
-            if ($address) {
-                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
-                $addressData = json_decode($jsonData, true);
+        $address = User_Address::where('user_id', auth()->user()->id)->where('default', 1)->first();
 
-                $allowedRegionCodes = ['01', '02', '03', '4A', '05', 'CAR', 'NCR'];
+        if ($address) {
+            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+            $addressData = json_decode($jsonData, true);
 
-                $regions = array_filter($addressData, function ($regionCode) use ($allowedRegionCodes) {
-                    return in_array($regionCode, $allowedRegionCodes);
-                }, ARRAY_FILTER_USE_KEY);
-
-                $prev = $request->query('prev');
-
-                return view('client.checkout.editAddressForm', compact('address', 'regions', 'addressData', 'prev'));
-            } else {
-                throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
-            }
+            return view('client.checkout.editAddressForm', compact('address', 'addressData'));
+        } else {
+            return redirect()->route('index');
         }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function checkEditAddress(Request $request)
     {
-        $id = $request->query('id');
-        $prev = $request->query('prev');
-        if (auth()->check()) {
-            $address = User_Address::where('id', $id)->where('user_id', auth()->user()->id)->firstOrFail();
-            if ($address) {
-                $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
-                $addressData = json_decode($jsonData, true);
+        $address = User_Address::where('user_id', auth()->user()->id)->where('default', 1)->first();
 
-                $addresses = $request->validate([
-                    'region' => ['string', 'required', 'max:255'],
-                    'province' => ['string', 'required', 'max:255'],
-                    'barangay' => ['string', 'required', 'max:255'],
-                    'municipality' => ['string', 'required', 'max:255'],
-                    'street' => ['string', 'required', 'max:255'],
-                    'label' => ['required', 'max:255', 'in:home,office'],
-                    'zip_code' => ['integer', 'required', 'digits:4']
+        if ($address) {
+            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+            $addressData = json_decode($jsonData, true);
+
+            $addresses = $request->validate([
+                'barangay' => ['string', 'required', 'max:255'],
+                'municipality' => ['string', 'required', 'max:255'],
+                'street' => ['string', 'required', 'max:255'],
+                'zip_code' => ['integer', 'required', 'digits:4']
+            ]);
+
+            // Set the fixed region and province
+            $addresses['region'] = '4A';
+            $addresses['province'] = 'CAVITE';
+
+            // Validation for municipality and barangay
+            $municipality = $request->input('municipality');
+            $barangay = $request->input('barangay');
+
+            // Validate if the municipality and barangay are valid within the fixed region and province
+            if (
+                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]) &&
+                in_array($barangay, $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]['barangay_list'])
+            ) {
+                // Address validation successful, continue storing process
+
+                // Rest of the code remains unchanged
+            } else {
+                throw ValidationException::withMessages([
+                    'address' => 'Something went wrong with the address value, please try again.',
                 ]);
-
-                if (
-                    isset($addressData[$addresses['region']]) &&
-                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
-                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
-                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
-                ) {
-                    $regionName = $addressData[$addresses['region']]['region_name'];
-                    // User input is valid
-                } else {
-                    // User input is invalid
-                    throw ValidationException::withMessages([
-                        'error' => 'Something went wrong with the address value, please try again.',
-                    ]);
-                }
-
-                $address->region = $regionName;
-                $address->province = $addresses['province'];
-                $address->municipality = $addresses['municipality'];
-                $address->barangay = $addresses['barangay'];
-                $address->street = $addresses['street'];
-                $address->label = $addresses['label'];
-                $address->zip_code = $addresses['zip_code'];
-
-                $address->save();
-
-                if ($prev == 'checkout') {
-                    return redirect()->route('checkout')->with('message', 'Address updated successfully');
-                } else {
-                    return redirect()->route('orders.re-order', ['id' => $prev])->with('message', 'Address updated successfully');
-                }
             }
-            throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
+            $address['region'] = $addresses['region'];
+            $address['province'] = $addresses['province'];
+            $address['municipality'] = $addresses['municipality'];
+            $address['barangay'] = $addresses['barangay'];
+            $address['street'] = $addresses['street'];
+            $address['zip_code'] = $addresses['zip_code'];
+            $address->save();
+
+            return redirect()->route('checkout')->with('message', [
+                'type' => 'info',
+                'title' => 'Address updated',
+                'body' => 'Address has been updated.',
+                'period' => false,
+            ]);
+        } else {
+            return redirect()->route('index');
         }
-        throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
 
     public function makeDefaultAddress(Request $request)
@@ -230,29 +291,29 @@ class CheckoutController extends Controller
 
                 if ($lastOrderMonthYear === $monthYear) {
                     $lastOrderId = $lastOrder->order_number;
-                    $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
+                    $lastNumber = intval(substr($lastOrderId, 0, -6)); // Extract first digit
                     $nextNumber = $lastNumber + 1;
-                    return 'DR' . $monthYear . $nextNumber;
+                    return $nextNumber . 'DR' . $monthYear;
                 }
             }
+
             // If no last order or the month/year has changed, reset the number to 1
-            return 'DR' . $monthYear . '1';
+            return '1DR' . $monthYear;
         }
 
         $orderID = generateOrderId();
-
         $request->validate([
             'remarks' => ['max:255'],
             'payment_method' => ['required'],
         ]);
 
         if ($request->input('payment_method') != 'Cash On Delivery') {
-            $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
+            $Method = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
             $request->validate([
                 'reference_number' => ['required', 'max:255'],
             ]);
             $referenceNumber = $request->input('reference_number');
-            if (!$paymentMethod) {
+            if (!$Method) {
                 throw ValidationException::withMessages([
                     'payment_method' => 'Something went wrong on the payment method, please try again.',
                 ]);
@@ -270,11 +331,27 @@ class CheckoutController extends Controller
             $fileName = Str::random(40) . '.' . $extension;
             $file->storeAs('public/images/payment_reciept', $fileName);
             $filePath = 'images/payment_reciept/' . $fileName;
+
+            $paymentMethod = $Method->type;
         } else {
             $paymentMethod = 'Cash On Delivery';
             $referenceNumber = NULL;
             $filePath = NULL;
         }
+
+        // Check if the Pusher API is reachable
+        function isPusherReachable()
+        {
+            try {
+                // Send a GET request to the Pusher API endpoint
+                $response = Http::get('https://api-ap1.pusher.com');
+                return $response->successful();
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        $delivery_fee = 38;
 
         if (auth()->check()) {
             $userId = auth()->user()->id;
@@ -283,8 +360,8 @@ class CheckoutController extends Controller
             if (!$user->cart) {
                 return redirect()->route('index')->with('message', [
                     'type' => 'error',
-                    'title' => 'Error',
-                    'body' => 'Please select atleast 1 product.',
+                    'title' => ' Empty Cart',
+                    'body' => 'Your cart is empty. Please add items before proceeding to checkout.',
                     'period' => false,
                 ]);
             }
@@ -293,48 +370,51 @@ class CheckoutController extends Controller
             $address = $user->address->where('default', true)->first();
 
             if ($address) {
-                $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->municipality . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
+                $completeAddress = $address->street . ' ' . ucwords(strtolower($address->barangay)) . ', ' . ucwords(strtolower($address->municipality)) . ', ' . ucwords(strtolower($address->province)) . ', ' . $address->zip_code . ' Philippines';
             } else {
                 $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
                 $addressData = json_decode($jsonData, true);
 
                 $addresses = $request->validate([
-                    'region' => ['string', 'required', 'max:255'],
-                    'province' => ['string', 'required', 'max:255'],
                     'barangay' => ['string', 'required', 'max:255'],
                     'municipality' => ['string', 'required', 'max:255'],
                     'street' => ['string', 'required', 'max:255'],
-                    'label' => ['required', 'max:255', 'in:home,office'],
                     'zip_code' => ['integer', 'required', 'digits:4']
                 ]);
 
+                // Set the fixed region and province
+                $addresses['region'] = '4A';
+                $addresses['province'] = 'CAVITE';
+
+                // Validation for municipality and barangay
+                $municipality = $request->input('municipality');
+                $barangay = $request->input('barangay');
+
+                // Validate if the municipality and barangay are valid within the fixed region and province
                 if (
-                    isset($addressData[$addresses['region']]) &&
-                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]) &&
-                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]) &&
-                    in_array($addresses['barangay'], $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$addresses['municipality']]['barangay_list'])
+                    isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]) &&
+                    in_array($barangay, $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]['barangay_list'])
                 ) {
-                    $regionName = $addressData[$request->input('region')]['region_name'];
-                    // User input is valid
+                    // Address validation successful, continue storing process
+
+                    // Rest of the code remains unchanged
                 } else {
-                    // User input is invalid
                     throw ValidationException::withMessages([
-                        'error' => 'Something went wrong on the address value, please try again.',
+                        'address' => 'Something went wrong with the address value, please try again.',
                     ]);
                 }
 
                 $user_address = new User_Address;
                 $user_address->user_id = auth()->user()->id;
-                $user_address->region = $regionName;
-                $user_address->province = $request->input('province');
+                $user_address->region = $addresses['region'];
+                $user_address->province = $addresses['province'];
                 $user_address->municipality = $request->input('municipality');
                 $user_address->barangay = $request->input('barangay');
                 $user_address->street = $request->input('street');
-                $user_address->label = $request->input('label');
                 $user_address->zip_code = $request->input('zip_code');
                 $user_address->default = 1;
                 $user_address->save();
-                $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
+                $completeAddress = $request->input('street') . ' ' . ucwords(strtolower($request->input('barangay'))) . ', ' . ucwords(strtolower($request->input('municipality'))) . ', ' . ucwords(strtolower($request->input('province'))) . ', ' . $request->input('zip_code') . ' Philippines';
             }
 
             $cart_items = Cart::where('user_id', $userId)->get();
@@ -352,17 +432,52 @@ class CheckoutController extends Controller
                     "total" => $item->total,
                 ];
             }
+
+            foreach ($items as $item) {
+                $product = Product::find($item['product_id']);
+
+                if ($product) {
+                    if ($product->status == 'AVAILABLE') {
+                    } else {
+                        return redirect()->back()->with('message', [
+                            'type' => 'error',
+                            'title' => 'Product Status Alert',
+                            'body' => 'The status of some selected products is set to "Not Available". Please review and update the product availability if necessary.',
+                            'period' => false,
+                        ]);
+                    }
+                    $remainingStock = $product->stocks - $item['quantity'];
+
+                    if ($remainingStock >= 0) {
+                    } else {
+                        return redirect()->back()->with('message', [
+                            'type' => 'error',
+                            'title' => 'Insufficient Stock',
+                            'body' => "The quantity you're trying to order exceeds the available stock. Please adjust your order quantity.",
+                            'period' => false,
+                        ]);
+                    }
+                } else {
+                    return redirect()->back()->with('message', [
+                        'type' => 'error',
+                        'title' => 'Product Not Found',
+                        'body' => "The requested product was not found in our database. Please verify the product details and try again.",
+                        'period' => false,
+                    ]);
+                }
+            }
             Cart::where('user_id', $userId)->delete();
 
             $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
             $order = new Order;
             $order->name = $name;
             $order->mobile_number = auth()->user()->mobile_number;
+            $order->email  = auth()->user()->email;
             $order->order_number = $orderID;
             $order->address = $completeAddress;
             $order->remarks = $request->input('remarks');
-            $order->grand_total = $cart->sum('total');
-            $order->payment_method = $paymentMethod->type;
+            $order->grand_total = $cart->sum('total') + $delivery_fee;;
+            $order->payment_method = $paymentMethod;
             $order->reference_number = $referenceNumber;
             $order->shipping_option = 'Delivery';
             $order->customer_id = $userId;
@@ -375,11 +490,22 @@ class CheckoutController extends Controller
             }
 
             $order->save();
-            event(new OrderNotification($order));
+
+            foreach ($items as $item) {
+                $product = Product::find($item['product_id']);
+                $remainingStock = $product->stocks - $item['quantity'];
+                $product->stocks = $remainingStock;
+                $product->save();
+            }
+
+            if (isPusherReachable()) {
+                event(new OrderNotification($order));
+            }
         } else {
             $request->validate([
                 'name' => 'required|max:255|min:4',
                 'mobile_number' => ['required', 'integer', 'digits:10', 'regex:/^9/'],
+                'email' => ['required', 'email'],
             ]);
 
             $orderData = session('order_data', []);
@@ -387,11 +513,54 @@ class CheckoutController extends Controller
             if (empty($orderData)) {
                 return redirect()->back()->with('message', [
                     'type' => 'error',
-                    'title' => 'Error',
-                    'body' => 'Please select atleast 1 product.',
+                    'title' => ' Empty Cart',
+                    'body' => 'Your cart is empty. Please add items before proceeding to checkout.',
                     'period' => false,
                 ]);
             }
+
+            foreach ($orderData as $item) {
+                $product = Product::find($item['product_id']);
+
+                if ($product) {
+                    if ($product->status == 'AVAILABLE') {
+                    } else {
+                        return redirect()->back()->with('message', [
+                            'type' => 'error',
+                            'title' => 'Product Status Alert',
+                            'body' => 'The status of some selected products is set to "Not Available". Please review and update the product availability if necessary.',
+                            'period' => false,
+                        ]);
+                    }
+                    $remainingStock = $product->stocks - $item['quantity'];
+
+                    if ($remainingStock >= 0) {
+                    } else {
+                        return redirect()->back()->with('message', [
+                            'type' => 'error',
+                            'title' => ' Insufficient Stock',
+                            'body' => "The quantity you're trying to order exceeds the available stock. Please adjust your order quantity.",
+                            'period' => false,
+                        ]);
+                    }
+                } else {
+                    return redirect()->back()->with('message', [
+                        'type' => 'error',
+                        'title' => 'Product Not Found',
+                        'body' => "The requested product was not found in our database. Please verify the product details and try again.",
+                        'period' => false,
+                    ]);
+                }
+            }
+
+            foreach ($orderData as $item) {
+                $product = Product::find($item['product_id']);
+                $remainingStock = $product->stocks - $item['quantity'];
+                $product->stocks = $remainingStock;
+                $product->save();
+            }
+
+
             $guestAddress = session('guest_address');
             $grandTotal = 0;
             foreach ($orderData as $item) {
@@ -401,11 +570,12 @@ class CheckoutController extends Controller
             $order = new Order;
             $order->name = $request->name;
             $order->mobile_number = $request->mobile_number;
+            $order->email  = $request->email;
             $order->order_number = $orderID;
             $order->address = $guestAddress['complete_address'];
             $order->remarks = $request->input('remarks');
-            $order->grand_total = $grandTotal;
-            $order->payment_method = $paymentMethod->type;
+            $order->grand_total = $grandTotal + $delivery_fee;
+            $order->payment_method = $paymentMethod;
             $order->reference_number = $referenceNumber;
             $order->shipping_option = 'Delivery';
             $order->customer_id = null;
@@ -419,10 +589,11 @@ class CheckoutController extends Controller
 
             $order->save();
 
-            session()->forget('guest_address');
             session()->forget('order_data');
 
-            event(new OrderNotification($order));
+            if (isPusherReachable()) {
+                event(new OrderNotification($order));
+            }
         }
         return redirect()->route('order_history')->with('message', [
             'type' => 'success',

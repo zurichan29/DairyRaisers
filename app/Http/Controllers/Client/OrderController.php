@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Http;
 use App\Events\OrderNotification;
 use App\Models\Product;
 use App\Models\User;
@@ -91,6 +91,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $items = $order->items;
         $grandTotal = 0;
+        $delivery_fee = 38;
         foreach ($items as $item) {
             $grandTotal += $item['total'];
         }
@@ -103,7 +104,76 @@ class OrderController extends Controller
         }
 
 
-        return view('client.order.re_order', compact('user', 'order', 'items', 'addresses', 'defaultAddress', 'payment_methods', 'grandTotal'));
+        return view('client.order.re_order', compact('user', 'order', 'items', 'addresses', 'defaultAddress', 'payment_methods', 'grandTotal', 'delivery_fee'));
+    }
+
+    public function showEditAddressForm(Request $request, $id)
+    {
+        $address = User_Address::where('user_id', auth()->user()->id)->where('default', 1)->first();
+        $order_id = $id;
+        if ($address) {
+            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+            $addressData = json_decode($jsonData, true);
+
+            return view('client.order.editAddressForm', compact('order_id', 'address', 'addressData'));
+        } else {
+            return redirect()->route('index');
+        }
+    }
+
+    public function checkEditAddress(Request $request, $id)
+    {
+        $address = User_Address::where('user_id', auth()->user()->id)->where('default', 1)->first();
+
+        if ($address) {
+            $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+            $addressData = json_decode($jsonData, true);
+
+            $addresses = $request->validate([
+                'barangay' => ['string', 'required', 'max:255'],
+                'municipality' => ['string', 'required', 'max:255'],
+                'street' => ['string', 'required', 'max:255'],
+                'zip_code' => ['integer', 'required', 'digits:4']
+            ]);
+
+            // Set the fixed region and province
+            $addresses['region'] = '4A';
+            $addresses['province'] = 'CAVITE';
+
+            // Validation for municipality and barangay
+            $municipality = $request->input('municipality');
+            $barangay = $request->input('barangay');
+
+            // Validate if the municipality and barangay are valid within the fixed region and province
+            if (
+                isset($addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]) &&
+                in_array($barangay, $addressData[$addresses['region']]['province_list'][$addresses['province']]['municipality_list'][$municipality]['barangay_list'])
+            ) {
+                // Address validation successful, continue storing process
+
+                // Rest of the code remains unchanged
+            } else {
+                throw ValidationException::withMessages([
+                    'address' => 'Something went wrong with the address value, please try again.',
+                ]);
+            }
+            $address['region'] = $addresses['region'];
+            $address['province'] = $addresses['province'];
+            $address['municipality'] = $addresses['municipality'];
+            $address['barangay'] = $addresses['barangay'];
+            $address['street'] = $addresses['street'];
+            $address['zip_code'] = $addresses['zip_code'];
+            $address->save();
+
+            return redirect()->route('orders.re-order', ['id'=> $id])->with('message', [
+                'type' => 'info',
+                'title' => 'Address updated',
+                'body' => 'Address has been updated.',
+                'period' => false,
+            ]);
+        } else {
+            return redirect()->route('index');
+        }
     }
     public function place(Request $request, $id)
     {
@@ -120,13 +190,25 @@ class OrderController extends Controller
 
                 if ($lastOrderMonthYear === $monthYear) {
                     $lastOrderId = $lastOrder->order_number;
-                    $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
+                    $lastNumber = intval(substr($lastOrderId, 0, -6)); // Extract first digit
                     $nextNumber = $lastNumber + 1;
-                    return 'DR' . $monthYear . $nextNumber;
+                    return $nextNumber . 'DR' . $monthYear;
                 }
             }
+
             // If no last order or the month/year has changed, reset the number to 1
-            return 'DR' . $monthYear . '1';
+            return '1DR' . $monthYear;
+        }
+
+        function isPusherReachable()
+        {
+            try {
+                // Send a GET request to the Pusher API endpoint
+                $response = Http::get('https://api-ap1.pusher.com');
+                return $response->successful();
+            } catch (\Exception $e) {
+                return false;
+            }
         }
 
         $orderID = generateOrderId();
@@ -137,12 +219,12 @@ class OrderController extends Controller
         ]);
 
         if ($request->input('payment_method') != 'Cash On Delivery') {
-            $paymentMethod = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
+            $Method = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
             $request->validate([
                 'reference_number' => ['required', 'max:255'],
             ]);
             $referenceNumber = $request->input('reference_number');
-            if (!$paymentMethod) {
+            if (!$Method) {
                 throw ValidationException::withMessages([
                     'payment_method' => 'Something went wrong on the payment method, please try again.',
                 ]);
@@ -160,6 +242,8 @@ class OrderController extends Controller
             $fileName = Str::random(40) . '.' . $extension;
             $file->storeAs('public/images/payment_reciept', $fileName);
             $filePath = 'images/payment_reciept/' . $fileName;
+
+            $paymentMethod = $Method->type;
         } else {
             $paymentMethod = 'Cash On Delivery';
             $referenceNumber = NULL;
@@ -181,17 +265,18 @@ class OrderController extends Controller
         }
 
         $address = $user->address->where('default', true)->first();
-        $completeAddress = $address->street . ' ' . $address->barangay . ', ' . $address->municipality . ', ' . $address->province . ', ' . $address->zip_code . ' Philippines';
+        $completeAddress = $address->street . ' ' . ucwords(strtolower($address->barangay)) . ', ' . ucwords(strtolower($address->municipality)) . ', ' . ucwords(strtolower($address->province)) . ', ' . $address->zip_code . ' Philippines';
         // Create a new Order instance and save it
         $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
         $order = new Order;
         $order->name = $name;
         $order->mobile_number = auth()->user()->mobile_number;
+        $order->email = auth()->user()->email;
         $order->order_number = $orderID;
         $order->address = $completeAddress;
         $order->remarks = $request->input('remarks');
         $order->grand_total = $grandTotal;
-        $order->payment_method = $paymentMethod->type;
+        $order->payment_method = $paymentMethod;
         $order->reference_number = $referenceNumber;
         $order->shipping_option = 'Delivery';
         $order->customer_id = $userId;
@@ -203,9 +288,15 @@ class OrderController extends Controller
             $order->payment_receipt = $filePath;
         }
         $order->save();
-        event(new OrderNotification($order));
+        if (isPusherReachable()) {
+            event(new OrderNotification($order));
+        }
 
-
-        return redirect()->route('order_history')->with('message', 'You have placed your order');
+        return redirect()->route('order_history')->with('message', [
+            'type' => 'success',
+            'title' => 'Order Placed',
+            'body' => 'Your order has been successfully placed. Thank you for shopping with us!',
+            'period' => false,
+        ]);
     }
 }

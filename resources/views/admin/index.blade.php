@@ -94,9 +94,11 @@
             <div class="col-xl-8 col-lg-7">
                 <div class="card shadow h-100 flex flex-pill">
                     <!-- Card Header - Dropdown -->
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-start">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">PRODUCT STOCKS BY VARIANTS</h6>
-
+                        <button id="downloadStocksChartButton" type="button" class="btn btn-sm btn-outline-primary">
+                            <i class="fa-solid fa-print"></i> Download
+                        </button>
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
@@ -129,7 +131,7 @@
                                 </form>
                             </div>
                             <div class="col-md-4 d-flex justify-content-end align-items-center">
-                                <button id="downloadButton" type="button" class="btn btn-sm btn-outline-primary">
+                                <button id="downloadSalesChartButton" type="button" class="btn btn-sm btn-outline-primary">
                                     <i class="fa-solid fa-print"></i> Download
                                 </button>
                             </div>
@@ -168,7 +170,7 @@
                                     <tr>
                                         <th>ORDER NO</th>
                                         <th>STATUS</th>
-                                        <th>METHOD</th>
+                                        <th>TOTAL</th>
                                         <th>DATE</th>
                                     </tr>
                                 </thead>
@@ -202,6 +204,10 @@
                                                     $statusBadge = 'badge-success';
                                                     $icon = 'fa-solid fa-circle-check me-1';
                                                     break;
+                                                case 'Rejected':
+                                                    $statusBadge = 'badge-danger';
+                                                    $icon = 'fa-solid fa-circle-xmark me-1';
+                                                    break;
                                                 default:
                                                     break;
                                             }
@@ -215,7 +221,7 @@
                                                     {{ $order->status }}
                                                 </p>
                                             </td>
-                                            <td>{{ $order->shipping_option }}</td>
+                                            <td>₱{{ $order->grand_total }}.00</td>
                                             <td>{{ date('M d, Y', strtotime($order->created_at)) }}</td>
                                         </tr>
                                     @endforeach
@@ -261,7 +267,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -270,6 +276,35 @@
             var ordersTable = null;
 
             ordersTable = $('#ordersTable').DataTable();
+
+            // Add event listener for the download button
+            $('#downloadSalesChartButton').on('click', function() {
+                var selectedYear = $('#year').val();
+                downloadSalesChartImage(selectedYear);
+            });
+
+            $('#downloadStocksChartButton').on('click', function() {
+                downloadStocksChartImage();
+            });
+
+            // Function to capture chart as image and initiate download
+            function downloadSalesChartImage(year) {
+                var canvas = $('#monthlySalesChart')[0];
+                var image = canvas.toDataURL('image/png'); // Convert canvas to base64 image
+                // Construct the filename using the selected year
+                var filename = 'monthly_sales_chart_' + year + '.png';
+                // Use downloadjs to initiate the download
+                download(image, filename, 'image/png');
+            }
+
+            function downloadStocksChartImage() {
+                var canvas = $('#productStocksChart')[0];
+                var image = canvas.toDataURL('image/png'); // Convert canvas to base64 image
+                // Construct the filename using the selected year
+                var filename = 'product_stocks_chart.png';
+                // Use downloadjs to initiate the download
+                download(image, filename, 'image/png');
+            }
 
             function initBuffaloChart() {
                 // Data for the donut chart
@@ -442,19 +477,21 @@
             initBuffaloChart();
             initMonthlySalesChart(@json($monthlySalesLabel), @json($earningData));
 
-             //Download Chart
-            document.addEventListener("DOMContentLoaded", function () {
-                document.getElementById("downloadButton").addEventListener("click", function () {
+            //Download Chart
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById("downloadButton").addEventListener("click", function() {
                     // Get the chart image data from the canvas
-                    var chartImageData = document.getElementById("monthlySalesChart").toDataURL("application/octet-stream");
-            
+                    var chartImageData = document.getElementById("monthlySalesChart").toDataURL(
+                        "application/octet-stream");
+
                     // Log the chart image data to the console for debugging
                     console.log(chartImageData);
 
                     // Redirect the user to the chart download route with the image data
-                    window.location.href = "{{ route('admin.dashboard.download-chart') }}" + "?chartImageData=" + encodeURIComponent(chartImageData);
+                    window.location.href = "{{ route('admin.dashboard.download-chart') }}" +
+                        "?chartImageData=" + encodeURIComponent(chartImageData);
 
-                    
+
                 });
             });
 

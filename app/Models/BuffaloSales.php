@@ -9,7 +9,7 @@ class BuffaloSales extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['buyer_name', 'buyer_address', 'total_quantity', 'details', 'grand_total'];
+    protected $fillable = ['buyer_name', 'buyer_address', 'mobile_number', 'total_quantity', 'details', 'grand_total'];
 
     protected $table = 'buffalo_sales';
 }

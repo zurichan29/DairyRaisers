@@ -34,8 +34,8 @@
                                 <th>TYPE</th>
                                 <th>CUSTOMER</th>
                                 <th>MOBILE NO.</th>
-                                <th>METHOD</th>
                                 <th>GRAND TOTAL</th>
+                                <th>DATE</th>
                                 <th>STATUS</th>
                                 <th></th>
                             </tr>
@@ -46,8 +46,8 @@
                                 <th>TYPE</th>
                                 <th>CUSTOMER</th>
                                 <th>MOBILE NO.</th>
-                                <th>METHOD</th>
                                 <th>GRAND TOTAL</th>
+                                <th>DATE</th>
                                 <th>STATUS</th>
                                 <th></th>
                             </tr>
@@ -82,6 +82,10 @@
                                             $statusBadge = 'badge-success';
                                             $icon = 'fa-solid fa-circle-check me-1';
                                             break;
+                                            case 'Rejected':
+                                            $statusBadge = 'badge-danger';
+                                            $icon = 'fa-solid fa-circle-xmark me-1';
+                                            break;
                                         default:
                                             break;
                                     }
@@ -89,26 +93,14 @@
                                 <tr>
                                     <td>{{ $order->order_number }}</td>
                                     <!-- Display customer details based on their type -->
-                                    @if ($order->customer instanceof \App\Models\OnlineShopper)
-                                        @if ($order->customer->user)
-                                            <td>Online Shopper</td>
-                                            <td>{{ $order->customer->user->first_name . ' ' . $order->customer->user->last_name }}
-                                            </td>
-                                            <td>{{ $order->customer->user->mobile_number }}</td>
-                                        @endif
-                                    @elseif ($order->customer instanceof \App\Models\Retailer)
-                                        <td>Retailer</td>
-                                        <td>{{ $order->customer->first_name . ' | ' . $order->customer->store_name }}</td>
-                                        <td>{{ $order->customer->mobile_number }}</td>
-                                    @elseif ($order->customer_type == 'guest')
+                
                                         <td>Guest</td>
-                                        <td>{{ $order->name }}</td>
+                                        <td>{{ ($order->store_name) ? $order->name . ' | ' . $order->store_name : $order->name }}</td>
                                         <td>+63{{ $order->mobile_number }}</td>
-                                    @endif
+                                
 
-                                    {{-- <td>{{ $order->reference_number }}</td> --}}
-                                    <td>{{ $order->shipping_option }}</td>
                                     <td>₱{{ $order->grand_total }}.00</td>
+                                    <td>{{ $order->updated_at }}</td>
                                     <td class=" text-center">
                                         <p class="badge {{ $statusBadge }} text-center text-wrap py-2"
                                             style="width: 8rem;">

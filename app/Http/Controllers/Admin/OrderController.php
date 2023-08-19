@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\PaymentMethod;
 use App\Models\PaymentReciept;
 use App\Models\Order;
+use App\Models\Sales;
 use App\Models\OnlineShopper;
 use App\Models\Retailer;
 use Illuminate\Http\Request;
@@ -18,9 +19,11 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\RejectedMailNotif;
+use App\Mail\approvedOrder;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\AdminHelper;
+use App\Events\OrderNotification;
 
 class OrderController extends Controller
 {
@@ -28,6 +31,7 @@ class OrderController extends Controller
     public function index()
     {
         if (auth()->guard('admin')->check()) {
+            session()->forget('selected_products');
             $orders = Order::with('customer')->get();
             // dd($orders);
             return view('admin.orders.index', compact('orders'));
@@ -39,6 +43,8 @@ class OrderController extends Controller
     public function create()
     {
         if (auth()->guard('admin')->check()) {
+            session()->forget('selected_products');
+
             $customer_details = Retailer::all();
             $products = Product::with('variant')->get();
             return view('admin.orders.create', compact('customer_details', 'products'));
@@ -56,7 +62,7 @@ class OrderController extends Controller
                 'last_name' => 'required|string|max:255|min:2',
                 'mobile_number' => ['required', 'numeric', 'digits:10', 'regex:/^9\d{9}$/'],
                 'store_name' => 'required|string|max:255|min:2',
-                'remarks' => 'string',
+                'remarks' => 'string|nullable',
 
             ]);
 
@@ -87,7 +93,7 @@ class OrderController extends Controller
                 return response()->json(['errors' => 'address'], 422);
             }
 
-            $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' PHILIPPINES';
+            $completeAddress = $request->input('street') . ' ' . ucwords(strtolower($request->input('barangay'))) . ', ' . ucwords(strtolower($request->input('municipality'))) . ', ' . ucwords(strtolower($request->input('province'))) . ', ' . $request->input('zip_code') . ' PHILIPPINES';
 
             $customer = new Retailer;
             $customer->first_name = $request->first_name;
@@ -167,7 +173,7 @@ class OrderController extends Controller
                 return response()->json(['errors' => 'address'], 422);
             }
 
-            $completeAddress = $request->input('street') . ' ' . $request->input('barangay') . ', ' . $request->input('municipality') . ', ' . $request->input('province') . ', ' . $request->input('zip_code') . ' Philippines';
+            $completeAddress = $request->input('street') . ' ' . ucwords(strtolower($request->input('barangay'))) . ', ' . ucwords(strtolower($request->input('municipality'))) . ', ' . ucwords(strtolower($request->input('province'))) . ', ' . $request->input('zip_code') . ' PHILIPPINES';
 
             $customer = Retailer::where('id', $request->customer_id)->first();
             $customer->first_name = $request->first_name;
@@ -212,8 +218,11 @@ class OrderController extends Controller
         $productsData = [];
 
         foreach ($selectedProducts as $product) {
-            $productData = Product::findOrFail($product['product_id']);
+            $productData = Product::where('id', $product['product_id'])->with('variant')->first();
             $price = $productData->price;
+            $name = $productData->name;
+            $variant = $productData->variant->name;
+            $img = $productData->img;
             $quantity = $product['quantity'];
             $discount = $product['discount'];
 
@@ -225,6 +234,9 @@ class OrderController extends Controller
 
             $productsData[] = [
                 'product_id' => $product['product_id'],
+                'name' => $name,
+                'variant' => $variant,
+                'img' => $img,
                 'quantity' => $quantity,
                 'discount' => $discount,
                 'price' => $priceWithoutDiscount,
@@ -240,12 +252,26 @@ class OrderController extends Controller
         foreach ($productsData as $product) {
             $productData = Product::findOrFail($product['product_id']);
 
-            $html .= '<div class="col-md-4">';
-            $html .= '<h6>' . $productData->name . '</h6>';
-            $html .= '<p>Price: ₱' . $product['price'] . '.00</p>';
+            $html .= '<div class="col-md-6 mb-3">';
+            $html .= '<div class="card shadow">';
+            $html .= '<div class="card-header">';
+            $html .= '<p>' . $productData->name . '</p>';
+            $html .= '</div>';
+            $html .= '<div class="card-body">';
+            $html .= '<p class="fw-bold">Price: ₱' . $product['price'] . '.00</p>';
+            $html .= '<div class="form-floating mb-3">';
             $html .= '<input type="number" class="form-control quantity-input" id="quantity_' . $productData->id . '" value="' . $product['quantity'] . '" min="1">';
+            $html .= '<label for="quantity_' . $productData->id . '">Quantity *</label>';
+            $html .= '</div>';
+            $html .= '<div class="input-group mb-3"><span class="input-group-text">₱</span>';
+            $html .= '<div class="form-floating">';
             $html .= '<input type="number" class="form-control discount-input" id="discount_' . $productData->id . '" value="' . $product['discount'] . '" min="0">';
-            $html .= '<p>Total: ₱' . $product['total'] . '.00</p>';
+            $html .= '<label for="discount_' . $productData->id . '">Discount (optional)</label>';
+            $html .= '</div>';
+            $html .= '</div>';
+            $html .= '<p class="fw-bold">Total: ₱' . $product['total'] . '.00</p>';
+            $html .= '</div>';
+            $html .= '</div>';
             $html .= '</div>';
 
             $total += $product['total'];
@@ -259,8 +285,6 @@ class OrderController extends Controller
         return response()->json($response);
     }
 
-
-
     public function store_order(Request $request)
     {
         if (auth()->guard('admin')->check()) {
@@ -270,6 +294,40 @@ class OrderController extends Controller
             ]);
 
             if (session()->has('selected_products')) {
+
+                foreach (session('selected_products') as $item) {
+                    $product = Product::find($item['product_id']);
+
+                    if ($product) {
+                        if ($product->status == 'AVAILABLE') {
+                        } else {
+                            return redirect()->back()->with('message', [
+                                'type' => 'error',
+                                'title' => 'Product Status Alert',
+                                'body' => 'The status of some selected products is set to "Not Available". Please review and update the product availability if necessary.',
+                                'period' => false,
+                            ]);
+                        }
+                        $remainingStock = $product->stocks - $item['quantity'];
+
+                        if ($remainingStock >= 0) {
+                        } else {
+                            return redirect()->back()->with('message', [
+                                'type' => 'error',
+                                'title' => 'Insufficient Stock',
+                                'body' => "The quantity you're trying to order exceeds the available stock. Please adjust your order quantity.",
+                                'period' => false,
+                            ]);
+                        }
+                    } else {
+                        return redirect()->back()->with('message', [
+                            'type' => 'error',
+                            'title' => 'Product Not Found',
+                            'body' => "The requested product was not found in our database. Please verify the product details and try again.",
+                            'period' => false,
+                        ]);
+                    }
+                }
                 function generateOrderId()
                 {
                     $currentDate = now();
@@ -282,20 +340,25 @@ class OrderController extends Controller
 
                         if ($lastOrderMonthYear === $monthYear) {
                             $lastOrderId = $lastOrder->order_number;
-                            $lastNumber = intval(substr($lastOrderId, -1)); // Extract last digit
+                            $lastNumber = intval(substr($lastOrderId, 0, -6)); // Extract first digit
                             $nextNumber = $lastNumber + 1;
-                            return 'DR' . $monthYear . $nextNumber;
+                            return $nextNumber . 'DR' . $monthYear;
                         }
                     }
+
                     // If no last order or the month/year has changed, reset the number to 1
-                    return 'DR' . $monthYear . '1';
+                    return '1DR' . $monthYear;
                 }
+
                 $orderId = generateOrderId();
                 $items = [];
                 $grand_total = 0;
                 foreach (session('selected_products') as $product) {
                     $item = [
                         "product_id" => $product['product_id'],
+                        "name" => $product['name'],
+                        'variant' => $product['variant'],
+                        'img' => $product['img'],
                         "price" => $product['price'],
                         "discount" => $product['discount'],
                         "quantity" => $product['quantity'],
@@ -307,6 +370,10 @@ class OrderController extends Controller
                 $retailer = Retailer::find($request->customer_details);
 
                 $order = new Order;
+                $order->name = $retailer->first_name . ' ' . $retailer->last_name;
+                $order->mobile_number = $retailer->mobile_number;
+                $order->store_name = $retailer->store_name;
+                $order->address = $retailer->street . ', ' . ucwords(strtolower($retailer->barangay)) . ', ' . ucwords(strtolower($retailer->municipality)) . ', ' . ucwords(strtolower($retailer->province)) . ', ' . $retailer->zip_code . ' Philippines';
                 $order->order_number = $orderId;
                 $order->grand_total = $grand_total;
                 $order->customer_id = $retailer->id;
@@ -314,16 +381,29 @@ class OrderController extends Controller
                 $order->items = $items;
                 $order->shipping_option = 'Delivery';
                 $order->payment_method = 'Cash On Delivery';
+                $order->ip_address =  $request->ip();
                 $order->save();
-
+                foreach (session('selected_products') as $item) {
+                    $product = Product::find($item['product_id']);
+                    $remainingStock = $product->stocks - $item['quantity'];
+                    $product->stocks = $remainingStock;
+                    $product->save();
+                }
                 session()->forget('selected_products');
 
                 $this->logActivity(auth()->guard('admin')->user()->name . ' has added a new order: ' . $order->order_number, $request);
 
-                return redirect()->route('admin.orders.index');
-
+                return redirect()->route('admin.orders.index')->with('message', [
+                    'type' => 'success',
+                    'title' => 'Order Placed',
+                    'body' => 'Your order has been successfully placed.',
+                ]);
             } else {
-                return redirect()->back()->with('error', 'There is no added products in the cart. Please try again.');
+                return redirect()->back()->with('message', [
+                    'type' => 'error',
+                    'title' => ' Empty Cart',
+                    'body' => 'Your cart is empty. Please add items before proceeding to checkout.',
+                ]);
             }
         }
     }
@@ -406,6 +486,12 @@ class OrderController extends Controller
         }
     }
 
+    public function printInvoice($id)
+    {
+        $order = Order::findOrFail($id);
+        return view('admin.orders.print-invoice', compact('order'));
+    }
+
     public function approved(Request $request, $id)
     {
         if (auth()->guard('admin')->check()) {
@@ -413,10 +499,35 @@ class OrderController extends Controller
             if ($order->status == 'Pending') {
                 $order->status = 'Approved';
                 $order->save();
+
+                if ($order->customer_type != 'retailer') {
+                    $orderData = [
+                        'name' => $order->name,
+                        'mobile_number' => $order->mobile_number,
+                        'address' => $order->address,
+                        'email' => $order->email,
+                        'order_number' => $order->order_number,
+                        'reference_number' => $order->reference_number,
+                        'payment_method' => $order->payment_method,
+                        'created_at' => $order->created_at,
+                        'items' => $order->items,
+                        'grand_total' => $order->grand_total,
+                    ];
+                    Mail::to($order->email)->send(new approvedOrder($orderData));
+                }
+
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
-                return redirect()->route('admin.orders.show', ['id' => $id]);
+                return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
+                    'type' => 'info',
+                    'title' => 'Order Approved',
+                    'body' => 'Order ' . $order->order_number . ' has been approved successfully.',
+                ]);
             } else {
-                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
+                return redirect()->route('admin.orders.index')->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Something went wrong. Please try again.',
+                ]);
             }
         } else {
             return redirect()->route('login.administrator');
@@ -431,9 +542,17 @@ class OrderController extends Controller
                 $order->status = 'On The Way';
                 $order->save();
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
-                return redirect()->route('admin.orders.show', ['id' => $id]);
+                return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
+                    'type' => 'info',
+                    'title' => 'Order Shipped',
+                    'body' => 'Order ' . $order->order_number . ' is on the way for deliver.',
+                ]);
             } else {
-                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
+                return redirect()->route('admin.orders.index')->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Something went wrong. Please try again.',
+                ]);
             }
         } else {
             return redirect()->route('login.administrator');
@@ -464,15 +583,19 @@ class OrderController extends Controller
             if ($order->status == 'On The Way') {
                 $order->status = 'Delivered';
                 $order->save();
-                $this->logActivity('Administrator updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
-                return redirect()->route('admin.orders.show', ['id' => $id]);
-            } elseif ($order->status == 'Ready To Pick Up') {
-                $order->status = 'Recieved';
-                $order->save();
+
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
-                return redirect()->route('admin.orders.show', ['id' => $id]);
+                return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
+                    'type' => 'info',
+                    'title' => 'Order Delivered',
+                    'body' => 'Order ' . $order->order_number . ' has delivered successfully.',
+                ]);
             } else {
-                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
+                return redirect()->route('admin.orders.index')->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Something went wrong. Please try again.',
+                ]);
             }
         } else {
             return redirect()->route('login.administrator');
@@ -487,23 +610,39 @@ class OrderController extends Controller
                 'remarks' => ['required', 'max:255'],
             ]);
             if ($order->status == 'Pending') {
-                $user = User::where('id', $order->user_id)->first();
                 $order->status = 'Rejected';
                 $order->comments = $request->input('remarks');
                 $order->save();
 
-                $orderData = [
-                    'order_number' => $order->order_number,
-                    'created_at' => $order->created_at,
-                    'reference_number' => $order->reference_number,
-                    'comments' => $order->comments,
-                    'first_name' => $user->first_name,
-                ];
-                Mail::to($user->email)->send(new RejectedMailNotif($orderData));
+                if ($order->customer_type != 'retailer') {
+                    $orderData = [
+                        'name' => $order->name,
+                        'mobile_number' => $order->mobile_number,
+                        'email' => $order->email,
+                        'address' => $order->address,
+                        'order_number' => $order->order_number,
+                        'reference_number' => $order->reference_number,
+                        'payment_method' => $order->payment_method,
+                        'created_at' => $order->created_at,
+                        'items' => $order->items,
+                        'grand_total' => $order->grand_total,
+                        'comments' => $order->comments,
+                    ];
+                    Mail::to($order->email)->send(new RejectedMailNotif($orderData));
+                }
+
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
-                return redirect()->route('admin.orders.show', ['id' => $id]);
+                return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
+                    'type' => 'info',
+                    'title' => 'Order Rejected',
+                    'body' => 'Order ' . $order->order_number . ' has been rejected.',
+                ]);
             } else {
-                return redirect()->route('admin.orders.index')->with('error', 'Something went wrong.');
+                return redirect()->route('admin.orders.index')->with('message', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'body' => 'Something went wrong. Please try again.',
+                ]);
             }
         } else {
             return redirect()->route('login.administrator');

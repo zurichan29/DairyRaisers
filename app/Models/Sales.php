@@ -9,7 +9,7 @@ class Sales extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category', 'amount'];
+    protected $fillable = ['category', 'amount', 'name', 'quantity', 'price'];
 
     protected $table = 'sales';
 }

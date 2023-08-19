@@ -42,17 +42,19 @@ class ProfileController extends Controller
             $user = Admin::where('id', auth()->guard('admin')->user()->id)->first();
 
             if (!Hash::check($request->current_password, $user->password)) {
-                return redirect()->route('admin.profile.index')->withErrors(['current_password' => 'The current password is incorrect.']);
+                return response()->json(['password_verification' => "We encountered an issue during password verification. Please ensure that the current password you've entered is accurate."],422);
             }
 
             $user->password = Hash::make($request->new_password);
             $user->save();
-            $this->logActivity(auth()->guard('admin')->user()->name . ' update the password', $request);
-            return redirect()->route('admin.profile.index')->with('message', [
-                'type' => 'info',
-                'body' => 'Your password has been successfully changed. Please keep your new password secure.',
-                'title' => 'Password Change Successful',
-            ]);
+            $this->logActivity(auth()->guard('admin')->user()->name . '  has successfully updated their password.', $request);
+            
+            return response()->json($user);
+            // return redirect()->route('admin.profile.index')->with('message', [
+            //     'type' => 'info',
+            //     'body' => 'Your password has been successfully changed. Please keep your new password secure.',
+            //     'title' => 'Password Change Successful',
+            // ]);
 
         } else {
             return redirect()->route('login.administrator');

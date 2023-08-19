@@ -11,6 +11,8 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ActivityLog;
+use Illuminate\Support\Str;
+use App\Models\Sales;
 
 class ProductController extends Controller
 {
@@ -82,7 +84,7 @@ class ProductController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             $validator = Validator::make($request->all(), [
-                'stock_quantity' => 'required|numeric',
+                'stock_quantity' => 'required|numeric|min:0',
             ]);
 
             if ($validator->fails()) {
@@ -101,7 +103,9 @@ class ProductController extends Controller
 
             $this->logActivity('Administrator added ' . $newStock . ' to ' . $product->name . '.', $request);
 
-            return response()->json($product);
+            return response()->json([
+                'stock' => $request->stock_quantity,
+            ]);
         }
     }
 
@@ -143,7 +147,7 @@ class ProductController extends Controller
                 'price' => $product->price,
                 'variant' => $product->variant->name,
             ];
-            $this->logActivity(auth()->guard('admin')->user()->name . ' added a new product: ' . $product->name . '.' , $request);
+            $this->logActivity(auth()->guard('admin')->user()->name . ' added a new product: ' . $product->name . '.', $request);
 
             return response()->json($data);
         }
