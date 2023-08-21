@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-    {{-- <h1>Hello {{ auth()->guard('admin')->user()->name }}</h1> --}}
 
     <div class="">
         <div class="row mb-3">

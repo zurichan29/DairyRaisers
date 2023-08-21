@@ -101,6 +101,21 @@
         object-fit: cover;
         /* Maintain aspect ratio and cover the container */
     }
+
+    /* Show this content on screens larger than or equal to the lg breakpoint */
+    @media only screen and (min-width: 768px) {
+        .img-carousel {
+            width: 50px;
+        }
+
+        .carousel-item-name {
+            font-size: 16px
+        }
+
+        .sm-content{
+            display: block
+        }
+    }
 </style>
 
 <body class="">
@@ -109,81 +124,112 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
+
+
+
     <!-- Navigation -->
-    <nav
-        class="navbar navbar-expand-lg navbar-light  bg-light border-bottom shadow d-flex align-items-center justify-content-center flex-column">
-        <div class="p-0 m-0 container d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <a class="navbar-brand p-0 m-0 fw-bold" href="#"><img
-                        src="{{ asset('images/company-logo.png') }}" class="img-fluid logo" alt="Company Logo">
-                    DAIRY RAISERS</a>
-                <ul class="navbar-nav ms-3">
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('index') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('shop') }}">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('order_history') }}">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('about') }}">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('contact') }}">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('faqs') }}">FAQ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{ route('terms') }}">Terms</a>
-                    </li>
-                </ul>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow">
+
+        <div class="container d-flex flex-column align-items-center justify-content-between">
+
+            <!-- First Line: Brand Name and Navigation Links -->
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <a class="navbar-brand fw-bold" href="#">
+                    <img src="{{ asset('images/company-logo.png') }}" class="brand-img img-fluid logo"
+                        alt="Company Logo">
+                    DAIRY RAISERS
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="d-none d-lg-block">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('index') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('shop') }}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('order_history') }}">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('contact') }}">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('faqs') }}">FAQ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('terms') }}">Terms</a>
+                        </li>
+                        <!-- Add other navigation items here -->
+                    </ul>
+                </div>
             </div>
-            <div class="row">
-                <div class="navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto"></ul>
-                    <div class="d-flex gap-5 align-items-center">
-                        <div class="btn-group btn-group-sm me-2" role="group"
-                            aria-label="Button group with nested dropdown">
-                            <button type="button" class="btn btn-sm btn-dark font-weight-bolder">₱<span
-                                    id="cartTotal">{{ $cartTotal }}</span>.00</button>
-                            <div class=" position-static btn-group" role="group">
-                                <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary position-relative"
-                                    id="hoverDropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa-solid fa-cart-shopping me-2"></i> Cart
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        <span id="cartCount">{{ $cartCount }}</span>
-                                        <span class="visually-hidden">your shopping cart</span>
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                        @auth
-                            <div id="user-name">
-                                @php
-                                    $modifiedName = str_replace(' ', '', $user->first_name);
-                                    $displayedName = strlen($modifiedName) > 9 ? substr($modifiedName, 0, 9) . '...' : $modifiedName;
-                                @endphp
-                                <a href="{{ route('profile') }}" class=" btn btn-sm btn-dark">
-                                    <span>{{ $displayedName }}</span> <i class="fa-solid fa-user-gear"></i>
-                                </a>
-                            </div>
-                        @else
-                            <div class="col btn-group">
-                                <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark me-3">Register</a>
-                                <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
-                            </div>
-                        @endauth
-                    </div>
+
+            <!-- Collapsible Navigation Links (Initially Hidden for Large Screens) -->
+            <div class="d-lg-none">
+                <div class="collapse navbar-collapse " id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('index') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('shop') }}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('order_history') }}">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('contact') }}">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('faqs') }}">FAQ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('terms') }}">Terms</a>
+                        </li>
+                        <!-- Add other navigation items here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Second Line: Cart and Login/Register Buttons -->
+            <div class="d-flex justify-content-between w-100">
+                <div class="btn-group btn-group-sm me-2">
+                    <button type="button" class="btn btn-sm btn-dark font-weight-bolder">₱<span
+                            id="cartTotal">{{ $cartTotal }}</span>.00</button>
+                    <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-cart-shopping me-2"></i> Cart
+                        <span class="badge bg-danger" id="cartCount">{{ $cartCount }}</span>
+                    </a>
+                </div>
+                <div class="btn-group">
+                    @auth
+                        <!-- User is Authenticated -->
+                        <a href="{{ route('profile') }}" class="btn btn-sm btn-dark">
+                            {{ $displayedName }} <i class="fa-solid fa-user-gear"></i>
+                        </a>
+                    @else
+                        <!-- User is Not Authenticated -->
+                        <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark me-3">Register</a>
+                        <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
+                    @endauth
                 </div>
             </div>
 
         </div>
-
     </nav>
+
+
+
     <!-- Navigation -->
 
     <main id="" class="py-3 px-5">

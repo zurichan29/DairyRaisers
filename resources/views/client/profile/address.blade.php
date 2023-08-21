@@ -69,7 +69,7 @@
 
         <div class="">
             <div class="row" id="user-address">
-                @if ($addresses->isNotEmpty())
+                @if (!$addresses->isEmpty())
                     @foreach ($addresses as $key => $value)
                         <div class="col">
                             <div class="card shadow d-flex flex-fill h-100">

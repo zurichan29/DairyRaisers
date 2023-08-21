@@ -14,15 +14,14 @@
     <!-- Add this script tag to include moment.js library -->
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> --}}
 
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}" >
-    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css" >
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet" >
-    <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet" >
-    <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css"
-        >
-    <script src="{{ asset('js/jquery.min.js') }}" ></script>
+        rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
 
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('js/toastr.min.js') }}"></script>
@@ -318,9 +317,9 @@
     <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
 
-    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}" ></script>
-    <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}" ></script>
-    <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}" ></script>
+    <script src="{{ asset('js/sb-admin-2/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
 
     <script src="{{ asset('js/sb-admin-2/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2/dataTables.bootstrap4.min.js') }}"></script>
@@ -332,10 +331,11 @@
         $(document).ready(function() {
 
             // Enable pusher logging - don't include this in production
-            Pusher.logToConsole = true;
+            //Pusher.logToConsole = true;
 
             var pusher = new Pusher('f25da7ad5e99d90d9214', {
-                cluster: 'ap1'
+                cluster: 'ap1',
+                encrypted: true,
             });
 
             var channel = pusher.subscribe('admin-channel');

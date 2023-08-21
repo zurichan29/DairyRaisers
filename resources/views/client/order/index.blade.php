@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="container-fluid py-5">
-        @if ($orders->isNotEmpty())
+        @if (!$orders->isEmpty())
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <h4 class="mb-3 font-weight-normal text-center">Order History <i class="fas fa-shopping-cart ml-1"></i>

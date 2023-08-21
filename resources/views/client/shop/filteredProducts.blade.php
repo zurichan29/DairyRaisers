@@ -1,4 +1,4 @@
-@if ($products->isNotEmpty())
+@if (!$products ->isEmpty())
     <div class="row d-flex flex-pill h-100">
         @foreach ($products as $product)
             <div class="col-md-3 mb-3">

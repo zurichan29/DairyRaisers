@@ -33,58 +33,81 @@ class CheckoutController extends Controller
 {
     public function checkout()
     {
+
+        $currentTime = Carbon::now();
+        $openingTime = Carbon::create($currentTime->year, $currentTime->month, $currentTime->day, 7, 0, 0);
+        $closingTime = Carbon::create($currentTime->year, $currentTime->month, $currentTime->day, 17, 0, 0);
+
         $delivery_fee = 38;
-        if (auth()->check()) {
-            $userId = auth()->user()->id;
-            $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
-            $address = $user->address;
+        if ($currentTime >= $openingTime && $currentTime <= $closingTime) {
 
-            $defaultAddress = $user->address->where('default', true)->first();
-            $cartItems = $user->cart;
-            $cart = [];
-            $grandTotal = $cartItems->sum('total');
+            if (auth()->check()) {
+                $userId = auth()->user()->id;
+                $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
+                $address = $user->address;
 
-            foreach ($cartItems as $cartItem) {
-                $cart[] = [
-                    'cartId' => $cartItem->id,
-                    'product_id' => $cartItem->product->id,
-                    'name' => $cartItem->product->name,
-                    'img' => $cartItem->product->img,
-                    'variant' => $cartItem->product->variant->name,
-                    'price' => $cartItem->product->price,
-                    'quantity' => $cartItem->quantity,
-                    'total' => $cartItem->total
-                ];
+                $defaultAddress = $user->address->where('default', true)->first();
+                $cartItems = $user->cart;
+                $cart = [];
+                $grandTotal = $cartItems->sum('total');
+
+                foreach ($cartItems as $cartItem) {
+                    $cart[] = [
+                        'cartId' => $cartItem->id,
+                        'product_id' => $cartItem->product->id,
+                        'name' => $cartItem->product->name,
+                        'img' => $cartItem->product->img,
+                        'variant' => $cartItem->product->variant->name,
+                        'price' => $cartItem->product->price,
+                        'quantity' => $cartItem->quantity,
+                        'total' => $cartItem->total
+                    ];
+                }
+
+                if ($cartItems->isEmpty()) {
+                    return redirect()->back()->with('message', [
+                        'type' => 'error',
+                        'title' => 'Error',
+                        'body' => 'Please select atleast 1 product.',
+                        'period' => false,
+                    ]);
+                }
+            } else {
+                $defaultAddress = null;
+                $address = session('guest_address');
+                $cartItems = session('order_data', []);
+                $grandTotal = 0;
+                foreach ($cartItems as $item) {
+                    $grandTotal += $item['total'];
+                }
+
+                if ($cartItems === null) {
+                    return redirect()->back()->with('message', [
+                        'type' => 'error',
+                        'title' => 'Error',
+                        'body' => 'Please select atleast 1 product.',
+                        'period' => false,
+                    ]);
+                }
             }
-        } else {
-            $defaultAddress = null;
-            $address = session('guest_address');
-            $cartItems = session('order_data', []);
-            $grandTotal = 0;
-            foreach ($cartItems as $item) {
-                $grandTotal += $item['total'];
-            }
-        }
+            $paymentMethod = PaymentMethod::all();
 
-        if (!$cartItems->isNotEmpty()) {
-            return redirect()->back()->with('message', [
-                'type' => 'error',
-                'title' => 'Error',
-                'body' => 'Please select atleast 1 product.',
-                'period' => false,
+            return view('client.checkout.show', [
+                'defaultAddress' => $defaultAddress,
+                'addresses' => $address,
+                'items' => $cartItems,
+                'grandTotal' => $grandTotal,
+                'payment_methods' => $paymentMethod,
+                'delivery_fee' => $delivery_fee
             ]);
+        } else {
+            // Store is closed
+            // Calculate the time when the store will open again (next day at 7 AM)
+            $nextOpeningTime = $openingTime->copy()->addDay();
+            $formattedNextOpeningTime = $nextOpeningTime->format('g:i A');
+            $notificationMessage = "Our store is currently closed. We will be open again tomorrow at $formattedNextOpeningTime.";
+            return view('client.checkout.unavailable', compact('notificationMessage'));
         }
-
-        $paymentMethod = PaymentMethod::all();
-
-        return view('client.checkout.show', [
-            'defaultAddress' => $defaultAddress,
-            'addresses' => $address,
-            'items' => $cartItems,
-            'grandTotal' => $grandTotal,
-            'payment_methods' => $paymentMethod,
-            'delivery_fee' => $delivery_fee
-        ]);
     }
 
     public function update_location_checkout(Request $request)

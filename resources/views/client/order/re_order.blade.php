@@ -196,8 +196,8 @@
                                         <select class="form-select" id="payment_method" name="payment_method"
                                             aria-label="Payment Method">
                                             <option selected>Select</option>
+                                            <option value="Cash On Delivery">Cash On Delivery</option>
                                             @foreach ($payment_methods as $method)
-                                                <option value="Cash On Delivery">Cash On Delivery</option>
                                                 @if ($method->status == 'ACTIVATED')
                                                     <option value="{{ $method->id }}">{{ $method->type }}
                                                     </option>

@@ -36,7 +36,7 @@ class OrderController extends Controller
                 ->where('customer_id', auth()->user()->id)
                 ->orderByDesc('created_at')
                 ->get();
-            if ($orders->isNotEmpty()) {
+            if (!$orders->isEmpty()) {
                 $firstData = $orders[0]->items[0];
             }
         } else {
@@ -46,7 +46,7 @@ class OrderController extends Controller
                 ->where('ip_address', $ip_address)
                 ->orderByDesc('created_at')
                 ->get();
-            if ($orders->isNotEmpty()) {
+            if (!$orders->isEmpty()) {
                 $firstData = $orders[0]->items[0];
             }
         }
@@ -165,7 +165,7 @@ class OrderController extends Controller
             $address['zip_code'] = $addresses['zip_code'];
             $address->save();
 
-            return redirect()->route('orders.re-order', ['id'=> $id])->with('message', [
+            return redirect()->route('orders.re-order', ['id' => $id])->with('message', [
                 'type' => 'info',
                 'title' => 'Address updated',
                 'body' => 'Address has been updated.',
