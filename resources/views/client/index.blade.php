@@ -2,18 +2,38 @@
 @section('content')
     <!--slider-->
     <style>
-      /* for larger screen */
-        @media only screen and (min-width: 768px) {
-            .carousel-item-name {
-                font-size: 50px;
-            }
+        /* for larger screen */
+        /* @media only screen and (min-width: 768px) {
+                .carousel-item-name {
+                    font-size: 50px;
+                }
 
-        }
+            } */
         /* for smaller screen */
         @media only screen and (max-width: 767px) {
 
+            .index-title {
+                font-size: 23px !important;
+            }
+
+            .index-sub-title {
+                font-size: 20px !important;
+            }
+
+            .index-image {
+              width: 40px !important;
+            }
+
+            .index-p {
+                font-size: 12px !important;
+            }
+
             .carousel-item-name {
-                font-size: 10px;
+                font-size: 17px !important;
+            }
+
+            .carousel-image {
+              width: 40px !important;
             }
         }
     </style>
@@ -52,18 +72,17 @@
     <section class="features-icons bg-light text-center mt-4" style="padding-top: 4rem; padding-bottom: 5rem;">
         <div class="container">
             <div class="mb-5">
-                <h1 style="color:#007bff; margin-bottom:4rem;"><strong>WHAT WE OFFER</strong></h1>
+                <h1 style="color:#007bff; margin-bottom:4rem;"><strong class="index-title">WHAT WE OFFER</strong></h1>
             </div>
             <div class="row">
                 <div class="col-lg-3">
                     <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3" style="max-width: 17rem;">
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i class="fa-solid fa-tag"
                                 style="font-size: 4.5rem; margin-left: 6.5rem;"></i></div>
-                        <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;">
+                        <h3  style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title fs-4 ">
                             Affordable Products
                         </h3>
-                        <p class="lead mb-0" style="font-size:13px; color:#666; text-transform:uppercase;">
+                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Everyone can be healthy in an affordable price!
                         </p>
                     </div>
@@ -73,10 +92,10 @@
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i class="fa-solid fa-cow"
                                 style="font-size: 4.5rem; margin-left: 5rem;"></i></div>
                         <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;">
+                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
                             Fresh Milk
                         </h3>
-                        <p class="lead mb-0" style="font-size:13px; color:#666; text-transform:uppercase;">
+                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Featuring products that made from buffalos milk!
                         </p>
                     </div>
@@ -87,10 +106,10 @@
                                 class="fa-solid fa-hand-holding-dollar" style="font-size: 4.5rem; margin-left: 5rem;"></i>
                         </div>
                         <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;">
+                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
                             Flexible Payments
                         </h3>
-                        <p class="lead mb-0" style="font-size:13px; color:#666; text-transform:uppercase;">
+                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Easy to order with your own devices, with flexible payment methods!
                         </p>
                     </div>
@@ -101,10 +120,10 @@
                                 style="font-size: 4.5rem; margin-left: 5.5rem;"></i>
                         </div>
                         <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;">
+                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
                             Quality Control Passed
                         </h3>
-                        <p class="lead mb-0" style="font-size:13px; color:#666; text-transform:uppercase;">
+                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Featuring the good quality products passed in quality control!
                         </p>
                     </div>

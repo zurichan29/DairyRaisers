@@ -103,19 +103,15 @@
     }
 
     /* Show this content on screens larger than or equal to the lg breakpoint */
-    @media only screen and (min-width: 768px) {
+    /* @media only screen and (min-width: 768px) {
         .img-carousel {
             width: 50px;
         }
 
-        .carousel-item-name {
-            font-size: 16px
-        }
+       
 
-        .sm-content{
-            display: block
-        }
-    }
+      
+    } */
 </style>
 
 <body class="">
