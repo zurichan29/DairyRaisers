@@ -1,0 +1,40 @@
+/* Styles for printing */
+@media print {
+    .exclude-print {
+        display: none;
+    }
+    
+    /* Apply styles to the entire table */
+    #dataTable {
+        font-size: 15px;
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        border-collapse: collapse; /* Add this to ensure table borders are visible */
+    }
+
+    /* Apply styles to table header cells */
+    #dataTable thead th {
+        font-size: 14px;
+        border: 1px solid #e3e6f0; /* Add border style for table headers */
+        border-bottom: 3px solid #e3e6f0;
+        padding: 8px;
+        color: #212529;
+    }
+
+    #dataTable tbody td{
+        text-align: center;
+        border: 1px solid #e3e6f0; /* Add border style for table data cells */
+        padding: 8px; /* Adjust padding as needed */
+        color: #858796;
+    }
+
+    /* Apply styles to table footer cells */
+    #dataTable tfoot th {
+        font-size: 15px;
+        border-left: 1px solid #e3e6f0; /* Add border style for table data cells */
+        border-right: 1px solid #e3e6f0; /* Add border style for table data cells */
+        border-bottom: 1px solid #e3e6f0; /* Add border style for table data cells */
+
+
+    }
+
+}

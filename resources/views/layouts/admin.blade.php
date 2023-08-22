@@ -91,7 +91,7 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" style="width: 800px"
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion exclude-print" style="width: 800px"
             id="accordionSidebar">
 
             <a class="sidebar-brand d-flex align-items-center justify-content-between"
@@ -274,7 +274,7 @@
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
+                <div class="container my-auto exclude-print">
                     <div class="copyright text-center my-auto">
                         <span>Copyright &copy; General Trias Dairy Raisers Multi-Purpose Cooperative 2021</span>
                     </div>

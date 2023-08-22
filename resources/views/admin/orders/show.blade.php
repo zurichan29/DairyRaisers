@@ -181,7 +181,7 @@
                                     <br>
                                     <h4 class="font-weight-bold">Grand Total (₱): {{ $order->grand_total . '.00' }}</h4>
                                     <h6>Order No. {{ $order->order_number }}</h6>
-                                    <h6>Referenace No. <span id="ref">{{ $order->reference_number }}</span></h6>
+                                    <h6>Reference No. <span id="ref">{{ $order->reference_number }}</span></h6>
                                     <br>
                                     <div class="row">
                                         <div class="col">

@@ -6,16 +6,8 @@
             {{ session('no_access') }}
         </div>
     @else
-        <style>
-            #dataTable {
-                font-size: 14px;
-                /* Adjust the font size as per your preference */
-            }
+        <link rel="stylesheet" href="{{ asset('css/inventory-print.css') }}" media="print">
 
-            #variantTable {
-                font-size: 14px;
-            }
-        </style>
         <ul class="nav nav-pills nav-fill flex-row mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-inventory-tab" data-bs-toggle="pill" data-bs-target="#pills-inventory"
@@ -228,26 +220,26 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>PHOTO</th>
+                                        <th class="exclude-print">PHOTO</th>
                                         <th class="">NAME</th>
                                         <th class="">VARIANT</th>
                                         <th class="">PRICE</th>
                                         <th class="">STOCKS</th>
                                         <th>STATUS</th>
                                         <th>UPDATED AT</th>
-                                        <th class=""></th>
+                                        <th class="exclude-print"></th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th>PHOTO</th>
+                                        <th class="exclude-print">PHOTO</th>
                                         <th class="">NAME</th>
                                         <th class="">VARIANT</th>
                                         <th class="">PRICE</th>
                                         <th class="">STOCKS</th>
                                         <th>STATUS</th>
                                         <th>UPDATED AT</th>
-                                        <th class=""></th>
+                                        <th class="exclude-print"></th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
@@ -272,8 +264,8 @@
                                             }
                                         @endphp
                                         <tr data-product-id="{{ $product->id }}">
-                                            <td class="img-column">
-                                                <img src="{{ asset($product->img) }}" class="img-fluid img-thumbnail"
+                                            <td class="img-column exclude-print">
+                                                <img src="{{ asset($product->img) }}" class="img-fluid img-thumbnail exclude-print"
                                                     alt="product picture" style="width: 50px; height: 50px;">
                                             </td>
                                             <td class="name-column">{{ $product->name }}</td>
@@ -287,24 +279,24 @@
                                             <td class="update-column">
                                                 {{ $product->updated_at }}
                                             </td>
-                                            <td class="">
-                                                <div class="dropdown">
-                                                    <button class="btn rounded-3 btn-light" type="button"
+                                            <td class="exclude-print">
+                                                <div class="dropdown exclude-print">
+                                                    <button class="btn rounded-3 btn-light exclude-print" type="button"
                                                         id="actionsDropdown" data-bs-toggle="dropdown"
                                                         aria-haspopup="true" aria-expanded="false">
-                                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                        <i class="fa-solid fa-ellipsis-vertical exclude-print"></i>
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-end"
+                                                    <div class="dropdown-menu dropdown-menu-end exclude-print"
                                                         aria-labelledby="actionsDropdown">
-                                                        <a class="dropdown-item"
+                                                        <a class="dropdown-item exclude-print"
                                                             href="{{ route('admin.products.show', ['id' => $product->id]) }}">View</a>
-                                                        <button type="button" class="dropdown-item edit-btn"
+                                                        <button type="button" class="dropdown-item edit-btn exclude-print"
                                                             data-product-id="{{ $product->id }}">
                                                             Edit
                                                         </button>
-                                                        <button type="button" class="dropdown-item status-btn"
+                                                        <button type="button" class="dropdown-item status-btn exclude-print"
                                                             data-product-id="{{ $product->id }}">{{ $product->status == 'AVAILABLE' ? 'Deactivate' : 'Activate' }}</button>
-                                                        <button class="dropdown-item stocks-btn"
+                                                        <button class="dropdown-item stocks-btn exclude-print"
                                                             data-product-id="{{ $product->id }}" type="button">Add
                                                             Stocks</button>
                                                     </div>
@@ -1283,6 +1275,31 @@
                             loadingSpinner.hide();
                         }
                     });
+                });
+                $('#printButton').on('click', function() {
+                    if (dataTable.rows().count() > 0) {
+                        // Hide the first and last columns during printing
+                        $('.exclude-print').css('display', 'none');
+
+                        printJS({
+                            printable: 'dataTable', // Provide the ID of the element to print
+                            type: 'html', // Specify the type of content
+                            // header: '<h2>Your Sales Report</h2>', // Optional header content
+                            css: ["{{ asset('css/inventory-print.css') }}"],
+                            onPrintDialogClose: function () {
+                                // Restore the display of the first and last columns after printing
+                                $('.exclude-print').css('display', '');
+
+                                // Check if the print dialog was canceled
+                                if (!this.printable) {
+                                    // Reload the main page
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    } else {
+                        showNotification('error', 'No data to print');
+                    }
                 });
             });
         </script>

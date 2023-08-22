@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card d-flex flex-fill h-100 bg-primary text-white">
+                <div class="card d-flex flex-fill h-100 bg-primary text-white" style="background-image: url('/images/art.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                     <div class="card-body d-flex flex-column justify-content-center align-items-center text-center h-100">
                         <p class="fs-3">REGISTER NOW AT DAIRY RAISERS!</p>
                         <p class="">Already have an account? <a href="{{ route('login') }}" class="link-underline-light text-white fw-bolder"><u>LOGIN</u></a> here.</p>
