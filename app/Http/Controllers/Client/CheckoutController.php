@@ -521,9 +521,8 @@ class CheckoutController extends Controller
                 $product->save();
             }
 
-            if (isPusherReachable()) {
-                event(new OrderNotification($order));
-            }
+            broadcast(new OrderNotification($order))->toOthers();
+
         } else {
             $request->validate([
                 'name' => 'required|max:255|min:4',
@@ -614,9 +613,8 @@ class CheckoutController extends Controller
 
             session()->forget('order_data');
 
-            if (isPusherReachable()) {
-                event(new OrderNotification($order));
-            }
+            broadcast(new OrderNotification($order))->toOthers();
+
         }
         return redirect()->route('order_history')->with('message', [
             'type' => 'success',

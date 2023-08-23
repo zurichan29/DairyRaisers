@@ -32,9 +32,7 @@ class OrderNotification implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [
-            new Channel('admin-channel'),
-        ];
+        return ['admin-channel'];
     }
 
     /**
@@ -43,7 +41,7 @@ class OrderNotification implements ShouldBroadcast
      * @return void
      */
 
-    public function broadcastAs()
+    public function broadcastAs(): string
     {
         return 'order-notification';
     }

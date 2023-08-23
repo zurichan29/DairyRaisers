@@ -42,7 +42,6 @@ use App\Http\Controllers\Admin\OrderController as OrderManagement;
 
 /* HOME */
 
-
 Route::get('/', [PageController::class, 'index'])->name('index');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
@@ -129,6 +128,7 @@ Route::post('/checkout/default_address', [CheckoutController::class, 'makeDefaul
 Route::get('/administrator/login', [AuthController::class, 'show_admin'])->name('login.administrator');
 Route::post('/administrator/authenticate', [AuthController::class, 'admin_auth'])->name('administrator.authenticate');
 
+
 Route::get('/administrator/password/reset', [AuthController::class, 'showLinkRequestForm'])->name('admin.password.request');
 Route::post('/administrator/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('admin.password.email');
 Route::get('/administrator/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('admin.password.reset');
@@ -140,6 +140,7 @@ Route::post('/administrator/password/reset', [AuthController::class, 'resetAdmin
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 Route::get('/admin/dashboard/download-chart', [DashboardController::class, 'downloadChart'])->name('admin.dashboard.download-chart');
+Route::post('/administrator/broadcast', [DashboardController::class, 'broadcast'])->name('admin.broadcast');
 
 // STAFF
 Route::group(['middleware' => 'check.access:staff_management'], function () {

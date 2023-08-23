@@ -87,6 +87,7 @@
         <source src="{{ asset('sounds/order_notification_sound.wav') }}" type="audio/wav">
     </audio>
 
+
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -293,6 +294,8 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
+
+
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -329,23 +332,21 @@
 
     <script>
         $(document).ready(function() {
+            var notificationSound = new Audio('{{ asset('sounds/order_notification_sound.wav') }}');
 
             // Enable pusher logging - don't include this in production
-            //Pusher.logToConsole = true;
+            // Pusher.logToConsole = true;
 
             var pusher = new Pusher('f25da7ad5e99d90d9214', {
                 cluster: 'ap1',
-                encrypted: true,
             });
 
             var channel = pusher.subscribe('admin-channel');
             channel.bind('order-notification', function(data) {
                 var order = JSON.parse(JSON.stringify(data));
-                var notificationSound = $('#notification-sound')[0];
-
-                // Play the notification sound
                 notificationSound.play();
                 orderNotification(order.order);
+
             });
 
             $("input[type='number']").on("keydown", function(event) {

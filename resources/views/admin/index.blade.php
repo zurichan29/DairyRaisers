@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-
+    <button id="my-btn">asd</button>
     <div class="">
         <div class="row mb-3">
             <div class="col">

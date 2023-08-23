@@ -22,6 +22,19 @@ use Illuminate\Support\Facades\Response;
 class DashboardController extends Controller
 {
     //
+
+    public function  broadcast(Request $request) {
+        $order = Order::where('id', 6)->first();
+        broadcast(new OrderNotification($order))->toOthers();
+
+        return redirect()->back()->with('message',[
+            'type' => 'info',
+            'title' => 'Notification sent successfully',
+            'body' => null,
+            'period'=> false,
+        ]);
+    }
+
     public function index()
     {
         if (auth()->guard('admin')->check()) {
@@ -86,18 +99,6 @@ class DashboardController extends Controller
         } else {
             return redirect()->route('login.administrator');
         }
-    }
-
-   
-
-    public function send_notifications()
-    {
-
-        $order = 'IM CHRISTIAN JAY';
-
-        event(new OrderNotification($order));
-
-        return redirect()->route('admin.dashboard');
     }
 
     public function downloadChart(Request $request)

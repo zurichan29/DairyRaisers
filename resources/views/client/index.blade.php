@@ -4,11 +4,11 @@
     <style>
         /* for larger screen */
         /* @media only screen and (min-width: 768px) {
-                .carousel-item-name {
-                    font-size: 50px;
-                }
+                    .carousel-item-name {
+                        font-size: 50px;
+                    }
 
-            } */
+                } */
         /* for smaller screen */
         @media only screen and (max-width: 767px) {
 
@@ -21,7 +21,7 @@
             }
 
             .index-image {
-              width: 40px !important;
+                width: 40px !important;
             }
 
             .index-p {
@@ -33,11 +33,14 @@
             }
 
             .carousel-image {
-              width: 40px !important;
+                width: 40px !important;
             }
         }
     </style>
-
+    <form action="{{ route('admin.broadcast') }}" method="POST">
+        @csrf
+        <button type="submit" class="btn btn-primary">Notify</button>
+    </form>
 
 
 
@@ -79,10 +82,11 @@
                     <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3" style="max-width: 17rem;">
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i class="fa-solid fa-tag"
                                 style="font-size: 4.5rem; margin-left: 6.5rem;"></i></div>
-                        <h3  style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title fs-4 ">
+                        <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;"
+                            class="index-sub-title fs-4 ">
                             Affordable Products
                         </h3>
-                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
+                        <p style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Everyone can be healthy in an affordable price!
                         </p>
                     </div>
@@ -91,11 +95,11 @@
                     <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3" style="max-width: 17rem;">
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i class="fa-solid fa-cow"
                                 style="font-size: 4.5rem; margin-left: 5rem;"></i></div>
-                        <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
+                        <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;"
+                            class="index-sub-title">
                             Fresh Milk
                         </h3>
-                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
+                        <p style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Featuring products that made from buffalos milk!
                         </p>
                     </div>
@@ -105,11 +109,11 @@
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i
                                 class="fa-solid fa-hand-holding-dollar" style="font-size: 4.5rem; margin-left: 5rem;"></i>
                         </div>
-                        <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
+                        <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;"
+                            class="index-sub-title">
                             Flexible Payments
                         </h3>
-                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
+                        <p style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Easy to order with your own devices, with flexible payment methods!
                         </p>
                     </div>
@@ -119,11 +123,11 @@
                         <div class="features-icons-icon d-flex" style="height: 7rem;"><i class="fa-regular fa-circle-check"
                                 style="font-size: 4.5rem; margin-left: 5.5rem;"></i>
                         </div>
-                        <h3
-                            style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;" class="index-sub-title">
+                        <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; color:#007bff;"
+                            class="index-sub-title">
                             Quality Control Passed
                         </h3>
-                        <p  style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
+                        <p style="font-size:13px; color:#666; text-transform:uppercase;" class="lead mb-0 index-p">
                             Featuring the good quality products passed in quality control!
                         </p>
                     </div>
