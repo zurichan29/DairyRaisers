@@ -6,6 +6,7 @@
             {{ session('no_access') }}
         </div>
     @else
+        <link rel="stylesheet" href="{{ asset('css/sales-print.css') }}" media="print">
         <div class="card shadow mb-3">
             <div class="card-header py-3">
                 <div class="row">
@@ -449,6 +450,7 @@
                             printable: 'dataTable', // Provide the ID of the element to print
                             type: 'html', // Specify the type of content
                             // header: '<h2>Your Sales Report</h2>', // Optional header content
+                            css: ["{{ asset('css/sales-print.css') }}"],
                         });
                     } else {
                         showNotification('error', 'No data to print');

@@ -7,13 +7,19 @@
         </div>
     @else
         {{-- make and insert here the css for print buffao sales --}}
-        {{-- <link rel="stylesheet" href="{{ asset('css/buffalo-print.css') }}" media="print"> --}}
+        <style>
+            @media print {
+                .exclude-print {
+                    display: none;
+                }
+            }
+        </style>
         <div id="printableContent" class="card container shadow">
             <button type="button" id="buffaloPrintButton" onclick="printInvoice({{ $buffalo_sales->id }})"
-                class="position-absolute top-0 end-0 mr-4 mt-4 btn btn-outline-primary"><i class="fa-solid fa-print"></i>
+                class="position-absolute top-0 end-0 mr-4 mt-4 btn btn-outline-primary exclude-print"><i class="fa-solid fa-print"></i>
                 Print</button>
             <a href="{{ route('admin.dairy.index') }}"
-                class="position-absolute top-0 start-0 ml-4 mt-4 btn btn-secondary">Back</a>
+                class="position-absolute top-0 start-0 ml-4 mt-4 btn btn-secondary exclude-print">Back</a>
             <div class="card-header d-flex flex-column align-items-center justify-content-center">
                 <img src="{{ asset('images/company-logo.png') }}" class="img-fluid" style="width: 80px" alt="company logo">
                 <p class="card-title fw-bold fs-4">General Trias Dairy Raisers Multi-Purpose Cooperative</p>
@@ -126,9 +132,17 @@
                     window.removeEventListener('beforeprint', closePrintTab);
                 });
             }
-            $(document).ready(function() {
+            //Print
+            function printInvoice(id) {
+                // Optional: You can hide the "Print" button before printing.
+                document.getElementById('buffaloPrintButton').style.display = 'none';
+                
+                // Use window.print() to open the print dialog.
+                window.print();
 
-            });
+                // Optional: You can show the "Print" button again after printing.
+                document.getElementById('buffaloPrintButton').style.display = 'block';
+            }
         </script>
     @endif
 @endsection
