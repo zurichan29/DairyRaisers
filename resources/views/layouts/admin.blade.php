@@ -384,7 +384,7 @@
                     // Call the logout function or redirect to logout URL
                     // For example, assuming you have a logout route in Laravel:
                     window.location.href = '{{ route('logout.admin') }}';
-                }, 1800000); // 30 minutes
+                }, 3600000); // 30 minutes
             };
 
             function initLogoutTimer() {

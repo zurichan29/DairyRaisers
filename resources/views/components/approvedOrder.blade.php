@@ -22,7 +22,7 @@ We are pleased to inform you that your order has been approved and is ready for 
 | {{ $item['name'] }} | {{ $item['quantity'] }} | ₱{{ $item['price'] }}.00 | ₱{{ $item['total'] }}.00 |
 @endforeach
 @endcomponent
-<h1 style="font-size: 18px">Grand Total: {{ $order['grand_total'] }}</h1>
+<h1 style="font-size: 18px">Grand Total: ₱{{ $order['grand_total'] }}.00</h1>
 <br>
 <p>Thank you for choosing us! If you have any questions or need further assistance, please feel free to contact our support team.</p>
 

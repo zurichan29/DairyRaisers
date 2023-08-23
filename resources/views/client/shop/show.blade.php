@@ -27,6 +27,12 @@
             opacity: 1;
             /* Place above the blurred card */
         }
+
+        @media only screen and (max-width: 767px) {
+            .set-location {
+                margin-block: 15px;
+            }
+        }
     </style>
     <div class="row mb-3">
         <div class="col align-items-stretch">
@@ -47,7 +53,7 @@
         <div class="col-md-10 align-items-stretch">
             <div class="mb-3 d-flex justify-content-between">
                 <div class="d-flex flex-column justify-content-between">
-                    <div>
+                    <div class="set-location">
                         @auth
                             @if ($complete_address)
                                 <span><span class="text-primary fw-bold">LOCATION :

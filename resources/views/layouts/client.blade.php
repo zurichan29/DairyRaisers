@@ -65,6 +65,8 @@
         </script>
     @endif
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
 </head>
 <!-- Custome style -->
 <style>
@@ -101,17 +103,6 @@
         object-fit: cover;
         /* Maintain aspect ratio and cover the container */
     }
-
-    /* Show this content on screens larger than or equal to the lg breakpoint */
-    /* @media only screen and (min-width: 768px) {
-        .img-carousel {
-            width: 50px;
-        }
-
-       
-
-      
-    } */
 </style>
 
 <body class="">
@@ -121,28 +112,41 @@
         </div>
     </div>
 
-
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow">
-
-        <div class="container d-flex flex-column align-items-center justify-content-between">
-
-            <!-- First Line: Brand Name and Navigation Links -->
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <a class="navbar-brand fw-bold" href="#">
-                    <img src="{{ asset('images/company-logo.png') }}" class="brand-img img-fluid logo"
-                        alt="Company Logo">
-                    DAIRY RAISERS
+    <nav class="navbar navbar-light bg-light navbar-expand-lg fixed-top border-bottom shadow w-100"
+        style="z-index: 99">
+        <div class="container-fluid">
+            <!-- Content 1: Logo and Company Name -->
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="{{ route('index') }}">
+                    <img src="{{ asset('images/company-logo.png') }}" alt="Logo" class="logo">
+                    Dairy Raisers
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="d-none d-lg-block">
-                    <ul class="navbar-nav">
+            </div>
+
+            <!-- Toggle Button for Small Screens -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Content 2: Sidebar and Links -->
+            <div class="collapse navbar-collapse pb-3" id="navbarContent">
+                <div class="d-lg-flex text-center ml-auto align-items-center gap-4">
+                    <!-- My Cart -->
+                    <div class="my-cart">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-sm btn-dark font-weight-bolder">₱<span
+                                    id="cartTotal">{{ $cartTotal }}</span>.00</button>
+                            <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-cart-shopping me-2"></i> Cart
+                                <span class="badge bg-danger" id="cartCount">{{ $cartCount }}</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- List of URLs -->
+                    <ul class="navbar-nav" style="font-size: 16px">
                         <li class="nav-item">
-                            <a class="nav-link " href="{{ route('index') }}">Home</a>
+                            <a class="nav-link" href="{{ route('index') }}">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link " href="{{ route('shop') }}">Products</a>
@@ -162,73 +166,19 @@
                         <li class="nav-item">
                             <a class="nav-link " href="{{ route('terms') }}">Terms</a>
                         </li>
-                        <!-- Add other navigation items here -->
                     </ul>
-                </div>
-            </div>
 
-            <!-- Collapsible Navigation Links (Initially Hidden for Large Screens) -->
-            <div class="d-lg-none">
-                <div class="collapse navbar-collapse " id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('index') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('shop') }}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('order_history') }}">Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('about') }}">About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('contact') }}">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('faqs') }}">FAQ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="{{ route('terms') }}">Terms</a>
-                        </li>
-                        <!-- Add other navigation items here -->
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Second Line: Cart and Login/Register Buttons -->
-            <div class="d-flex justify-content-between w-100">
-                <div class="btn-group btn-group-sm me-2">
-                    <button type="button" class="btn btn-sm btn-dark font-weight-bolder">₱<span
-                            id="cartTotal">{{ $cartTotal }}</span>.00</button>
-                    <a href="{{ route('cart') }}" class="btn btn-sm btn-outline-primary">
-                        <i class="fa-solid fa-cart-shopping me-2"></i> Cart
-                        <span class="badge bg-danger" id="cartCount">{{ $cartCount }}</span>
-                    </a>
-                </div>
-                <div class="btn-group">
-                    @auth
-                        <!-- User is Authenticated -->
-                        <a href="{{ route('profile') }}" class="btn btn-sm btn-dark">
-                            {{ $displayedName }} <i class="fa-solid fa-user-gear"></i>
-                        </a>
-                    @else
-                        <!-- User is Not Authenticated -->
-                        <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark me-3">Register</a>
+                    <!-- Register and Login Buttons -->
+                    <div>
+                        <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark mr-3">Register</a>
                         <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
-                    @endauth
+                    </div>
                 </div>
             </div>
-
         </div>
     </nav>
 
-
-
-    <!-- Navigation -->
-
-    <main id="" class="py-3 px-5">
+    <main id="main-content" class="py-3 px-5">
         @yield('content')
     </main>
 
@@ -335,11 +285,14 @@
     <script src="{{ asset('js/sb-admin-2/sb-admin-2.min.js') }}"></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script>
-        window.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
             $('#loading-animation-id').hide();
-            var navbarHeight = document.querySelector('.navbar').offsetHeight;
-            // var mainContent = document.getElementById('main-content');
-            // mainContent.style.marginTop = navbarHeight + 'px';
+            // Get the height of the navbar
+           // Get the height of the navbar
+    var navbarHeight = $('.navbar').outerHeight();
+
+// Set the top margin of the main content to match the navbar height
+$('#main-content').css('margin-top', navbarHeight + 'px');
         });
     </script>
     @if (auth()->check())
@@ -368,6 +321,9 @@
 
                 // Call the initLogoutTimer function when the page is loaded
                 $(document).ready(initLogoutTimer);
+                // Toggle the sidebar on button click
+
+
 
             });
         </script>
