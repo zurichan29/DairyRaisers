@@ -20,6 +20,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\RejectedMailNotif;
 use App\Mail\approvedOrder;
+use App\Mail\OtwNotif;
+use App\Mail\DeliveredNotif;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\AdminHelper;
@@ -509,7 +511,7 @@ class OrderController extends Controller
                         'order_number' => $order->order_number,
                         'reference_number' => $order->reference_number,
                         'payment_method' => $order->payment_method,
-                        'created_at' => $order->created_at,
+                        'created_at' => $order->updated_at,
                         'items' => $order->items,
                         'grand_total' => $order->grand_total,
                     ];
@@ -541,6 +543,22 @@ class OrderController extends Controller
             if ($order->status == 'Approved') {
                 $order->status = 'On The Way';
                 $order->save();
+                if ($order->customer_type != 'retailer') {
+                    $orderData = [
+                        'name' => $order->name,
+                        'mobile_number' => $order->mobile_number,
+                        'email' => $order->email,
+                        'address' => $order->address,
+                        'order_number' => $order->order_number,
+                        'reference_number' => $order->reference_number,
+                        'payment_method' => $order->payment_method,
+                        'created_at' => $order->updated_at,
+                        'items' => $order->items,
+                        'grand_total' => $order->grand_total,
+                        'comments' => $order->comments,
+                    ];
+                    Mail::to($order->email)->send(new OtwNotif($orderData));
+                }
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
                     'type' => 'info',
@@ -583,7 +601,22 @@ class OrderController extends Controller
             if ($order->status == 'On The Way') {
                 $order->status = 'Delivered';
                 $order->save();
-
+                if ($order->customer_type != 'retailer') {
+                    $orderData = [
+                        'name' => $order->name,
+                        'mobile_number' => $order->mobile_number,
+                        'email' => $order->email,
+                        'address' => $order->address,
+                        'order_number' => $order->order_number,
+                        'reference_number' => $order->reference_number,
+                        'payment_method' => $order->payment_method,
+                        'created_at' => $order->updated_at,
+                        'items' => $order->items,
+                        'grand_total' => $order->grand_total,
+                        'comments' => $order->comments,
+                    ];
+                    Mail::to($order->email)->send(new DeliveredNotif($orderData));
+                }
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
                     'type' => 'info',

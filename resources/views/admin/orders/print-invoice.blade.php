@@ -33,6 +33,8 @@
                         <p>Name: {{ $order->name }}</p>
                         @if ($order->customer_type != 'retailer')
                             <p>Email: {{ $order->email }}</p>
+                        @else
+                            <p>Store: {{ $order->store_name }}</p>
                         @endif
                         <p>Phone No: +63{{ $order->mobile_number }}</p>
                         <p>Address: {{ $order->address }}</p>
@@ -71,7 +73,9 @@
                     <div class="col">
                         <p class="">Recieved the above articles in good order condition.</p>
                         <p class="mb-2">Mode Of Payment: {{ $order->payment_method }}</p>
-                        <p class="mb-2">Reference No: {{ $order->reference_number }}</p>
+                        @if ($order->customer_type != 'retailer')
+                            <p class="mb-2">Reference No: {{ $order->reference_number }}</p>
+                        @endif
                         <p class="mb-2">Shipping Option: {{ $order->shipping_option }}</p>
 
                         <p class="mt-3">Thank you for purchasing!</p>
