@@ -1,6 +1,13 @@
 @extends('layouts.client')
 @section('content')
-    <form class="container my-5" style="width: 500px" method="POST" action="{{ route('reset_password.validate') }}">
+    <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('login') }}">Login</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Forgot Password</li>
+        </ol>
+    </nav>
+    <form class="container-fluid my-5" style="max-width: 500px" method="POST"
+        action="{{ route('reset_password.validate') }}">
         <div class="card shadow">
             <div class="card-header text-center">
                 <h5 class="fw-bold">Reset your Account password</h5>

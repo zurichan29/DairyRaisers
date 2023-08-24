@@ -73,7 +73,7 @@
                 <a href="{{ route('checkout') }}" class="btn btn-primary">Checkout</a>
             @else
                 <div class=" justify-center text-center items-center">
-                    <img src="{{ asset('images/empty_cart.png') }}" alt="" style="width: 400px">
+                    <img src="{{ asset('images/empty_cart.png') }}" alt="" style="width: 400px" class="img-fluid">
                     <div class="text-center">
                         <p>No items on your cart. Please select on product page.</p>
                     </div>

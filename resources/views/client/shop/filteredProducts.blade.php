@@ -1,7 +1,7 @@
-@if (!$products ->isEmpty())
+@if (!$products->isEmpty())
     <div class="row d-flex flex-pill h-100">
         @foreach ($products as $product)
-            <div class="col-md-3 mb-3">
+            <div class="col-lg-4 col-md-6 mb-3">
                 <div
                     class="card shadow d-flex flex-pill h-100 @if ($product->stocks <= 0 || $product->status == 'NOT AVAILABLE') out-of-stock-card @endif">
                     <div class="card-header px-2 d-flex justify-content-between align-items-center">

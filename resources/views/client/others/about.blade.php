@@ -10,18 +10,18 @@
                     <h1 style="color:#007bff; margin-bottom:3rem; margin-top:1rem;"><strong>ABOUT US</strong></h1>
                 </div>
                 <!-- Start about us Area -->
-                <section class="cown-down mt-4" style="position: relative; overflow:hidden;">
+                <section class="cown-down mb-3 mt-4" style="position: relative; overflow:hidden;">
                     <div class="section-inner">
                         <div class="container-fluid">
                             <div class="row">
-                                <div class="col-lg-6 col-12 padding-left" style="padding-right:0;">
+                                <div class="col-md-6 ">
                                     <div class="image">
                                         <img src="{{asset('images/dairy.jpg')}}" alt="#" style="width:100%; height:100%;">
                                     </div>	
                                 </div>	
-                                <div class="col-lg-6 col-12 padding-right" style="padding-left:0;">
+                                <div class="col-md-6 px-3" >
                                     <div class="content bg-light" style="text-align: center; height: 100%; position:relative;">
-                                        <div class="heading-block" style="position:absolute; left:0; top:52%; transform:translateY(-50%); padding: 55px;">
+                                        <div class="heading-block">
                                             <h3 class="title" style="margin-bottom: 1rem;">General Trias Dairy Raisers Multi-Purpose Cooperative + Gentri's Best</h3>
                                             <p class="text" style="font-size:11px; color:#666; text-align: justify;">
                                                 The Dairy Processing Center is the first of its kind in the Province of Cavite and, most likely, the
@@ -54,13 +54,13 @@
                 <!-- /End about us Area -->
 
                 <!-- Start vision Area -->
-                <section class="cown-down" style="position: relative; overflow:hidden;">
+                <section class="cown-down mb-3" style="position: relative; overflow:hidden;">
                     <div class="section-inner">
                         <div class="container-fluid">
                             <div class="row">
-                                <div class="col-lg-6 col-12 padding-left" style="padding-right:0;">
+                                <div class="col-md-6 px-3">
                                     <div class="content bg-light" style="text-align: center; height: 100%; position:relative;">
-                                        <div class="heading-block" style="position:absolute; left:0; top:52%; transform:translateY(-50%); padding: 55px;">
+                                        <div class="heading-block">
                                             <h3 class="title" style="margin-bottom: 1rem;">Our Vision</h3>
                                             <p class="text" style="font-size:12px; color:#666; text-align: justify;">
                                                 Isang maunlad, malakas, at nagkakaisang kooperatiba na tutulong upang mapaunlad ang kalagayang
@@ -69,7 +69,7 @@
                                         </div>
                                     </div>	
                                 </div>	
-                                <div class="col-lg-6 col-12 padding-left" style="padding-left:0;">
+                                <div class="col-md-6">
                                     <div class="image">
                                         <img src="{{asset('images/vision.jpg')}}" alt="#" style="width:100%; height:100%;">
                                     </div>	
@@ -82,18 +82,18 @@
                 <!-- /End Vision Area -->
 
                 <!-- Start Mission Area -->
-                <section class="cown-down" style="position: relative; overflow:hidden; margin-bottom:3rem;">
+                <section class="cown-down mb-3" style="position: relative; overflow:hidden; margin-bottom:3rem;">
                     <div class="section-inner">
                         <div class="container-fluid">
                             <div class="row">
-                                <div class="col-lg-6 col-12 padding-left" style="padding-right:0;">
+                                <div class="col-md-6 ">
                                     <div class="image">
                                         <img src="{{asset('images/mission.png')}}" alt="#" style="width:100%; height:100%;">
                                     </div>	
                                 </div>	
-                                <div class="col-lg-6 col-12 padding-right" style="padding-left:0;">
+                                <div class="col-md-6 px-3" style="padding-left:0;">
                                     <div class="content bg-light" style="text-align: center; height: 100%; position:relative;">
-                                        <div class="heading-block" style="position:absolute; left:0; top:52%; transform:translateY(-50%); padding: 55px;">
+                                        <div class="heading-block">
                                             <h3 class="title" style="margin-bottom: 1rem;">Our Mission</h3>
                                             <p class="text" style="font-size:12px; color:#666; text-align: justify;">
                                                 Ang pinaninindigang kontribusyon ng General Trias Dairy Raisers Multi-Purpose Cooperative upang

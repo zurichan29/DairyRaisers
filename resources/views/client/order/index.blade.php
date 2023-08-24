@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('content')
 
-    <div class="container-fluid py-5">
+    <div class="py-5">
         @if (!$orders->isEmpty())
             <div class="row justify-content-center">
                 <div class="col-md-12">

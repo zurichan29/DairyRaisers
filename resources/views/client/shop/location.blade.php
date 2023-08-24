@@ -1,5 +1,6 @@
 @extends('layouts.client')
 @section('content')
+
     <div class="text-center text-dark fw-bolder mb-0 mt-3">
         <p class="fs-2">SELECT YOUR LOCATION</p>
         <p class="fw-light">Please note that our delivery services are currently limited to the <b>REGION IV-A
@@ -12,7 +13,7 @@
         @enderror
         @csrf
         <div class="row">
-            <div class="col">
+            <div class="col-md-6">
                 <div class="form-floating mb-3">
                     <select class="form-select" id="municipalitySelect" name="municipality"
                         aria-label="select municipality">
@@ -27,14 +28,14 @@
                     <label for="barangaySelect">Barangay *</label>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-md-6">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" name="street" id="street" placeholder="enter street">
-                    <label for="street">Street Name, Building, House No. *</label>
+                    <label for="street" class="custom-floating-label">Street Name, Building, House No. *</label>
                 </div>
                 <div class="form-floating mb-3">
                     <input type="number" class="form-control" name="zip_code" id="zip_code" placeholder="enter zip_code">
-                    <label for="zip_code">Zip Code *</label>
+                    <label for="zip_code" class="custom-floating-label">Zip Code *</label>
                 </div>
             </div>
         </div>

@@ -103,6 +103,17 @@
         object-fit: cover;
         /* Maintain aspect ratio and cover the container */
     }
+
+    .custom-floating-label {
+        width: 100%;
+        /* Ensure the label takes full width */
+        white-space: nowrap;
+        /* Prevent line breaks */
+        overflow: hidden;
+        /* Hide any overflowing text */
+        text-overflow: ellipsis;
+        /* Display an ellipsis (...) for overflowed text */
+    }
 </style>
 
 <body class="">
@@ -112,8 +123,7 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-light bg-light navbar-expand-lg fixed-top border-bottom shadow w-100"
-        style="z-index: 99">
+    <nav class="navbar navbar-light bg-light navbar-expand-lg fixed-top border-bottom shadow w-100" style="z-index: 99">
         <div class="container-fluid">
             <!-- Content 1: Logo and Company Name -->
             <div class="d-flex align-items-center">
@@ -168,11 +178,18 @@
                         </li>
                     </ul>
 
-                    <!-- Register and Login Buttons -->
-                    <div>
-                        <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark mr-3">Register</a>
-                        <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
-                    </div>
+                    @auth
+                        <div id="user-name">
+                            <a href="{{ route('profile') }}" class="btn btn-sm btn-dark"><span>{{ auth()->user()->first_name }}</span><i class="fa-solid fa-user-gear"></i></a>
+                        </div>
+                    @else
+                        <!-- Register and Login Buttons -->
+                        <div>
+                            <a href="{{ route('register') }}" class="btn btn-sm btn-outline-dark mr-3">Register</a>
+                            <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
+                        </div>
+                    @endauth
+
                 </div>
             </div>
         </div>
@@ -288,11 +305,11 @@
         $(document).ready(function() {
             $('#loading-animation-id').hide();
             // Get the height of the navbar
-           // Get the height of the navbar
-    var navbarHeight = $('.navbar').outerHeight();
+            // Get the height of the navbar
+            var navbarHeight = $('.navbar').outerHeight();
 
-// Set the top margin of the main content to match the navbar height
-$('#main-content').css('margin-top', navbarHeight + 'px');
+            // Set the top margin of the main content to match the navbar height
+            $('#main-content').css('margin-top', navbarHeight + 'px');
         });
     </script>
     @if (auth()->check())

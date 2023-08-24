@@ -168,8 +168,8 @@
                         <div class="card mb-3 shadow">
                             <div class="card-body">
                                 <div class="">
-                                    <div class="row">
-                                        <div class="col mb-3">
+                                    <div class="row mb-3">
+                                        <div class="col">
                                             <h4 class="text-primary">PAYMENTS</h4>
                                         </div>
                                         <div class="col">

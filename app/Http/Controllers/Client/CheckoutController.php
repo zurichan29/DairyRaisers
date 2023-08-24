@@ -323,7 +323,6 @@ class CheckoutController extends Controller
             // If no last order or the month/year has changed, reset the number to 1
             return '1DR' . $monthYear;
         }
-
         $orderID = generateOrderId();
         $request->validate([
             'remarks' => ['max:255'],
@@ -331,16 +330,22 @@ class CheckoutController extends Controller
         ]);
 
         if ($request->input('payment_method') != 'Cash On Delivery') {
-            $Method = PaymentMethod::findOrFail($request->input('payment_method'))->where('status', 'ACTIVATED')->first();
+            $Method = PaymentMethod::where('id', $request->input('payment_method'))->where('status', 'ACTIVATED')->first();
             $request->validate([
                 'reference_number' => ['required', 'max:255'],
             ]);
+            
             $referenceNumber = $request->input('reference_number');
+            
             if (!$Method) {
-                throw ValidationException::withMessages([
-                    'payment_method' => 'Something went wrong on the payment method, please try again.',
+                return redirect()->back()->with('message', [
+                    'type' => 'error',
+                    'title' => 'Payment Method Error',
+                    'body' => 'Something went wrong on the payment method, please try again.',
+                    'period' => false,
                 ]);
             }
+            
             $validator = Validator::make($request->all(), [
                 'formFile' => 'required|image|mimes:png,jpg,jpeg',
             ]);

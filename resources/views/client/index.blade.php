@@ -2,14 +2,7 @@
 @section('content')
     <!--slider-->
     <style>
-        /* for larger screen */
-        /* @media only screen and (min-width: 768px) {
-                        .carousel-item-name {
-                            font-size: 50px;
-                        }
-
-                    } */
-        /* for smaller screen */
+       
         @media only screen and (max-width: 767px) {
 
             .container-box {

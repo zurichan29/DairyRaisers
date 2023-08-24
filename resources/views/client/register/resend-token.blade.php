@@ -1,12 +1,19 @@
 @extends('layouts.client')
 
 @section('content')
-    <form class="my-5 container" style="width: 500px" id="resendTokenForm">
+    <nav class="" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('register') }}">Register</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Resend Token</li>
+        </ol>
+    </nav>
+    <form class="my-5 container-fluid d-flex justify-content-center align-items-center" style="max-width: 500px" id="resendTokenForm">
         @csrf
-        <div class="card shadow">
+        <div class="card  shadow">
             <div class="card-header text-center">
                 <h5 class="fw-bold">Resend Email Verification</h5>
-                <p>To resend the email verification link, please enter your email address below. Clicking the link in the email will verify your account.</p>
+                <p>To resend the email verification link, please enter your email address below. Clicking the link in the
+                    email will verify your account.</p>
             </div>
             <div class="card-body">
                 <div class="input-group has-validation mb-3">

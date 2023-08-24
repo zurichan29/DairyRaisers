@@ -29,19 +29,67 @@
         }
 
         @media only screen and (max-width: 767px) {
-            .set-location {
-                margin-block: 15px;
             }
-        }
     </style>
-    <div class="row mb-3">
-        <div class="col align-items-stretch">
-            <div class="card shadow h-100">
+    <div class="card mb-3 shadow">
+        <div class="set-location card-body ">
+            @auth
+                @if ($complete_address)
+                    <span><span class="text-primary fw-bold">LOCATION :
+                        </span>{{ $complete_address }}</span>
+                    <a href="{{ route('location.update-show') }}" class="ml-2 btn btn-sm btn-primary">Change</a>
+                @else
+                    <a href="{{ route('location') }}" class="ml-2 btn btn-primary"><i class="fa-solid fa-location-crosshairs"></i>
+                        Set
+                        your
+                        location</a>
+                    <span class="ml-2">and start ordering!</span>
+                @endif
+            @else
+                @if (session()->has('guest_address'))
+                    <span><span class="text-primary fw-bold">LOCATION :
+                        </span>{{ session('guest_address')['complete_address'] }}</span>
+                    <a href="{{ route('location.update-show') }}" class="ml-2 btn btn-sm btn-primary">Change</a>
+                @else
+                    <a href="{{ route('location') }}" class="ml-2 btn btn-primary"><i
+                            class="fa-solid fa-location-crosshairs"></i>
+                        Set your
+                        location</a>
+                    <span class="ml-2">and start ordering!</span>
+                @endif
+            @endauth
+        </div>
+    </div>
+
+
+
+
+    <section class="text-center row m-0 p-0">
+        <button class="btn btn-primary d-block d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse">
+            Filters
+        </button>
+        <div class="collapse d-md-block col-md-3 mb-5" id="filter-collapse">
+             <!-- Button to Toggle Filters -->
+            
+            <div class="mb-3">
+                <form id="searchForm" class=" navbar-search">
+                    <div class="input-group">
+                        <input id="searchInput" type="text" class="form-control bg-light small"
+                            placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button id="searchButton" class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card shadow mb-3">
                 <div class="card-header text-primary">
                     <i class="fa-solid fa-sort"></i>
                     Sort by Price
                 </div>
-                <div class="card-body text-left" style="font-size: 14px">
+                <div class="card-body text-left " style="font-size: 14px">
                     <select name="sort_by" class="form-select">
                         <option value="" style="cursor: pointer">None</option>
                         <option value="low_to_high" style="cursor: pointer">Lowest to Highest</option>
@@ -49,86 +97,52 @@
                     </select>
                 </div>
             </div>
-        </div>
-        <div class="col-md-10 align-items-stretch">
-            <div class="mb-3 d-flex justify-content-between">
-                <div class="d-flex flex-column justify-content-between">
-                    <div class="set-location">
-                        @auth
-                            @if ($complete_address)
-                                <span><span class="text-primary fw-bold">LOCATION :
-                                    </span>{{ $complete_address }}</span>
-                                <a href="{{ route('location.update-show') }}" class="ml-2 btn btn-sm btn-primary">Change</a>
-                            @else
-                                <a href="{{ route('location') }}" class="ml-2 btn btn-primary"><i
-                                        class="fa-solid fa-location-crosshairs"></i> Set your
-                                    location</a>
-                                <span class="ml-2">and start ordering!</span>
-                            @endif
-                        @else
-                            @if (session()->has('guest_address'))
-                                <span><span class="text-primary fw-bold">LOCATION :
-                                    </span>{{ session('guest_address')['complete_address'] }}</span>
-                                <a href="{{ route('location.update-show') }}" class="ml-2 btn btn-sm btn-primary">Change</a>
-                            @else
-                                <a href="{{ route('location') }}" class="ml-2 btn btn-primary"><i
-                                        class="fa-solid fa-location-crosshairs"></i> Set your
-                                    location</a>
-                                <span class="ml-2">and start ordering!</span>
-                            @endif
-                        @endauth
-                    </div>
-                    <div>
-                        <!-- Empty space for vertical justification -->
-                    </div>
-                </div>
-                <div>
-                    <form id="searchForm"
-                        class="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input id="searchInput" type="text" class="form-control bg-light small"
-                                placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button id="searchButton" class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card text-center">
-                <div class="card-body text-center">
-                    <p class="text-primary fs-2">GENTRI'S BEST</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <section class="panel text-center row">
-        <div class="col">
-            <div class="card shadow">
+            <div class="card shadow mb-3">
                 <div class="card-header text-primary">
                     <i class="fa-solid fa-filter"></i>
                     Filter by Variant
                 </div>
                 <div class="card-body text-left " style="font-size: 14px">
-                    @foreach ($variants as $variant)
-                        <div class="pt-2 pb-2">
-                            <label class="" style="">
-                                <input type="checkbox" name="variants[]" value="{{ $variant->id }}"
-                                    style="cursor: pointer">
-                                <span class="ml-4">{{ $variant->name }}</span>
-                            </label>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            @php
+                                $totalVariants = count($variants);
+                                $halfTotal = ceil($totalVariants / 2);
+                            @endphp
 
+                            @foreach ($variants as $index => $variant)
+                                @if ($index < $halfTotal)
+                                    <div class="pt-2 pb-2">
+                                        <label class="">
+                                            <input type="checkbox" name="variants[]" value="{{ $variant->id }}"
+                                                style="cursor: pointer">
+                                            <span class="ml-4">{{ $variant->name }}</span>
+                                        </label>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        <div class="col-md-6">
+                            @foreach ($variants as $index => $variant)
+                                @if ($index >= $halfTotal)
+                                    <div class="pt-2 pb-2">
+                                        <label class="">
+                                            <input type="checkbox" name="variants[]" value="{{ $variant->id }}"
+                                                style="cursor: pointer">
+                                            <span class="ml-4">{{ $variant->name }}</span>
+                                        </label>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
-        <div class="col-md-10">
+        <div class="col-md-9">
             <div class="row product-list text-center">
                 <div class="text-center text-primary" id="filter-products-loading" style="display: none">
                     <span class="spinner-border spinner-border-sm align-middle me-1" aria-hidden="true"></span>
@@ -138,7 +152,7 @@
                     @if ($products)
                         <div class="row d-flex flex-pill h-100">
                             @foreach ($products as $product)
-                                <div class="col-md-3 mb-3">
+                                <div class="col-lg-4 col-md-6 mb-3">
                                     <div
                                         class="card shadow d-flex flex-pill h-100 @if ($product->stocks <= 0 || $product->status == 'NOT AVAILABLE') out-of-stock-card @endif">
                                         <div class="card-header px-2 d-flex justify-content-between align-items-center">
@@ -150,7 +164,8 @@
                                             <img src="{{ asset($product->img) }}" class="img-fluid" style="height: 220px"
                                                 alt="product picture">
                                             @if ($product->stocks <= 0 || $product->status == 'NOT AVAILABLE')
-                                                <div class="not-available-overlay fw-bold text-center"><i class="fa-solid fa-circle-xmark"></i> NOT AVAILABLE</div>
+                                                <div class="not-available-overlay fw-bold text-center"><i
+                                                        class="fa-solid fa-circle-xmark"></i> NOT AVAILABLE</div>
                                             @else
                                                 <div class="d-grid mt-3">
                                                     <button type="submit" class="btn btn-primary add-to-cart-button"
