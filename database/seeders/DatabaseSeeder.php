@@ -186,35 +186,62 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Choco Milk',
-            'img' => 'images/Baka.png',
+            'name' => 'Choco Milk (1L)',
+            'img' => 'images/products/choco_milk_large.png',
             'variants_id' => 3,
-            'price' => 100,
+            'price' => 135,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Fresh Milk',
-            'img' => 'images/Baka.png',
+            'name' => 'Choco Milk (200ml)',
+            'img' => 'images/products/choco_milk_small.png',
             'variants_id' => 3,
-            'price' => 100,
+            'price' => 40,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Strawberry Milk',
-            'img' => 'images/Baka.png',
+            'name' => 'Fresh Milk (1L)',
+            'img' => 'images/products/fresh_milk_large.png',
             'variants_id' => 3,
-            'price' => 100,
+            'price' => 145,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Fresh Milk (200ml)',
+            'img' => 'images/products/fresh_milk_small.png',
+            'variants_id' => 3,
+            'price' => 40,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Strawberry Milk (1L)',
+            'img' => 'images/products/strawberry_milk_large.png',
+            'variants_id' => 3,
+            'price' => 170,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Strawberry Milk (200ml)',
+            'img' => 'images/products/strawberry_milk_small.png',
+            'variants_id' => 3,
+            'price' => 50,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Plain Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/plain_yogurt.png',
             'variants_id' => 1,
             'price' => 50,
             'stocks' => 100,
@@ -223,124 +250,115 @@ class DatabaseSeeder extends Seeder
 
         Product::create([
             'name' => 'Strawberry Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/strawberry_yogurt.png',
             'variants_id' => 1,
-            'price' => 50,
+            'price' => 55,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Mango Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/mango_yogurt.png',
             'variants_id' => 1,
-            'price' => 50,
+            'price' => 55,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Blueberry Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/blueberry_yogurt.png',
             'variants_id' => 1,
-            'price' => 50,
+            'price' => 55,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Patchberry Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/patchberry_yogurt.png',
             'variants_id' => 1,
-            'price' => 50,
+            'price' => 55,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Pineapple Yogurt',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/pineapple_yogurt.png',
             'variants_id' => 1,
-            'price' => 50,
-            'stocks' => 100,
-            'status' => 'AVAILABLE',
-        ]);
-
-        Product::create([
-            'name' => 'Mango Yogurt',
-            'img' => 'images/Baka.png',
-            'variants_id' => 1,
-            'price' => 50,
+            'price' => 55,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Milk-o-Jel',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/milk_o_jel.png',
             'variants_id' => 4,
-            'price' => 50,
+            'price' => 22,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Plain Pastillas',
-            'img' => 'images/Baka.png',
+            'name' => 'Plain Pastillas (20pcs)',
+            'img' => 'images/products/plain_pastillas.png',
             'variants_id' => 2,
-            'price' => 25,
+            'price' => 75,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Cheese Pastillas',
-            'img' => 'images/Baka.png',
+            'name' => 'Cheese Pastillas (20pcs)',
+            'img' => 'images/products/cheese_pastillas.png',
             'variants_id' => 2,
-            'price' => 25,
+            'price' => 75,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Ube Pastillas',
-            'img' => 'images/Baka.png',
+            'name' => 'Ube Pastillas (20pcs)',
+            'img' => 'images/products/ube_pastillas.png',
             'variants_id' => 2,
-            'price' => 25,
+            'price' => 75,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Buko Pandan Pastillas',
-            'img' => 'images/Baka.png',
+            'name' => 'Buko Pandan Pastillas (20pcs)',
+            'img' => 'images/products/plain_pastillas.png',
             'variants_id' => 2,
-            'price' => 25,
+            'price' => 75,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Langka Pastillas',
-            'img' => 'images/Baka.png',
+            'name' => 'Langka Pastillas (20pcs)',
+            'img' => 'images/products/cheese_pastillas.png',
             'variants_id' => 2,
-            'price' => 25,
+            'price' => 75,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Ice Candy',
-            'img' => 'images/Baka.png',
+            'name' => 'Corn Cheese Ice Cream',
+            'img' => 'images/products/cheese_icecream.png',
             'variants_id' => 5,
-            'price' => 5,
+            'price' => 30,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
-            'name' => 'Cheese & Corn Ice Cream',
-            'img' => 'images/Baka.png',
+            'name' => 'Ube Cheese Ice Cream',
+            'img' => 'images/products/ube_icecream.png',
             'variants_id' => 5,
             'price' => 30,
             'stocks' => 100,
@@ -349,7 +367,7 @@ class DatabaseSeeder extends Seeder
 
         Product::create([
             'name' => 'Cookies & Cream Ice Cream',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/cookies_icecream.png',
             'variants_id' => 5,
             'price' => 30,
             'stocks' => 100,
@@ -357,29 +375,64 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Choco Ice Candy',
-            'img' => 'images/Baka.png',
+            'name' => 'Ube Ice Candy',
+            'img' => 'images/products/ube_ice_candy.jpg',
             'variants_id' => 5,
-            'price' => 10,
+            'price' => 7,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Choco Ice Candy',
+            'img' => 'images/products/ice_candy.jpg',
+            'variants_id' => 5,
+            'price' => 7,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
         Product::create([
             'name' => 'Mais Ice Candy',
-            'img' => 'images/Baka.png',
+            'img' => 'images/products/ice_candy.jpg',
             'variants_id' => 5,
-            'price' => 10,
+            'price' => 7,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);
 
+        Product::create([
+            'name' => 'Buko Pandan Ice Candy',
+            'img' => 'images/products/pandan_ice_candy.jpg',
+            'variants_id' => 5,
+            'price' => 7,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
 
         Product::create([
-            'name' => 'Mozarella Cheese',
-            'img' => 'images/Baka.png',
+            'name' => 'Plain Kesong Puti',
+            'img' => 'images/products/plain_cheese.png',
             'variants_id' => 6,
-            'price' => 250,
+            'price' => 80,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Kasilyo',
+            'img' => 'images/products/kasilyo_cheese.png',
+            'variants_id' => 6,
+            'price' => 30,
+            'stocks' => 100,
+            'status' => 'AVAILABLE',
+        ]);
+
+        Product::create([
+            'name' => 'Mozzarella Cheese',
+            'img' => 'images/products/cheese.png',
+            'variants_id' => 6,
+            'price' => 200,
             'stocks' => 100,
             'status' => 'AVAILABLE',
         ]);

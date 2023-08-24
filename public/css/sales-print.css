@@ -18,10 +18,11 @@
         border-bottom: 3px solid #e3e6f0;
         padding: 8px;
         color: #212529;
+        text-align: left;
     }
 
     #dataTable tbody td{
-        text-align: center;
+        text-align: left;
         border: 1px solid #e3e6f0; /* Add border style for table data cells */
         padding: 8px; /* Adjust padding as needed */
         color: #858796;
@@ -33,8 +34,19 @@
         border-left: 1px solid #e3e6f0; /* Add border style for table data cells */
         border-right: 1px solid #e3e6f0; /* Add border style for table data cells */
         border-bottom: 1px solid #e3e6f0; /* Add border style for table data cells */
-
-
+        text-align: left;
+        padding: 8px;
     }
 
+}
+
+#printHeader {
+    display: block !important;
+}
+
+/* Hide the header on the screen */
+@media screen {
+    #printHeader {
+        display: none !important;
+    }
 }
