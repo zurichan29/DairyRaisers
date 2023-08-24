@@ -72,7 +72,8 @@
                     </div>
                 </div>
             </div>
-            <div class="card-body">
+
+            <div class="card-body">             
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" style="font-size: 14px"
                         cellspacing="0">
@@ -446,11 +447,20 @@
 
                 $('#printButton').on('click', function() {
                     if (dataTable.rows().count() > 0) {
+                        // Create a header row with the desired content
+                        var headerRow = '<tr><th colspan="6" style="text-align:center;"><h2>Sales Report</h2></th></tr>';
+                        
+                        // Append the header row to the table
+                        $('#dataTable thead').prepend(headerRow);
                         printJS({
                             printable: 'dataTable', // Provide the ID of the element to print
                             type: 'html', // Specify the type of content
                             // header: '<h2>Your Sales Report</h2>', // Optional header content
                             css: ["{{ asset('css/sales-print.css') }}"],
+                            onPrintDialogClose: function() {
+                                // Remove the header row after printing is complete
+                                $('#dataTable thead tr:first-child').remove();
+                            }
                         });
                     } else {
                         showNotification('error', 'No data to print');

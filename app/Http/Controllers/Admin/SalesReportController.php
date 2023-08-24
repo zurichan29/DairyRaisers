@@ -46,7 +46,7 @@ class SalesReportController extends Controller
         return view('admin.sales_report.index', compact('years', 'currentYear', 'labels', 'earningData'));
     }
 
-    public function printDailySales()
+    public function print()
     {
         $currentYear = Carbon::now()->year;
         $years = range($currentYear, $currentYear - 9);

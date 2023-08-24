@@ -6,8 +6,6 @@
             {{ session('no_access') }}
         </div>
     @else
-        <link rel="stylesheet" href="{{ asset('css/inventory-print.css') }}" media="print">
-
         <ul class="nav nav-pills nav-fill flex-row mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-inventory-tab" data-bs-toggle="pill" data-bs-target="#pills-inventory"
@@ -210,9 +208,9 @@
                             <button type="button" id="downloadExcelButton" class="mr-2 btn btn-sm btn-outline-primary">
                                 <i class="fa-regular fa-file-excel"></i> Excel
                             </button>
-                            <button type="button" id="printButton" class="btn btn-sm btn-outline-primary">
-                                <i class="fa-solid fa-print"></i> Print
-                            </button>
+                            <a href="{{ route('admin.products.print') }}" type="button" id="printButton" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-print"></i> Print
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -1276,31 +1274,7 @@
                         }
                     });
                 });
-                $('#printButton').on('click', function() {
-                    if (dataTable.rows().count() > 0) {
-                        // Hide the first and last columns during printing
-                        $('.exclude-print').css('display', 'none');
 
-                        printJS({
-                            printable: 'dataTable', // Provide the ID of the element to print
-                            type: 'html', // Specify the type of content
-                            // header: '<h2>Your Sales Report</h2>', // Optional header content
-                            css: ["{{ asset('css/inventory-print.css') }}"],
-                            onPrintDialogClose: function () {
-                                // Restore the display of the first and last columns after printing
-                                $('.exclude-print').css('display', '');
-
-                                // Check if the print dialog was canceled
-                                if (!this.printable) {
-                                    // Reload the main page
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    } else {
-                        showNotification('error', 'No data to print');
-                    }
-                });
             });
         </script>
     @endif
