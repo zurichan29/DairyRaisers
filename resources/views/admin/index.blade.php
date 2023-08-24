@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-    <button id="my-btn">asd</button>
     <div class="">
         <div class="row mb-3">
             <div class="col">
@@ -444,6 +443,47 @@
                                 fontColor: '#858796'
                             }
                         },
+                        animation: {
+                            onComplete: function(context) {
+                                var chartInstance = context.chart;
+                                var ctx = chartInstance.ctx;
+
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.font = 'bold 12px Arial';
+
+                                var datasets = chartInstance.data.datasets;
+
+                                // Calculate the total sum for each stacked bar
+                                var totalSums = [];
+
+                                datasets.forEach(function(dataset) {
+                                    dataset.data.forEach(function(value, index) {
+                                        if (typeof totalSums[index] === 'undefined') {
+                                            totalSums[index] = 0;
+                                        }
+                                        totalSums[index] += value;
+                                    });
+                                });
+
+                                datasets.forEach(function(dataset, datasetIndex) {
+                                    var meta = chartInstance.getDatasetMeta(datasetIndex);
+
+                                    meta.data.forEach(function(element, index) {
+                                        var model = element.tooltipPosition();
+
+                                        // Display the total sum only for the first dataset in each stacked bar
+                                        if (datasetIndex ===
+                                            1) { // Check if it's the Buffalo dataset
+                                            ctx.fillStyle = 'black';
+                                            ctx.fillText('₱' + totalSums[index], model
+                                                .x, model.y
+                                            ); // Adjust y position here
+                                        }
+                                    });
+                                });
+                            }
+                        }
                     }
                 });
             }

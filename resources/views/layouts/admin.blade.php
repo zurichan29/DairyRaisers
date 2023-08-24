@@ -80,13 +80,38 @@
 
     <link rel="icon" href="{{ asset('images/company-logo.png') }}" />
     <title>Admin | Dairy Raisers</title>
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        #spinner-border {
+            width: 4rem;
+            /* Adjust the size as needed */
+            height: 4rem;
+            /* Adjust the size as needed */
+        }
+    </style>
 </head>
 
 <body id="page-top">
     <audio id="notification-sound">
         <source src="{{ asset('sounds/order_notification_sound.wav') }}" type="audio/wav">
     </audio>
-
+    <div id="loading-animation-id" class="loading-overlay">
+        <div id="spinner-border" class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -294,8 +319,6 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-
-
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -332,6 +355,7 @@
 
     <script>
         $(document).ready(function() {
+            $('#loading-animation-id').hide();
             var notificationSound = new Audio('{{ asset('sounds/order_notification_sound.wav') }}');
 
             // Enable pusher logging - don't include this in production

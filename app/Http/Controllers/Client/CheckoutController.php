@@ -39,7 +39,7 @@ class CheckoutController extends Controller
         $closingTime = Carbon::create($currentTime->year, $currentTime->month, $currentTime->day, 17, 0, 0);
 
         $delivery_fee = 38;
-        if ($currentTime >= $openingTime && $currentTime <= $closingTime) {
+        // if ($currentTime >= $openingTime && $currentTime <= $closingTime) {
 
             if (auth()->check()) {
                 $userId = auth()->user()->id;
@@ -100,14 +100,14 @@ class CheckoutController extends Controller
                 'payment_methods' => $paymentMethod,
                 'delivery_fee' => $delivery_fee
             ]);
-        } else {
-            // Store is closed
-            // Calculate the time when the store will open again (next day at 7 AM)
-            $nextOpeningTime = $openingTime->copy()->addDay();
-            $formattedNextOpeningTime = $nextOpeningTime->format('g:i A');
-            $notificationMessage = "Our store is currently closed. We will be open again tomorrow at $formattedNextOpeningTime.";
-            return view('client.checkout.unavailable', compact('notificationMessage'));
-        }
+        // } else {
+        //     // Store is closed
+        //     // Calculate the time when the store will open again (next day at 7 AM)
+        //     $nextOpeningTime = $openingTime->copy()->addDay();
+        //     $formattedNextOpeningTime = $nextOpeningTime->format('g:i A');
+        //     $notificationMessage = "Our store is currently closed. We will be open again tomorrow at $formattedNextOpeningTime.";
+        //     return view('client.checkout.unavailable', compact('notificationMessage'));
+        // }
     }
 
     public function update_location_checkout(Request $request)

@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <div class="card-body">             
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" style="font-size: 14px"
                         cellspacing="0">
@@ -111,6 +111,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.0.63/print.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js">
+        </script>
 
         <script>
             $(document).ready(function() {
@@ -369,6 +371,51 @@
                                     fontColor: '#858796'
                                 }
                             },
+                           
+                            animation: {
+                                onComplete: function(context) {
+                                    var chartInstance = context.chart;
+                                    var ctx = chartInstance.ctx;
+
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    ctx.font = 'bold 12px Arial';
+
+                                    var datasets = chartInstance.data.datasets;
+
+                                    // Calculate the total sum for each stacked bar
+                                    var totalSums = [];
+
+                                    datasets.forEach(function(dataset) {
+                                        dataset.data.forEach(function(value, index) {
+                                            if (typeof totalSums[index] === 'undefined') {
+                                                totalSums[index] = 0;
+                                            }
+                                            totalSums[index] += value;
+                                        });
+                                    });
+
+                                    datasets.forEach(function(dataset, datasetIndex) {
+                                        var meta = chartInstance.getDatasetMeta(datasetIndex);
+
+                                        meta.data.forEach(function(element, index) {
+                                            var model = element.tooltipPosition();
+
+                                            // Display the total sum only for the first dataset in each stacked bar
+                                            if (datasetIndex ===
+                                                1) { // Check if it's the Buffalo dataset
+                                                ctx.fillStyle = 'black';
+                                                ctx.fillText('₱' + totalSums[index], model
+                                                    .x, model.y
+                                                    ); // Adjust y position here
+                                            }
+                                        });
+                                    });
+                                }
+                            }
+
+
+
                         }
                     });
                 }
@@ -448,8 +495,9 @@
                 $('#printButton').on('click', function() {
                     if (dataTable.rows().count() > 0) {
                         // Create a header row with the desired content
-                        var headerRow = '<tr><th colspan="6" style="text-align:center;"><h2>Sales Report</h2></th></tr>';
-                        
+                        var headerRow =
+                            '<tr><th colspan="6" style="text-align:center"><h2 style="text-align:center">Sales Report</h2></th></tr>';
+
                         // Append the header row to the table
                         $('#dataTable thead').prepend(headerRow);
                         printJS({
@@ -457,11 +505,10 @@
                             type: 'html', // Specify the type of content
                             // header: '<h2>Your Sales Report</h2>', // Optional header content
                             css: ["{{ asset('css/sales-print.css') }}"],
-                            onPrintDialogClose: function() {
-                                // Remove the header row after printing is complete
-                                $('#dataTable thead tr:first-child').remove();
-                            }
                         });
+                        // Remove the header row from the table
+                        $('#dataTable thead tr:first-child').remove();
+
                     } else {
                         showNotification('error', 'No data to print');
                     }

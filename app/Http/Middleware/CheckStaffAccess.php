@@ -16,23 +16,24 @@ class CheckStaffAccess
      */
     public function handle($request, Closure $next, ...$requiredAccess)
     {
+        session()->forget('no_access');
         // Check if the staff is authenticated
         if (auth()->guard('admin')->check()) {
             // Get the authenticated staff
             $staff = auth()->guard('admin')->user();
-
             if($staff->is_admin) {
                 return $next($request);
             }
             // Convert the staff's access to an array if it's not already an array
             $staffAccess = is_array($staff->access) ? $staff->access : json_decode($staff->access, true);
-
             // Check if the staff has the required access for the current route
             foreach ($requiredAccess as $access) {
+               
                 if (!in_array($access, $staffAccess)) {
                     // Staff does not have the required access, store the error message in the session
                     $errorMessage = 'You do not have permission to access this page.';
                     session()->flash('no_access', $errorMessage);
+                    break;
                 }
             }
 

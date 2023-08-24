@@ -23,13 +23,13 @@ class StaffController extends Controller
         if (auth()->guard('admin')->check()) {
             $staffs = Admin::all();
             $accessList = [
-                'staff_management',
-                'buffalo_management',
-                'inventory',
                 'orders',
-                'payment_methods',
+                'products',
+                'buffalo_management',
+                'staff_management',
                 'activity_logs',
-                'sales_report',
+                'payment_methods',
+                'sales_report'
             ];
 
             return view('admin.staffs.index', compact('staffs', 'accessList'));
@@ -65,7 +65,7 @@ class StaffController extends Controller
                 'staff_id' => 'required',
                 'name' => 'required',
                 'access' => ['required', 'array'],
-                'access.*' => 'in:inventory,orders,products,buffalos_and_milk,staff_management,activity_logs,payment_methods,sales_report',
+                'access.*' => 'in:orders,products,buffalo_management,staff_management,activity_logs,payment_methods,sales_report',
             ]);
 
             if ($validator->fails()) {
@@ -90,7 +90,7 @@ class StaffController extends Controller
                 'name' => 'required',
                 'email' => 'required|unique:admin,email|email',
                 'access' => ['required', 'array'],
-                'access.*' => 'in:inventory,orders,products,buffalos_and_milk,staff_management,activity_logs,sales_report,payment_methods',
+                'access.*' => 'in:orders,products,buffalo_management,staff_management,activity_logs,sales_report,payment_methods',
             ]);
 
             if ($validator->fails()) {

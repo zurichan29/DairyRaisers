@@ -154,7 +154,7 @@ Route::group(['middleware' => 'check.access:staff_management'], function () {
 });
 
 // BUFFALOS
-Route::group(['middleware' => 'check.access:buffalos_management'], function () {
+Route::group(['middleware' => 'check.access:buffalo_management'], function () {
     Route::get('/admin/dairy', [DairyController::class, 'index'])->name('admin.dairy.index');
     Route::post('/admin/dairy/buffalo-update', [DairyController::class, 'buffalo_update'])->name('admin.dairy.buffalo-update');
     Route::post('/admin/dairy/buffalo-sell', [DairyController::class, 'buffalo_sell'])->name('admin.dairy.buffalo-sell');
@@ -165,7 +165,7 @@ Route::group(['middleware' => 'check.access:buffalos_management'], function () {
 });
 
 //PRODUCTS (INVENTORY AND VARIANT)
-Route::group(['middleware' => 'check.access:inventory'], function () {
+Route::group(['middleware' => 'check.access:products'], function () {
     Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
     Route::get('/admin/products/print', [ProductController::class, 'print'])->name('admin.products.print');
     Route::get('/admin/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');

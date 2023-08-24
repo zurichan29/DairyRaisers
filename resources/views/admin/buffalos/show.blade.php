@@ -31,7 +31,7 @@
                 <div class="row">
                     <div class="col">
                         <p>Name: {{ $buffalo_sales->buyer_name }}</p>
-                        <p>Phone No: +63{{ 9262189072 }}</p>
+                        <p>Phone No: +63{{ $buffalo_sales->mobile_number }}</p>
                         <p>Address: {{ $buffalo_sales->buyer_address }}</p>
                     </div>
                     <div class="col">
@@ -46,7 +46,7 @@
                             <th scope="col">Age</th>
                             <th scope="col">Quantity</th>
                             <th scope="col">Price</th>
-                            <th scope="col">Amount</th>
+                            <th scope="col">Total</th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -100,11 +100,8 @@
 
                     </div>
                     <div class="col text-end">
-                        @if (auth()->guard('admin')->user()->name == 'Administrator')
                             <p class="mb-0">______________________________</p>
-                        @else
-                            <p class="mb-0"><u>{{ auth()->guard('admin')->user()->name }}</u></p>
-                        @endif
+                       
                         <p>Cashier/Representative</p>
                     </div>
                 </div>

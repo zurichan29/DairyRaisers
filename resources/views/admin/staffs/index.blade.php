@@ -223,12 +223,6 @@
                             {
                                 data: 'email',
                                 title: 'EMAIL',
-                                render: function(data, type, row) {
-                                    var badgeClass = row.is_verified ? 'badge bg-success' :
-                                        'badge bg-danger';
-                                    var badgeText = row.is_verified ? 'VERIFIED' : 'NOT VERIFIED';
-                                    return `${data} <span class="${badgeClass}">${badgeText}</span>`;
-                                }
                             },
                             {
                                 data: 'access',
@@ -244,11 +238,13 @@
                                 }
                             },
                             {
-                                data: null,
+                                data: 'is_verified',
                                 title: 'STATUS',
                                 render: function(data, type, row) {
-                                    // Return an empty string for the "Status" column
-                                    return '';
+                                    var badgeClass = row.is_verified ? 'badge bg-success' :
+                                        'badge bg-danger';
+                                    var badgeText = row.is_verified ? 'VERIFIED' : 'NOT VERIFIED';
+                                    return `<span class="${badgeClass}">${badgeText}</span>`;
                                 }
                             },
                             {
@@ -451,7 +447,7 @@
                     submitBtn.prop('disabled', true);
                     buttonText.hide();
                     loadingSpinner.show();
-
+                    $('#loading-animation-id').show();
                     $.ajax({
                         url: "{{ route('admin.staff.update') }}",
                         type: 'POST',
@@ -494,6 +490,7 @@
                             submitBtn.prop('disabled', false);
                             buttonText.show();
                             loadingSpinner.hide();
+                            $('#loading-animation-id').hide();
                         }
                     });
                 });

@@ -172,11 +172,9 @@
                                         <h5>
                                             Invoice <i class="fa-solid fa-credit-card text-primary"></i>
                                         </h5>
-                                        <button type="button" id="printInvoiceButton"
-                                            onclick="printInvoice({{ $order->id }})"
-                                            class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ route('admin.orders.print-invoice', ['id' => $order->id]) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="fa-solid fa-print"></i> Print Invoice
-                                        </button>
+                                        </a>
                                     </div>
                                     <br>
                                     <h4 class="font-weight-bold">Grand Total (₱): {{ $order->grand_total . '.00' }}</h4>
@@ -416,25 +414,7 @@
         </div>
 
         <script>
-            function printInvoice(id) {
-                const printWindow = window.open(`{{ route('admin.orders.print-invoice', '') }}/${id}`, '_blank');
-
-                const closePrintTab = function() {
-                    printWindow.close();
-                };
-
-                printWindow.onload = function() {
-                    printWindow.print();
-                };
-
-                // Listen for the beforeprint event
-                window.addEventListener('beforeprint', closePrintTab);
-
-                // Remove the event listener if the user cancels the print
-                window.addEventListener('afterprint', function() {
-                    window.removeEventListener('beforeprint', closePrintTab);
-                });
-            }
+           
             $(document).ready(function() {
                 $("[data-fancybox]").fancybox({
                     thumbs: {

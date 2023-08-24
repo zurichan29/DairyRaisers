@@ -82,22 +82,36 @@
                                             $statusBadge = 'badge-success';
                                             $icon = 'fa-solid fa-circle-check me-1';
                                             break;
-                                            case 'Rejected':
+                                        case 'Rejected':
                                             $statusBadge = 'badge-danger';
                                             $icon = 'fa-solid fa-circle-xmark me-1';
                                             break;
                                         default:
                                             break;
                                     }
+                                    $type = null;
+                                    switch ($order->customer_type) {
+                                        case 'guest':
+                                            $type = 'Guest';
+                                            break;
+                                        case 'online_shopper':
+                                            $type = 'Online Shopper';
+                                            break;
+                                        case 'retailer':
+                                            $type = 'Retailer';
+                                            break;
+                                        default:
+                                            $type = 'Guest';
+                                            break;
+                                    }
                                 @endphp
                                 <tr>
                                     <td>{{ $order->order_number }}</td>
-                                    <!-- Display customer details based on their type -->
-                
-                                        <td>Guest</td>
-                                        <td>{{ ($order->store_name) ? $order->name . ' | ' . $order->store_name : $order->name }}</td>
-                                        <td>+63{{ $order->mobile_number }}</td>
-                                
+                                    <td>{{ $type }}</td>
+                                    <td>{{ $order->store_name ? $order->name . ' | ' . $order->store_name : $order->name }}
+                                    </td>
+                                    <td>+63{{ $order->mobile_number }}</td>
+
 
                                     <td>₱{{ $order->grand_total }}.00</td>
                                     <td>{{ $order->updated_at }}</td>
