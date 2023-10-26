@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Response;
 class DashboardController extends Controller
 {
     //
-
     public function  broadcast(Request $request) {
         $order = Order::where('id', 6)->first();
         broadcast(new OrderNotification($order))->toOthers();
@@ -34,7 +33,7 @@ class DashboardController extends Controller
             'period'=> false,
         ]);
     }
-
+    
     public function index()
     {
         if (auth()->guard('admin')->check()) {
@@ -116,4 +115,5 @@ class DashboardController extends Controller
         // Return the image as a downloadable response
         return Response::make(base64_decode($base64ImageData), 200, $headers);
     }
+
 }

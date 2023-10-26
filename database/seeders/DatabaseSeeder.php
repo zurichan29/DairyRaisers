@@ -16,6 +16,7 @@ use App\Models\Variants;
 use App\Models\User_Address;
 use App\Models\PaymentMethod;
 use App\Models\Sales;
+use App\Models\DeliveryFee;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -47,43 +48,126 @@ class DatabaseSeeder extends Seeder
         $this->seedSalesData();
         $this->seedProducts();
         $this->seedBuffalo();
-    }
 
-    private function seedCart()
-    {
-        // Cart::Create([
-        //     'product_id' => 1,
-        //     'user_id' => 1,
-        //     'quantity' => 3,
-        //     'order_number' => 'DR-0723-1',
-        //     'price' => 100,
-        //     'total' => 300
-        // ]);
+        $data = [
+            [
+                'municipality' => 'ALFONSO',
+                'fee' => 50,
+                'zip_code' => '4123',
+            ],
+            [
+                'municipality' => 'AMADEO',
+                'fee' => 50,
+                'zip_code' => '4119',
+            ],
+            [
+                'municipality' => 'BACOOR CITY',
+                'fee' => 50,
+                'zip_code' => '4102',
+            ],
+            [
+                'municipality' => 'CARMONA',
+                'fee' => 50,
+                'zip_code' => '4116',
+            ],
+            [
+                'municipality' => 'CAVITE CITY',
+                'fee' => 50,
+                'zip_code' => '4100',
+            ],
+            [
+                'municipality' => 'DASMARIÑAS CITY',
+                'fee' => 50,
+                'zip_code' => '4114',
+            ],
+            [
+                'municipality' => 'GEN. MARIANO ALVAREZ',
+                'fee' => 50,
+                'zip_code' => '4117',
+            ],
+            [
+                'municipality' => 'GENERAL EMILIO AGUINALDO',
+                'fee' => 50,
+                'zip_code' => '4124',
+            ],
+            [
+                'municipality' => 'GENERAL TRIAS CITY',
+                'fee' => 50,
+                'zip_code' => '4107',
+            ],
+            [
+                'municipality' => 'IMUS',
+                'fee' => 50,
+                'zip_code' => '4103',
+            ],
+            [
+                'municipality' => 'INDANG',
+                'fee' => 50,
+                'zip_code' => '4122',
+            ],
+            [
+                'municipality' => 'KAWIT',
+                'fee' => 50,
+                'zip_code' => '4104',
+            ],
+            [
+                'municipality' => 'MAGALLANES',
+                'fee' => 50,
+                'zip_code' => '4113',
+            ],
+            [
+                'municipality' => 'MARAGONDON',
+                'fee' => 50,
+                'zip_code' => '4112',
+            ],
+            [
+                'municipality' => 'MENDEZ (MENDEZ-NUÑEZ)',
+                'fee' => 50,
+                'zip_code' => '4121',
+            ],
+            [
+                'municipality' => 'NAIC',
+                'fee' => 50,
+                'zip_code' => '4110',
+            ],
+            [
+                'municipality' => 'NOVELETA',
+                'fee' => 50,
+                'zip_code' => '4105',
+            ],
+            [
+                'municipality' => 'ROSARIO',
+                'fee' => 50,
+                'zip_code' => '4106',
+            ],
+            [
+                'municipality' => 'SILANG',
+                'fee' => 50,
+                'zip_code' => '4118',
+            ],
+            [
+                'municipality' => 'TAGAYTAY CITY',
+                'fee' => 50,
+                'zip_code' => '4120',
+            ],
+            [
+                'municipality' => 'TANZA',
+                'fee' => 50,
+                'zip_code' => '4108',
+            ],
+            [
+                'municipality' => 'TERNATE',
+                'fee' => 50,
+                'zip_code' => '4111',
+            ],
+            [
+                'municipality' => 'TRECE MARTIRES CITY',
+                'fee' => 50,
+                'zip_code' => '4109',
+            ],
+        ];
 
-        // Cart::Create([
-        //     'product_id' => 5,
-        //     'user_id' => 1,
-        //     'quantity' => 7,
-        //     'order_number' => 'DR-0623-1',
-        //     'price' => 50,
-        //     'total' => 350
-        // ]);
-
-        // Cart::Create([
-        //     'product_id' => 2,
-        //     'user_id' => 1,
-        //     'quantity' => 3,
-        //     'price' => 100,
-        //     'total' => 300
-        // ]);
-
-        // Cart::Create([
-        //     'product_id' => 17,
-        //     'user_id' => 1,
-        //     'quantity' => 10,
-        //     'price' => 5,
-        //     'total' => 50
-        // ]);
+        DeliveryFee::Insert($data);
     }
     private function seedUserandAddress()
     {

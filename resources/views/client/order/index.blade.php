@@ -32,6 +32,10 @@
                                     $statusBadge = 'badge-success';
                                     $icon = 'fa-solid fa-circle-check me-1';
                                     break;
+                                    case 'Rejected':
+                                    $statusBadge = 'badge-danger';
+                                    $icon = 'fa-solid fa-circle-xmark me-1';
+                                    break;
                                 default:
                                     break;
                             }

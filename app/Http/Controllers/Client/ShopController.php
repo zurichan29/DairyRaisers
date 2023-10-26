@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use App\Models\User;
 use App\Models\User_Address;
 use App\Models\Cart;
+use App\Models\DeliveryFee;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
@@ -62,6 +63,7 @@ class ShopController extends Controller
         }
         throw new HttpResponseException(response()->view('404_page', [], Response::HTTP_NOT_FOUND));
     }
+
     public function updateCart(Request $request)
     {
         $productId = $request->product_id;
@@ -185,6 +187,22 @@ class ShopController extends Controller
             }
         }
     }
+
+    public function getZipCode(Request $request)
+    {
+        $zip_code = DeliveryFee::where('municipality',$request->input('municipality'))->first();
+
+        if ($zip_code) {
+            return response()->json($zip_code);
+        } else {
+            return response()->json(['error' => 'no municipality found.'], 400);
+        }
+    }
+
+    public function getDeliveryFee(Request $request)
+    {
+    }
+
 
     public function confirm_location(Request $request, $backRoute)
     {

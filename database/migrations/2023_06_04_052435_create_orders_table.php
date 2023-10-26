@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('remarks')->nullable();
             $table->string('comments')->nullable();
             $table->string('shipping_option');
+            $table->integer('delivery_fee')->nullable();
             $table->string('payment_method');
             $table->string('reference_number')->nullable();
             $table->string('payment_receipt')->nullable();

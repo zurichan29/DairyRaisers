@@ -91,7 +91,22 @@
                                     name: barangayName
                                 };
                             });
-
+                            $.ajax({
+                            url: "{{ route('location.zip_code') }}",
+                            type: 'POST',
+                            data: {
+                                municipality: municipalityName,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                $('#zip_code').val(response.zip_code);
+                            },
+                            error: function(xhr) {
+                                console.log(xhr);
+                            },
+                            complete:function() {
+                            } 
+                        });
                             populateSelectOptions('#barangaySelect', barangays, 'Select your barangay');
 
                             // Pre-select barangay

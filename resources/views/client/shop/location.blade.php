@@ -1,6 +1,5 @@
 @extends('layouts.client')
 @section('content')
-
     <div class="text-center text-dark fw-bolder mb-0 mt-3">
         <p class="fs-2">SELECT YOUR LOCATION</p>
         <p class="fw-light">Please note that our delivery services are currently limited to the <b>REGION IV-A
@@ -43,7 +42,6 @@
             <button type="submit" class="btn btn-primary">Confirm</button>
         </div>
     </form>
-    {{-- <script src="{{ asset('js/load_address.js') }}"></script> --}}
     <script>
         $.getJSON('/js/philippine_address_2019v2.json')
             .done(function(data) {
@@ -78,6 +76,23 @@
                             };
                         });
 
+                        $.ajax({
+                            url: "{{ route('location.zip_code') }}",
+                            type: 'POST',
+                            data: {
+                                municipality: municipalityName,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                $('#zip_code').val(response.zip_code);
+                            },
+                            error: function(xhr) {
+                                console.log(xhr);
+                            },
+                            complete:function() {
+                            } 
+                        });
+
                         populateSelectOptions('#barangaySelect', barangays, 'Select your barangay');
                     })
                     .fail(function() {
@@ -94,7 +109,7 @@
             var select = $(selectId);
             select.empty();
             select.append($('<option disabled selected value="">' + placeholder + '</option>').text(
-            placeholder)); // Add placeholder option
+                placeholder)); // Add placeholder option
             $.each(options, function(index, option) {
                 select.append($('<option></option>').val(option.code).text(option.name));
             });

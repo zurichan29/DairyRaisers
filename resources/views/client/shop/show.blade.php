@@ -1,6 +1,52 @@
 @extends('layouts.client')
 @section('content')
     <style>
+        .image-container {
+            position: relative;
+        }
+
+        .image-hover {
+            transition: filter 0.3s;
+        }
+
+        .image-container:hover .image-hover {
+            filter: blur(4px);
+            /* Add blur effect on image hover */
+        }
+
+        .text-description {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            display: none;
+            text-align: center;
+            max-width: 100%;
+            /* Adjust the maximum width as needed */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+            max-height: 100%;
+            /* Add max height for scrolling */
+            box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.5);
+            /* Add a box shadow */
+        }
+
+        .image-container:hover .text-description {
+            display: block;
+            overflow: auto;
+            overflow: ;
+            /* Enable scrolling for long text */
+            white-space: normal;
+            max-height: 70%;
+            /* Adjust the maximum height as needed */
+        }
+
+
         .out-of-stock-card {
             opacity: 0.5;
             /* Reduce opacity */
@@ -28,9 +74,9 @@
             /* Place above the blurred card */
         }
 
-        @media only screen and (max-width: 767px) {
-            }
+        @media only screen and (max-width: 767px) {}
     </style>
+    {{-- <link rel="stylesheet" href="{{ asset('js/popper.min.js') }}"> --}}
     <div class="card mb-3 shadow">
         <div class="set-location card-body ">
             @auth
@@ -61,16 +107,14 @@
         </div>
     </div>
 
-
-
-
     <section class="text-center row m-0 p-0">
-        <button class="btn btn-primary d-block d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse">
+        <button class="btn btn-primary d-block d-md-none mb-3" type="button" data-bs-toggle="collapse"
+            data-bs-target="#filter-collapse">
             Filters
         </button>
         <div class="collapse d-md-block col-md-3 mb-5" id="filter-collapse">
-             <!-- Button to Toggle Filters -->
-            
+            <!-- Button to Toggle Filters -->
+
             <div class="mb-3">
                 <form id="searchForm" class=" navbar-search">
                     <div class="input-group">
@@ -161,8 +205,15 @@
                                         </div>
                                         <div
                                             class="card-body d-flex justify-content-between align-items-center flex-column">
-                                            <img src="{{ asset($product->img) }}" class="img-fluid" style="height: 220px"
-                                                alt="product picture">
+                                            <div class="image-container position-relative w-100 h-100">
+                                                <!-- Add this container -->
+                                                <img src="{{ asset($product->img) }}" class="img-fluid image-hover"
+                                                    style="height: 220px" alt="product picture">
+                                                <div class="text-description">
+                                                    jhagsdhagsdahgjsahgdajdhgajdhgasjdhagdjahgdajhg{{ $product->description }}
+                                                </div>
+                                                <!-- Add your product description here -->
+                                            </div>
                                             @if ($product->stocks <= 0 || $product->status == 'NOT AVAILABLE')
                                                 <div class="not-available-overlay fw-bold text-center"><i
                                                         class="fa-solid fa-circle-xmark"></i> NOT AVAILABLE</div>
@@ -171,7 +222,8 @@
                                                     <button type="submit" class="btn btn-primary add-to-cart-button"
                                                         data-product-id="{{ $product->id }}">
                                                         <span class="loading-spinner" style="display: none;">
-                                                            <span class="spinner-border spinner-border-sm align-middle me-1"
+                                                            <span
+                                                                class="spinner-border spinner-border-sm align-middle me-1"
                                                                 aria-hidden="true"></span>
                                                             <span role="status">Loading...</span>
                                                         </span>
@@ -180,6 +232,7 @@
                                                 </div>
                                             @endif
                                         </div>
+
                                     </div>
                                 </div>
                             @endforeach

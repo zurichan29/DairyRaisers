@@ -96,7 +96,21 @@
                             });
 
                             populateSelectOptions('#barangaySelect', barangays, 'Select your barangay');
-
+                            $.ajax({
+                                url: "{{ route('location.zip_code') }}",
+                                type: 'POST',
+                                data: {
+                                    municipality: municipalityName,
+                                    _token: "{{ csrf_token() }}"
+                                },
+                                success: function(response) {
+                                    $('#zip_code').val(response.zip_code);
+                                },
+                                error: function(xhr) {
+                                    console.log(xhr);
+                                },
+                                complete: function() {}
+                            });
                             // Pre-select barangay
                             var selectedBarangay = '{{ $address['barangay'] }}';
                             $('#barangaySelect').val(selectedBarangay);

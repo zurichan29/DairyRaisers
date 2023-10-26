@@ -105,7 +105,9 @@ class ProfileController extends Controller
     {
         if ($request->is('admin/profile')) {
             return 'Profile';
-        } else {
+        } else  if ($request->is('admin/profile/update-password')) {
+            return 'Profile';
+        } {
             return 'Others';
         }
     }

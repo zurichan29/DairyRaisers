@@ -115,14 +115,20 @@ class ProductController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|min:5',
+                'description' => 'required|max:255',
                 'img' => 'required|image|mimes:jpeg,jpg,png|max:5120',
                 'variant' => 'required|exists:variants,name',
-                'price' => 'required|numeric',
+                'price' => 'numeric|min:1',  function ($attribute, $value, $fail) {
+                    // Custom rule to check for negative signs, 'e', and '+'
+                    if (preg_match('/[-e+]/', $value)) {
+                        $fail("The $attribute must be a positive number without negative signs, 'e', or '+' sign.");
+                    }
+                },
             ]);
-
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
+
 
             $variant = Variants::where('name', $request->variant)->first();
 
@@ -134,6 +140,7 @@ class ProductController extends Controller
             // Store the 'img' column in the database with the image path
             $newProduct = new Product;
             $newProduct->name = $request->name;
+            $newProduct->description = $request->description;
             $newProduct->img = 'images/' . $imageName;
             $newProduct->variants_id = $variant->id;
             $newProduct->price = $request->price;
@@ -144,6 +151,7 @@ class ProductController extends Controller
             $data = [
                 'product_id' => $product->id,
                 'name' => $product->name,
+                'description' => $product->description,
                 'price' => $product->price,
                 'variant' => $product->variant->name,
             ];
@@ -157,10 +165,16 @@ class ProductController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|min:3',
+                'name' => 'required|min:5',
+                'description' => 'required|max:255',
                 'img' => 'image|mimes:jpeg,jpg,png|max:5120',
                 'variant' => 'required|exists:variants,name',
-                'price' => 'required|numeric',
+                'price' => 'numeric|min:1',  function ($attribute, $value, $fail) {
+                    // Custom rule to check for negative signs, 'e', and '+'
+                    if (preg_match('/[-e+]/', $value)) {
+                        $fail("The $attribute must be a positive number without negative signs, 'e', or '+' sign.");
+                    }
+                },
             ]);
 
             if ($validator->fails()) {
@@ -182,6 +196,7 @@ class ProductController extends Controller
 
             // Update other product data
             $product->name = $request->input('name');
+            $product->description = $request->input('description');
             $product->variants_id = $variant->id;
             $product->price = $request->input('price');
             $product->save();
@@ -192,6 +207,7 @@ class ProductController extends Controller
             $data = [
                 'product_id' => $product->id,
                 'name' => $product->name,
+                'description' => $product->description,
                 'price' => $product->price,
                 'variant' => $updatedVariant->name,
                 'stock' => $product->stock,

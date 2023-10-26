@@ -25,6 +25,7 @@ use App\Models\GuestUser;
 use App\Models\GuestCart;
 use App\Models\GuestOrder;
 use App\Models\PaymentMethod;
+use App\Models\DeliveryFee;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Events\OrderNotification;
@@ -37,9 +38,12 @@ class CheckoutController extends Controller
         $currentTime = Carbon::now();
         $openingTime = Carbon::create($currentTime->year, $currentTime->month, $currentTime->day, 7, 0, 0);
         $closingTime = Carbon::create($currentTime->year, $currentTime->month, $currentTime->day, 17, 0, 0);
+        $jsonData = file_get_contents(public_path('js/philippine_address_2019v2.json'));
+        $addressData = json_decode($jsonData, true);
 
-        $delivery_fee = 38;
-        // if ($currentTime >= $openingTime && $currentTime <= $closingTime) {
+        $delivery_fee = 0;
+
+        if ($currentTime >= $openingTime && $currentTime <= $closingTime) {
 
             if (auth()->check()) {
                 $userId = auth()->user()->id;
@@ -47,6 +51,8 @@ class CheckoutController extends Controller
                 $address = $user->address;
 
                 $defaultAddress = $user->address->where('default', true)->first();
+                $DeliveryFee = DeliveryFee::where('municipality', $defaultAddress->municipality)->first();
+                $delivery_fee = $DeliveryFee->fee;
                 $cartItems = $user->cart;
                 $cart = [];
                 $grandTotal = $cartItems->sum('total');
@@ -72,6 +78,7 @@ class CheckoutController extends Controller
                         'period' => false,
                     ]);
                 }
+               
             } else {
                 $defaultAddress = null;
                 $address = session('guest_address');
@@ -80,8 +87,7 @@ class CheckoutController extends Controller
                 foreach ($cartItems as $item) {
                     $grandTotal += $item['total'];
                 }
-
-                if ($cartItems === null) {
+                if ($cartItems == null || empty($cartItems)) {
                     return redirect()->back()->with('message', [
                         'type' => 'error',
                         'title' => 'Error',
@@ -89,6 +95,9 @@ class CheckoutController extends Controller
                         'period' => false,
                     ]);
                 }
+                $DeliveryFee = DeliveryFee::where('municipality', $address['municipality'])->first();
+                $delivery_fee = $DeliveryFee->fee;
+
             }
             $paymentMethod = PaymentMethod::all();
 
@@ -100,14 +109,14 @@ class CheckoutController extends Controller
                 'payment_methods' => $paymentMethod,
                 'delivery_fee' => $delivery_fee
             ]);
-        // } else {
-        //     // Store is closed
-        //     // Calculate the time when the store will open again (next day at 7 AM)
-        //     $nextOpeningTime = $openingTime->copy()->addDay();
-        //     $formattedNextOpeningTime = $nextOpeningTime->format('g:i A');
-        //     $notificationMessage = "Our store is currently closed. We will be open again tomorrow at $formattedNextOpeningTime.";
-        //     return view('client.checkout.unavailable', compact('notificationMessage'));
-        // }
+        } else {
+            // Store is closed
+            // Calculate the time when the store will open again (next day at 7 AM)
+            $nextOpeningTime = $openingTime->copy()->addDay();
+            $formattedNextOpeningTime = $nextOpeningTime->format('g:i A');
+            $notificationMessage = "Our store is currently closed. We will be open again tomorrow at $formattedNextOpeningTime.";
+            return view('client.checkout.unavailable', compact('notificationMessage'));
+        }
     }
 
     public function update_location_checkout(Request $request)
@@ -334,9 +343,9 @@ class CheckoutController extends Controller
             $request->validate([
                 'reference_number' => ['required', 'max:255'],
             ]);
-            
+
             $referenceNumber = $request->input('reference_number');
-            
+
             if (!$Method) {
                 return redirect()->back()->with('message', [
                     'type' => 'error',
@@ -345,7 +354,7 @@ class CheckoutController extends Controller
                     'period' => false,
                 ]);
             }
-            
+
             $validator = Validator::make($request->all(), [
                 'formFile' => 'required|image|mimes:png,jpg,jpeg',
             ]);
@@ -354,10 +363,11 @@ class CheckoutController extends Controller
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
+
             $file = $request->file('formFile');
             $extension = $file->getClientOriginalExtension();
             $fileName = Str::random(40) . '.' . $extension;
-            $file->storeAs('public/images/payment_reciept', $fileName);
+            $file->move(public_path('images/payment_reciept'), $fileName);
             $filePath = 'images/payment_reciept/' . $fileName;
 
             $paymentMethod = $Method->type;
@@ -379,8 +389,8 @@ class CheckoutController extends Controller
             }
         }
 
-        $delivery_fee = 38;
-
+        $delivery_fee = 0;
+      
         if (auth()->check()) {
             $userId = auth()->user()->id;
             $user = User::with('cart.product')->with('address')->where('id', $userId)->first();
@@ -396,7 +406,7 @@ class CheckoutController extends Controller
 
             $cart = $user->cart;
             $address = $user->address->where('default', true)->first();
-
+            
             if ($address) {
                 $completeAddress = $address->street . ' ' . ucwords(strtolower($address->barangay)) . ', ' . ucwords(strtolower($address->municipality)) . ', ' . ucwords(strtolower($address->province)) . ', ' . $address->zip_code . ' Philippines';
             } else {
@@ -444,7 +454,7 @@ class CheckoutController extends Controller
                 $user_address->save();
                 $completeAddress = $request->input('street') . ' ' . ucwords(strtolower($request->input('barangay'))) . ', ' . ucwords(strtolower($request->input('municipality'))) . ', ' . ucwords(strtolower($request->input('province'))) . ', ' . $request->input('zip_code') . ' Philippines';
             }
-
+           
             $cart_items = Cart::where('user_id', $userId)->get();
             $items = [];
 
@@ -495,7 +505,8 @@ class CheckoutController extends Controller
                 }
             }
             Cart::where('user_id', $userId)->delete();
-
+            $DeliveryFee = DeliveryFee::where('municipality', $address->municipality)->first();
+            $delivery_fee = $DeliveryFee->fee;
             $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
             $order = new Order;
             $order->name = $name;
@@ -504,10 +515,11 @@ class CheckoutController extends Controller
             $order->order_number = $orderID;
             $order->address = $completeAddress;
             $order->remarks = $request->input('remarks');
-            $order->grand_total = $cart->sum('total') + $delivery_fee;;
+            $order->grand_total = $cart->sum('total') + $delivery_fee;
             $order->payment_method = $paymentMethod;
             $order->reference_number = $referenceNumber;
             $order->shipping_option = 'Delivery';
+            $order->delivery_fee = $delivery_fee;
             $order->customer_id = $userId;
             $order->customer_type = 'online_shopper';
             $order->items = $items;
@@ -527,7 +539,6 @@ class CheckoutController extends Controller
             }
 
             broadcast(new OrderNotification($order))->toOthers();
-
         } else {
             $request->validate([
                 'name' => 'required|max:255|min:4',
@@ -593,6 +604,8 @@ class CheckoutController extends Controller
             foreach ($orderData as $item) {
                 $grandTotal += $item['total'];
             }
+            $DeliveryFee = DeliveryFee::where('municipality', $guestAddress['municipality'])->first();
+            $delivery_fee = $DeliveryFee->fee;
 
             $order = new Order;
             $order->name = $request->name;
@@ -605,6 +618,7 @@ class CheckoutController extends Controller
             $order->payment_method = $paymentMethod;
             $order->reference_number = $referenceNumber;
             $order->shipping_option = 'Delivery';
+            $order->delivery_fee = $delivery_fee;
             $order->customer_id = null;
             $order->customer_type = 'guest';
             $order->items = $orderData;
@@ -619,7 +633,6 @@ class CheckoutController extends Controller
             session()->forget('order_data');
 
             broadcast(new OrderNotification($order))->toOthers();
-
         }
         return redirect()->route('order_history')->with('message', [
             'type' => 'success',

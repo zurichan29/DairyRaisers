@@ -39,6 +39,12 @@
                                 <label for="account_number">Account Number</label>
                                 <div id="add-account_number-error" class="add-method-error"></div>
                             </div>
+                            <div class="form-floating mb-3">
+                                <input type="file" class="form-control" name="img" id="addImg"
+                                    placeholder="Image">
+                                <label for="addImg">Image *</label>
+                                <div id="add-img-error" class="error-container"></div>
+                            </div>
                             <button type="submit" id="addMethodBtn" class="btn btn-primary mb-3">
                                 <span class="loading-spinner" style="display: none;">
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -74,25 +80,24 @@
                         <thead>
                             <tr>
                                 <th>TYPE</th>
+                                <th>PHOTO</th>
                                 <th>ACCOUNT NAME</th>
                                 <th>ACCOUNT NO.</th>
                                 <th>STATUS</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <th>TYPE</th>
-                                <th>ACCOUNT NAME</th>
-                                <th>ACCOUNT NO.</th>
-                                <th>STATUS</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
                         <tbody>
                             @foreach ($payment_methods as $method)
                                 <tr>
                                     <td class="type-column">{{ $method->type }}</td>
+                                    <td class="img-column">
+                                        <a href="{{ asset($method->img) }}" data-fancybox="gallery" data-caption="Img">
+                                            <img src="{{ asset($method->img) }}" class="img-fluid" style="width: 50px"
+                                                alt="Image">
+                                        </a>
+
+                                    </td>
                                     <td class="account-name-column">{{ $method->account_name }}</td>
                                     <td class="account-number-column">{{ $method->account_number }}</td>
                                     <td class="text-center">
@@ -114,7 +119,8 @@
                                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                             </button>
-                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
+                                            <div class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="actionsDropdown">
                                                 <button type="button" class="dropdown-item edit-btn"
                                                     data-id="{{ $method->id }}">Edit</button>
 
@@ -202,11 +208,26 @@
 
         <script>
             $(document).ready(function() {
+                $("[data-fancybox]").fancybox({
+                    thumbs: {
+                        autoStart: true,
+                        axis: 'x'
+                    },
+                    buttons: [
+                        'zoom',
+                        'slideShow',
+                        'fullScreen',
+                        'close'
+                    ]
+                });
                 var dataTable = null;
                 var currentDataTablePage = 1;
                 dataTable = $('#dataTable').DataTable({
                     columns: [{
                             className: 'type-column',
+                        },
+                        {
+                            className: 'img-column',
                         },
                         {
                             className: 'account-name-column',
@@ -238,6 +259,20 @@
                                 data: 'type',
                                 title: 'TYPE',
                                 className: 'type-column'
+                            },
+                            {
+                                data: 'img',
+                                title: 'PHOTO',
+                                className: 'img-column',
+                                render: function(data, type, row) {
+                                    var assetUrl = "{{ asset('') }}" + data;
+                                    console.log(assetUrl);
+                                    
+                                    return  `<a href="${assetUrl}" data-fancybox="gallery" data-caption="Img">
+                                            <img src="${assetUrl}" class="img-fluid" style="width: 50px"
+                                                alt="Image">
+                                        </a>`;
+                                }
                             },
                             {
                                 data: 'account_name',
@@ -532,6 +567,7 @@
                         confirmationMessage = 'Do you want to activate this payment method?';
                         newBg = 'bg-success';
                     }
+
 
                     showConfirmationModal(confirmationMessage, function() {
                         // Proceed with updating the payment method status

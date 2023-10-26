@@ -53,14 +53,20 @@ class CartController extends Controller
 
     public function updateQuantity(Request $request)
     {
+
         $grandTotal = 0;
         $total = 0;
-        if ($request->input('quantity') == 0) {
-            return response()->json(['errors' => 'invalid quantity: must not be less than 0.'], 422);
-        }
+        $item_quantity = 0;
         if (auth()->check()) {
             $cart = Cart::where('user_id', auth()->user()->id)->where('product_id', $request->input('cartId'))->first();
-            $cart->quantity = $request->quantity;
+            if ($request->input('math_method') == 'increase') {
+                $cart->quantity += 1;
+            } else if ($request->input('math_method') == 'decrease') {
+                $cart->quantity -= 1;
+            } else {
+                return response()->json("error invalid math method", 400);
+            }
+            $item_quantity = $cart->quantity;
             $cart->total = $cart->product->price * $cart->quantity;
             $cart->save();
             $total = $cart->total;
@@ -79,7 +85,14 @@ class CartController extends Controller
                 }
 
                 if ($existingProductIndex !== null) {
-                    $orderData[$existingProductIndex]['quantity'] = $request->input('quantity');
+                    if ($request->input('math_method') == 'increase') {
+                        $orderData[$existingProductIndex]['quantity'] += 1;
+                    } else if ($request->input('math_method') == 'decrease') {
+                        $orderData[$existingProductIndex]['quantity'] -= 1;
+                    } else {
+                        return response()->json("error invalid math method", 400);
+                    }
+                    $item_quantity = $orderData[$existingProductIndex]['quantity'];
                     $orderData[$existingProductIndex]['total'] = $orderData[$existingProductIndex]['price'] * $orderData[$existingProductIndex]['quantity'];
 
                     session(['order_data' => $orderData]);
@@ -102,6 +115,7 @@ class CartController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Quantity updated successfully.',
+            'item_quantity' => $item_quantity,
             'total' => $total,
             'grandTotal' => $grandTotal,
         ]);
@@ -119,17 +133,18 @@ class CartController extends Controller
         } else {
             $cartId = $request->input('cartId');
             $orderData = session('order_data', []);
-
+            
             if ($orderData) {
                 $removedProductIndex = null;
                 foreach ($orderData as $index => $item) {
+                    
                     if ($item['product_id'] == $cartId) {
                         $removedProductIndex = $index;
                         break;
                     }
                 }
-
                 if ($removedProductIndex !== null) {
+                    
                     $removedTotal = $orderData[$removedProductIndex]['total'];
                     unset($orderData[$removedProductIndex]); // Remove the product from the array
                     session(['order_data' => $orderData]);
@@ -140,6 +155,8 @@ class CartController extends Controller
                     }
 
                     $count = count(session('order_data'));
+                } else {
+                    return response()->json(['error' => 'no index found'], 400);
                 }
             } else {
                 return response()->json([

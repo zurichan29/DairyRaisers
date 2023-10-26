@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('img')->nullable();
             $table->string('variants_id');
+            $table->string('description')->nullable();
             $table->integer('price');
             $table->integer('stocks')->default(0);
             $table->string('status')->default('NOT AVAILABLE');

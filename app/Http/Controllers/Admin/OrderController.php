@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Sales;
 use App\Models\OnlineShopper;
 use App\Models\Retailer;
+use App\Models\DeliveryFee;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -293,6 +294,7 @@ class OrderController extends Controller
 
             $validator = $request->validate([
                 'customer_details' => 'required|exists:retailers,id',
+                'delivery_fee' => 'required|numeric|min:1'
             ]);
 
             if (session()->has('selected_products')) {
@@ -382,6 +384,7 @@ class OrderController extends Controller
                 $order->customer_type = 'retailer';
                 $order->items = $items;
                 $order->shipping_option = 'Delivery';
+                $order->delivery_fee = $request->input('delivery_fee');
                 $order->payment_method = 'Cash On Delivery';
                 $order->ip_address =  $request->ip();
                 $order->save();
@@ -477,6 +480,9 @@ class OrderController extends Controller
                     break;
                 case 'Delivered':
                     $statusBadge = 'badge-success';
+                    break;
+                case 'Rejected':
+                    $statusBadge = 'badge-danger';
                     break;
                 default:
                     break;
@@ -598,8 +604,9 @@ class OrderController extends Controller
     {
         if (auth()->guard('admin')->check()) {
             $order = Order::findOrFail($id);
-            if ($order->status == 'On The Way') {
+            if ($order->status != 'On The Way') {
                 $order->status = 'Delivered';
+
                 $order->save();
                 if ($order->customer_type != 'retailer') {
                     $orderData = [
@@ -617,6 +624,18 @@ class OrderController extends Controller
                     ];
                     Mail::to($order->email)->send(new DeliveredNotif($orderData));
                 }
+
+                foreach ($order->items as $sales) {
+                    Sales::create([
+                        'category' => 'Products',
+                        'name' => $sales['name'],
+                        'price' => $sales['price'],
+                        'quantity' => $sales['quantity'],
+                        'amount' => $sales['total'],
+                        'created_at' => Carbon::now(),
+                    ]);
+                }
+
                 $this->logActivity(auth()->guard('admin')->user()->name . ' updated the status of Order ' . $order->order_number . ' to ' . $order->status, $request);
                 return redirect()->route('admin.orders.show', ['id' => $id])->with('message', [
                     'type' => 'info',

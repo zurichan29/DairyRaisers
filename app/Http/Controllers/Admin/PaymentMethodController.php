@@ -31,6 +31,7 @@ class PaymentMethodController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'type' => 'required|max:255|min:3',
+                'img' => 'required|image|mimes:jpeg,jpg,png|max:5120',
                 'account_name' => 'required|max:255|min:3',
                 'account_number' => 'required|max:255|min:3',
             ]);
@@ -39,9 +40,15 @@ class PaymentMethodController extends Controller
                 return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
             }
 
+            // Handle the uploaded image
+            $image = $request->file('img');
+            $imageName = 'picture_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/payment_method'), $imageName);
+
             // Create a new PaymentMethod instance
             $paymentMethod = new PaymentMethod;
             $paymentMethod->type = $request->type;
+            $paymentMethod->img = 'images/payment_method/' . $imageName;
             $paymentMethod->account_name = $request->account_name;
             $paymentMethod->account_number = $request->account_number;
             $paymentMethod->status = 'ACTIVATED';

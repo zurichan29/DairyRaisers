@@ -9,8 +9,14 @@
                         <h6 class="text-primary">₱{{ $product->price . '.00' }}</h6>
                     </div>
                     <div class="card-body d-flex justify-content-between align-items-center flex-column">
-                        <img src="{{ asset($product->img) }}" class="img-fluid" style="height: 220px"
-                            alt="product picture">
+                        <div class="image-container"> <!-- Add this container -->
+                            <img src="{{ asset($product->img) }}" class="img-fluid image-hover" style="height: 220px"
+                                alt="product picture">
+                            <div class="text-description">
+                                jhagsdhagsdahgjsahgdajdhgajdhgasjdhagdjahgdajhg{{ $product->description }}
+                            </div>
+                            <!-- Add your product description here -->
+                        </div>
                         @if ($product->stocks <= 0 || $product->status == 'NOT AVAILABLE')
                             <div class="not-available-overlay fw-bold text-center"><i
                                     class="fa-solid fa-circle-xmark"></i> NOT AVAILABLE</div>
@@ -28,6 +34,7 @@
                             </div>
                         @endif
                     </div>
+
                 </div>
             </div>
         @endforeach

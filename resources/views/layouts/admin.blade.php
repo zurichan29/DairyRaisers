@@ -302,7 +302,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto exclude-print">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; General Trias Dairy Raisers Multi-Purpose Cooperative 2021</span>
+                        <span>Copyright &copy; General Trias Dairy Raisers Multi-Purpose Cooperative 2023</span>
                     </div>
                 </div>
             </footer>

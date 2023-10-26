@@ -70,6 +70,9 @@
                                 </h6>
                             </div>
                         </div>
+                        @if ($order->status == 'Rejected')
+                            <p class="text-center"><span class="text-danger">Rejected Reason:</span> {{ $order->comments }}</p>
+                        @endif
                         <br>
                         <div class="d-grid gap-2 col-6 mx-auto">
                             <button type="button" class="mx-auto text-center btn btn-sm btn-primary"

@@ -177,6 +177,7 @@
                                         </a>
                                     </div>
                                     <br>
+                                    <h6>Delivery Fee: ₱{{ $order->delivery_fee }}.00</h6>
                                     <h4 class="font-weight-bold">Grand Total (₱): {{ $order->grand_total . '.00' }}</h4>
                                     <h6>Order No. {{ $order->order_number }}</h6>
                                     <h6>Reference No. <span id="ref">{{ $order->reference_number }}</span></h6>
@@ -213,9 +214,9 @@
                                         </div>
                                         <div class="collapse mt-3" id="PaymentReciept">
                                             <div class="card card-body">
-                                                <a href="{{ asset('storage/' . $order->payment_receipt) }}"
+                                                <a href="{{ asset($order->payment_receipt) }}"
                                                     data-fancybox="gallery" data-caption="Payment Reciept">
-                                                    <img src="{{ asset('storage/' . $order->payment_receipt) }}"
+                                                    <img src="{{ asset($order->payment_receipt) }}"
                                                         class="img-fluid" alt="Image">
                                                 </a>
                                             </div>

@@ -15,14 +15,17 @@
         <div class="card shadow mb-4">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h1 class="h3 text-primary">Orders</h1>
-                <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-icon-split">
-                    <span class="icon text-white-50">
-                        <i class="fa-solid fa-circle-plus"></i>
-                    </span>
-                    <span class="text">
-                        New Order
-                    </span>
-                </a>
+                <div class="btn-group gap-4">
+                    <a href="{{ route('admin.delivery_fee.index') }}" class="btn btn-success">Delivery Fees</a>
+                    <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </span>
+                        <span class="text">
+                            New Order
+                        </span>
+                    </a>
+                </div>
             </div>
 
             <div class="card-body">
@@ -142,36 +145,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- <script>
-        function fetchNotifications() {
-            var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken // Set the CSRF token in the AJAX request headers
-                }
-            });
-            $.ajax({
-                url: "{{ route('fetch-notifications') }}", // Replace with the URL that returns the user's notifications
-                method: 'GET',
-                processData: false,
-                contentType: false,
-                success: function(notifications) {
-                    // Handle the response and update the UI with new notifications
-                    // You can show the notifications in a popup or update the notification panel
-                    console.log(notifications);
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors if any
-                    console.log(xhr);
-                }
-            });
-        }
-
-        // Call the fetchNotifications function every few seconds
-        setInterval(fetchNotifications, 5000); // Fetch notifications every 5 seconds (adjust the interval as needed)
-    </script> --}}
 
         <script>
             $(document).ready(function() {

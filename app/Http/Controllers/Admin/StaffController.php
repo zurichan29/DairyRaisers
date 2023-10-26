@@ -164,7 +164,15 @@ class StaffController extends Controller
     {
         if ($request->is('admin/staff')) {
             return 'Staff';
-        } else {
+        } else if ($request->is('admin/staff/update')) {
+            return 'Staff';
+        } else if ($request->is('admin/staff/fetch')) {
+            return 'Staff';
+        }else if ($request->is('admin/staff/init')) {
+            return 'Staff';
+        } else if ($request->is('admin/staff/store')) {
+            return 'Staff';
+        } {
             return 'Others';
         }
     }

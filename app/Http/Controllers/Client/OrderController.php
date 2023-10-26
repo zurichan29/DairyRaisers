@@ -17,6 +17,7 @@ use App\Models\GuestUser;
 use App\Models\GuestCart;
 use App\Models\GuestOrder;
 use App\Models\User_Address;
+use App\Models\DeliveryFee;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
@@ -78,6 +79,9 @@ class OrderController extends Controller
             case 'Delivered':
                 $statusBadge = 'badge-success';
                 break;
+            case 'Rejected':
+                $statusBadge = 'badge-danger';
+                break;
             default:
                 break;
         }
@@ -87,17 +91,20 @@ class OrderController extends Controller
     public function re_order($id)
     {
 
-        $user = User::with('cart.product')->where('id', auth()->user()->id)->first();
+        $user = User::with('cart.product')->with('address')->where('id', auth()->user()->id)->first();
         $order = Order::findOrFail($id);
         $items = $order->items;
         $grandTotal = 0;
-        $delivery_fee = 38;
+        $address = $user->address->where('default', true)->first();
+        $DeliveryFee = DeliveryFee::where('municipality', $address->municipality)->first();
+        $delivery_fee = $DeliveryFee->fee;
         foreach ($items as $item) {
             $grandTotal += $item['total'];
         }
         $addresses = $user->address;
         $defaultAddress = $user->address->where('default', true)->first();
         $payment_methods = PaymentMethod::all();
+        
         if ($order) {
         } else {
             return redirect()->route('index');
@@ -178,6 +185,8 @@ class OrderController extends Controller
     public function place(Request $request, $id)
     {
         $order = Order::findOrFail($id);
+        $delivery_fee = 0;
+    
         function generateOrderId()
         {
             $currentDate = now();
@@ -271,6 +280,9 @@ class OrderController extends Controller
         $completeAddress = $address->street . ' ' . ucwords(strtolower($address->barangay)) . ', ' . ucwords(strtolower($address->municipality)) . ', ' . ucwords(strtolower($address->province)) . ', ' . $address->zip_code . ' Philippines';
         // Create a new Order instance and save it
         $name = auth()->user()->first_name . ' ' . auth()->user()->last_name;
+       $DeliveryFee = DeliveryFee::where('municipality', $address->municipality)->first();
+       $delivery_fee = $DeliveryFee->fee;
+
         $order = new Order;
         $order->name = $name;
         $order->mobile_number = auth()->user()->mobile_number;
@@ -278,10 +290,11 @@ class OrderController extends Controller
         $order->order_number = $orderID;
         $order->address = $completeAddress;
         $order->remarks = $request->input('remarks');
-        $order->grand_total = $grandTotal;
+        $order->grand_total = $grandTotal + $delivery_fee;
         $order->payment_method = $paymentMethod;
         $order->reference_number = $referenceNumber;
         $order->shipping_option = 'Delivery';
+        $order->delivery_fee = $delivery_fee;
         $order->customer_id = $userId;
         $order->customer_type = 'online_shopper';
         $order->items = $items;

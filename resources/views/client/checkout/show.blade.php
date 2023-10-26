@@ -198,6 +198,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th>Type</th>
+                                                                    <th>Photo</th>
                                                                     <th>Account Name</th>
                                                                     <th>Account No.</th>
                                                                     <th>Status</th>
@@ -207,6 +208,13 @@
                                                                 @foreach ($payment_methods as $method)
                                                                     <tr>
                                                                         <td>{{ $method->type }}</td>
+                                                                        <td> <a href="{{ asset($method->img) }}"
+                                                                                data-fancybox="gallery"
+                                                                                data-caption="Img">
+                                                                                <img src="{{ asset($method->img) }}"
+                                                                                    class="img-fluid" style="width: 50px"
+                                                                                    alt="Image">
+                                                                            </a></td>
                                                                         <td>{{ $method->account_name }}
                                                                         </td>
                                                                         <td>{{ $method->account_number }}</td>
@@ -384,6 +392,18 @@
 
         $(document).ready(function() {
             $('#loading-animation-id').hide();
+            $("[data-fancybox]").fancybox({
+                thumbs: {
+                    autoStart: true,
+                    axis: 'x'
+                },
+                buttons: [
+                    'zoom',
+                    'slideShow',
+                    'fullScreen',
+                    'close'
+                ]
+            });
             $('#formFile').on('change', function() {
                 var fileInput = this;
                 var file = fileInput.files[0];

@@ -41,6 +41,11 @@
                                         <div id="add-product-name-error" class="error-container"></div>
                                     </div>
                                     <div class="form-floating mb-3">
+                                        <textarea class="form-control" placeholder="Leave a description here" name="description" id="addDescription"></textarea>
+                                        <label for="addDescription">Description *</label>
+                                        <div id="add-product-description-error" class="error-container"></div>
+                                    </div>
+                                    <div class="form-floating mb-3">
                                         <input type="file" class="form-control" name="img" id="addImg"
                                             placeholder="Product Image">
                                         <label for="addImg">Product Image *</label>
@@ -95,6 +100,12 @@
                                             placeholder="Name">
                                         <label for="editName">Name *</label>
                                         <div id="edit-product-name-error" class="error-container"></div>
+                                    </div>
+
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" placeholder="Leave a description here" name="description" id="editDescription"></textarea>
+                                        <label for="editDescription">Description *</label>
+                                        <div id="edit-product-description-error" class="error-container"></div>
                                     </div>
 
                                     <div class="form-floating mb-3">
@@ -208,8 +219,9 @@
                             <button type="button" id="downloadExcelButton" class="mr-2 btn btn-sm btn-outline-primary">
                                 <i class="fa-regular fa-file-excel"></i> Excel
                             </button>
-                            <a href="{{ route('admin.products.print') }}" type="button" id="printButton" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-print"></i> Print
+                            <a href="{{ route('admin.products.print') }}" type="button" id="printButton"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-print"></i> Print
                             </a>
                         </div>
                     </div>
@@ -220,6 +232,7 @@
                                     <tr>
                                         <th class="exclude-print">PHOTO</th>
                                         <th class="">NAME</th>
+                                        <th class="">DESCRIPTION</th>
                                         <th class="">VARIANT</th>
                                         <th class="">PRICE</th>
                                         <th class="">STOCKS</th>
@@ -232,6 +245,7 @@
                                     <tr>
                                         <th class="exclude-print">PHOTO</th>
                                         <th class="">NAME</th>
+                                        <th class="">DESCRIPTION</th>
                                         <th class="">VARIANT</th>
                                         <th class="">PRICE</th>
                                         <th class="">STOCKS</th>
@@ -263,10 +277,12 @@
                                         @endphp
                                         <tr data-product-id="{{ $product->id }}">
                                             <td class="img-column exclude-print">
-                                                <img src="{{ asset($product->img) }}" class="img-fluid img-thumbnail exclude-print"
-                                                    alt="product picture" style="width: 50px; height: 50px;">
+                                                <img src="{{ asset($product->img) }}"
+                                                    class="img-fluid img-thumbnail exclude-print" alt="product picture"
+                                                    style="width: 50px; height: 50px;">
                                             </td>
                                             <td class="name-column">{{ $product->name }}</td>
+                                            <td class="description-column">{{ $product->description }}</td>
                                             <td class="variant-column">{{ $product->variant->name }}</td>
                                             <td class="price-column">{{ $product->price }}</td>
                                             <td class="stock-column"> {{ $product->stocks }}</td>
@@ -288,11 +304,13 @@
                                                         aria-labelledby="actionsDropdown">
                                                         <a class="dropdown-item exclude-print"
                                                             href="{{ route('admin.products.show', ['id' => $product->id]) }}">View</a>
-                                                        <button type="button" class="dropdown-item edit-btn exclude-print"
+                                                        <button type="button"
+                                                            class="dropdown-item edit-btn exclude-print"
                                                             data-product-id="{{ $product->id }}">
                                                             Edit
                                                         </button>
-                                                        <button type="button" class="dropdown-item status-btn exclude-print"
+                                                        <button type="button"
+                                                            class="dropdown-item status-btn exclude-print"
                                                             data-product-id="{{ $product->id }}">{{ $product->status == 'AVAILABLE' ? 'Deactivate' : 'Activate' }}</button>
                                                         <button class="dropdown-item stocks-btn exclude-print"
                                                             data-product-id="{{ $product->id }}" type="button">Add
@@ -460,6 +478,9 @@
                         },
                         {
                             className: 'name-column'
+                        },
+                         {
+                            className: 'description-column'
                         },
                         {
                             className: 'variant-column'
@@ -642,6 +663,11 @@
                                 className: 'name-column'
                             },
                             {
+                                data: 'description',
+                                title: 'DESCRIPTION',
+                                className: 'description-column'
+                            },
+                            {
                                 data: 'variant.name',
                                 title: 'VARIANT',
                                 className: 'variant-column'
@@ -765,6 +791,7 @@
                     var row = $(this).closest('tr');
                     var productId = row.find('.edit-btn').data('product-id');
                     var name = row.find('.name-column').text();
+                    var description = row.find('.description-column').text();
                     var price = row.find('.price-column').text();
                     var variant = row.find('.variant-column').text();
 
@@ -772,6 +799,7 @@
                     $('#editProductModal').data('row', row); // Store the current row in the modal data
                     $('#editProductId').val(productId);
                     $('#editName').val(name);
+                    $('#editDescription').val(description);
                     $('#editPrice').val(price);
                     $('#editVariant').val(variant);
 
