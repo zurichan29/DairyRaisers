@@ -391,6 +391,26 @@
         }
 
         $(document).ready(function() {
+            $('#loading-animation-id').hide();
+            
+            $('#formFile').on('change', function() {
+                var fileInput = this;
+                var file = fileInput.files[0];
+                console.log('asd');
+                // Call the function to extract the reference number
+                extractReferenceNumber(file)
+                    .then(function(referenceNumberWithoutSpaces) {
+                        // Assign the extracted reference number to an input text field
+                        // Replace 'input-text-id' with the ID or selector of your input text field
+                        console.log(referenceNumberWithoutSpaces);
+                        $('#reference_number').val(referenceNumberWithoutSpaces);
+                    })
+                    .catch(function(error) {
+                        // Handle the error if extraction fails
+                        console.error(error);
+                    });
+            });
+
             $("[data-fancybox]").fancybox({
                 thumbs: {
                     autoStart: true,
@@ -402,23 +422,6 @@
                     'fullScreen',
                     'close'
                 ]
-            });
-            $('#loading-animation-id').hide();
-            $('#formFile').on('change', function() {
-                var fileInput = this;
-                var file = fileInput.files[0];
-
-                // Call the function to extract the reference number
-                extractReferenceNumber(file)
-                    .then(function(referenceNumberWithoutSpaces) {
-                        // Assign the extracted reference number to an input text field
-                        // Replace 'input-text-id' with the ID or selector of your input text field
-                        $('#reference_number').val(referenceNumberWithoutSpaces);
-                    })
-                    .catch(function(error) {
-                        // Handle the error if extraction fails
-                        console.error(error);
-                    });
             });
         });
     </script>
