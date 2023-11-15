@@ -210,7 +210,7 @@
                                                 <img src="{{ asset($product->img) }}" class="img-fluid image-hover"
                                                     style="height: 220px" alt="product picture">
                                                 <div class="text-description">
-                                                    jhagsdhagsdahgjsahgdajdhgajdhgasjdhagdjahgdajhg{{ $product->description }}
+                                                    {{ $product->description }}
                                                 </div>
                                                 <!-- Add your product description here -->
                                             </div>

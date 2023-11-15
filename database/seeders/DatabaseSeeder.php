@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
 
         PaymentMethod::Create([
             'type' => 'Gcash',
+            'img' => 'images/payment_method/gcash_barcode.jpg',
             'account_name' => 'Christian Jay Jacalne',
             'account_number' => '09262189072',
             'status' => 'ACTIVATED'

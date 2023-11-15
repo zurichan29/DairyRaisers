@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
+   
     <script src="https://kit.fontawesome.com/95c5b29ec4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link href="{{ asset('css/sb-admin-2/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -22,6 +22,10 @@
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('js/toastr.min.js') }}"></script>
+
+     <link rel="stylesheet" href="{{ asset('css/fancybox.min.css') }}" />
+    <script src="{{ asset('js/fancybox.min.js') }}"></script>
+    
     <script>
         function NotifyUser(status, title, message, noTimePeriod = false) {
             console.log(noTimePeriod);
@@ -180,7 +184,9 @@
 
                     @auth
                         <div id="user-name">
-                            <a href="{{ route('profile') }}" class="btn btn-sm btn-dark"><span>{{ auth()->user()->first_name }}</span><i class="fa-solid fa-user-gear"></i></a>
+                            <a href="{{ route('profile') }}"
+                                class="btn btn-sm btn-dark"><span>{{ auth()->user()->first_name }}</span><i
+                                    class="fa-solid fa-user-gear"></i></a>
                         </div>
                     @else
                         <!-- Register and Login Buttons -->

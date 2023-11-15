@@ -391,7 +391,6 @@
         }
 
         $(document).ready(function() {
-            $('#loading-animation-id').hide();
             $("[data-fancybox]").fancybox({
                 thumbs: {
                     autoStart: true,
@@ -404,6 +403,7 @@
                     'close'
                 ]
             });
+            $('#loading-animation-id').hide();
             $('#formFile').on('change', function() {
                 var fileInput = this;
                 var file = fileInput.files[0];

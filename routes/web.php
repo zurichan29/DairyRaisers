@@ -1,12 +1,6 @@
 <?php
-
-use App\Models\Buffalo;
-use App\Events\OrderNotification;
-
 // ADMIN
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BarGraphController;
 use App\Http\Controllers\Admin\DairyController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Client\AuthController;
@@ -15,7 +9,6 @@ use App\Http\Controllers\Client\PageController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\CsvExportController;
 use App\Http\Controllers\Admin\DeliveryFeeController;
 
 
@@ -138,10 +131,6 @@ Route::post('/administrator/password/email', [AuthController::class, 'sendResetL
 Route::get('/administrator/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('admin.password.reset');
 Route::post('/administrator/password/reset', [AuthController::class, 'resetAdminPassword'])->name('admin.password.new');
 
-// Route::get('/administrator/password/reset', [AuthController::class, 'admin_reset_password'])->name('login.administrator.reset-password');
-// Route::post('/administrator/password/reset/validate', [AuthController::class, 'admin_validate_rp'])->name('login.administrator.reset-password.validate');
-// Route::get('/administrator/password/reset', [AuthController::class, 'reset_password_admin'])->name('login.administrator.new-password');
-
 // DASHBOARD
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 Route::get('/admin/dashboard/download-chart', [DashboardController::class, 'downloadChart'])->name('admin.dashboard.download-chart');
@@ -183,7 +172,7 @@ Route::group(['middleware' => 'check.access:products'], function () {
     Route::post('/admin/variants/store', [VariantController::class, 'store'])->name('admin.variants.store');
     Route::post('/admin/variants/update', [VariantController::class, 'update'])->name('admin.variants.update');
 });
-use App\Models\DeliveryFee;
+
 // ORDERS
 Route::group(['middleware' => 'check.access:orders'], function () {
     Route::get('/admin/orders', [OrderManagement::class, 'index'])->name('admin.orders.index');
@@ -208,7 +197,6 @@ Route::group(['middleware' => 'check.access:orders'], function () {
     Route::put('/admin/orders/{id}/pickup', [OrderManagement::class, 'pickUp'])->name('admin.orders.pick_up');
     Route::put('/admin/orders/{id}/delivered', [OrderManagement::class, 'delivered'])->name('admin.orders.delivered');
     Route::put('/admin/orders/{id}/reject', [OrderManagement::class, 'reject'])->name('admin.orders.reject');
-    
 
     Route::post('/admin/orders/manage-delivery-fee/data', [DeliveryFeeController::class, 'data'])->name('admin.delivery_fee.data');
     Route::post('/admin/orders/manage-delivery-fee/get-municipality', [DeliveryFeeController::class, 'get'])->name('admin.delivery_fee.get-municipality');

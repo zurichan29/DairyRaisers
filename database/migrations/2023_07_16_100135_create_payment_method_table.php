@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('payment_method', function (Blueprint $table) {
             $table->id();
             $table->string('type');
+            $table->string('img')->nullable();
             $table->string('account_name');
             $table->string('account_number');
             $table->string('status');
